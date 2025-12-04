@@ -190,9 +190,17 @@ async def voice_clone(
     
     # Save uploaded voice sample temporarily
     file_content = await file.read()
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_voice:
+    
+    # Determine file extension from original filename
+    original_filename = file.filename or "audio.wav"
+    file_ext = Path(original_filename).suffix.lower() or ".wav"
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp_voice:
         tmp_voice.write(file_content)
         voice_sample_path = tmp_voice.name
+    
+    # Path for converted WAV file
+    wav_sample_path = voice_sample_path.replace(file_ext, ".wav")
     
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_output:
         output_path = tmp_output.name
@@ -204,7 +212,7 @@ async def voice_clone(
                 import soundfile as sf
                 import numpy as np
                 
-                # Try to read the audio file
+                # Try to read the audio file (handles MP3, WAV, etc.)
                 logger.info("Validating audio file: %s", voice_sample_path)
                 audio_data, sr = sf.read(voice_sample_path)
                 
@@ -217,9 +225,12 @@ async def voice_clone(
                     import librosa
                     audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=22050)
                 
-                # Save the normalized audio
-                sf.write(voice_sample_path, audio_data, 22050)
-                logger.info("Audio file validated and normalized")
+                # Ensure float32 dtype
+                audio_data = audio_data.astype(np.float32)
+                
+                # Save as WAV file
+                sf.write(wav_sample_path, audio_data, 22050)
+                logger.info("Audio file validated and normalized to: %s", wav_sample_path)
             except Exception as err:
                 logger.exception("Audio validation failed: %s", err)
                 raise HTTPException(status_code=400, detail=f"Invalid audio file: {str(err)}") from err
@@ -243,40 +254,40 @@ async def voice_clone(
         # Synthesize with voice cloning using the uploaded voice sample
         def _clone_voice():
             try:
-                import soundfile as sf
-                import numpy as np
-                
-                logger.info("Synthesizing with speaker_wav: %s", voice_sample_path)
-                
-                # Load the speaker wav file as numpy array
-                speaker_wav, sr = sf.read(voice_sample_path)
-                if len(speaker_wav.shape) > 1:
-                    speaker_wav = np.mean(speaker_wav, axis=1)
-                
-                # Ensure it's float32
-                speaker_wav = speaker_wav.astype(np.float32)
-                
-                logger.info("Speaker wav shape: %s, dtype: %s", speaker_wav.shape, speaker_wav.dtype)
+                logger.info("Synthesizing with speaker_wav: %s", wav_sample_path)
                 
                 # Use speaker_wav parameter for voice cloning
-                # This extracts speaker embedding from the provided audio
+                # Pass the file path (not numpy array) to avoid boolean check issues
                 engine.tts_to_file(
                     text=text,
-                    speaker_wav=speaker_wav,
+                    speaker_wav=wav_sample_path,
                     file_path=output_path,
                     gpu=False
                 )
                 logger.info("Voice synthesis succeeded")
             except Exception as err:
                 logger.exception("Voice synthesis failed: %s", err)
-                # If speaker_wav fails, try with default speaker as fallback
+                # If speaker_wav fails, try with a speaker from the model
                 try:
                     logger.info("Fallback: Synthesizing with default speaker")
-                    engine.tts_to_file(
-                        text=text,
-                        file_path=output_path,
-                        gpu=False
-                    )
+                    # Get available speakers from the model
+                    speakers = engine.speakers
+                    if speakers and len(speakers) > 0:
+                        default_speaker = speakers[0]
+                        logger.info("Using default speaker: %s", default_speaker)
+                        engine.tts_to_file(
+                            text=text,
+                            speaker=default_speaker,
+                            file_path=output_path,
+                            gpu=False
+                        )
+                    else:
+                        # Single speaker model
+                        engine.tts_to_file(
+                            text=text,
+                            file_path=output_path,
+                            gpu=False
+                        )
                     logger.info("Voice synthesis succeeded with fallback")
                 except Exception as fallback_err:
                     logger.exception("Fallback synthesis also failed: %s", fallback_err)
@@ -284,6 +295,7 @@ async def voice_clone(
         
         await run_in_threadpool(_clone_voice)
         _schedule_cleanup(background_tasks, voice_sample_path)
+        _schedule_cleanup(background_tasks, wav_sample_path)
         _schedule_cleanup(background_tasks, output_path)
         
         filename = f"voice_clone_{language}.wav"
