@@ -198,6 +198,34 @@ async def voice_clone(
         output_path = tmp_output.name
     
     try:
+        # Validate and convert audio file to proper format
+        def _validate_audio():
+            try:
+                import soundfile as sf
+                import numpy as np
+                
+                # Try to read the audio file
+                logger.info("Validating audio file: %s", voice_sample_path)
+                audio_data, sr = sf.read(voice_sample_path)
+                
+                # Ensure audio is mono or convert to mono
+                if len(audio_data.shape) > 1:
+                    audio_data = np.mean(audio_data, axis=1)
+                
+                # Resample to 22050 Hz if needed (standard for TTS)
+                if sr != 22050:
+                    import librosa
+                    audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=22050)
+                
+                # Save the normalized audio
+                sf.write(voice_sample_path, audio_data, 22050)
+                logger.info("Audio file validated and normalized")
+            except Exception as err:
+                logger.exception("Audio validation failed: %s", err)
+                raise HTTPException(status_code=400, detail=f"Invalid audio file: {str(err)}") from err
+        
+        await run_in_threadpool(_validate_audio)
+        
         # Map language to model and speaker
         language_config = {
             "fa": {"model": "tts_models/fa/cv/vits", "speaker": "default"},

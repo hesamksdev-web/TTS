@@ -1,19 +1,43 @@
 root@Automations:/opt/TTS# docker-compose -f docker-compose.prod.yml logs
-tts-db  |
-tts-db  | PostgreSQL Database directory appears to contain a database; Skipping initialization
-tts-db  |
-tts-db  | 2025-12-04 15:54:31.645 UTC [1] LOG:  starting PostgreSQL 15.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
-tts-db  | 2025-12-04 15:54:31.645 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
-tts-db  | 2025-12-04 15:54:31.645 UTC [1] LOG:  listening on IPv6 address "::", port 5432
-tts-db  | 2025-12-04 15:54:31.648 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
-tts-db  | 2025-12-04 15:54:31.654 UTC [28] LOG:  database system was shut down at 2025-12-04 15:54:24 UTC
-tts-db  | 2025-12-04 15:54:31.662 UTC [1] LOG:  database system is ready to accept connections
 tts-frontend  |
 tts-frontend  | > frontend@0.1.0 start
+tts-frontend  | > next start
+tts-frontend  |
+tts-frontend  |    ▲ Next.js 16.0.6
+tts-frontend  |    - Local:         http://localhost:3000
+tts-frontend  |    - Network:       http://172.18.0.5:3000
+tts-frontend  |
+tts-frontend  |  ✓ Starting...
+tts-frontend  |  ✓ Ready in 317ms
+caddy-proxy   | {"level":"info","ts":1764864911.3327165,"msg":"maxprocs: Leaving GOMAXPROCS=4: CPU quota undefined"}
+caddy-proxy   | {"level":"info","ts":1764864911.3328705,"msg":"GOMEMLIMIT is updated","package":"github.com/KimMachineGun/automemlimit/memlimit","GOMEMLIMIT":7314967756,"previous":9223372036854775807}
+caddy-proxy   | {"level":"info","ts":1764864911.3328943,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+caddy-proxy   | {"level":"info","ts":1764864911.3342323,"msg":"adapted config to JSON","adapter":"caddyfile"}
+caddy-proxy   | {"level":"warn","ts":1764864911.334246,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/etc/caddy/Caddyfile","line":3}
+caddy-proxy   | {"level":"warn","ts":1764864911.3348033,"logger":"admin","msg":"admin endpoint disabled"}
+caddy-proxy   | {"level":"info","ts":1764864911.3349912,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
+caddy-proxy   | {"level":"info","ts":1764864911.3350904,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc000414f00"}
+caddy-proxy   | {"level":"warn","ts":1764864911.3356276,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+caddy-proxy   | {"level":"warn","ts":1764864911.3357563,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+caddy-proxy   | {"level":"info","ts":1764864911.3357615,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+caddy-proxy     | {"level":"info","ts":1764864911.3361652,"msg":"autosaved config (load with --resume flag)","file":"/config/caddy/autosave.json"}
+caddy-proxy     | {"level":"info","ts":1764864911.3362136,"msg":"serving initial configuration"}
+caddy-proxy     | {"level":"info","ts":1764864911.3379276,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/data/caddy","instance":"d8065e38-ac18-4c56-9718-355cfc33b1f3","try_again":1764951311.3379266,"try_again_in":86399.999999639}
+caddy-proxy     | {"level":"info","ts":1764864911.337977,"logger":"tls","msg":"finished cleaning storage units"}
 python-service  | /usr/local/lib/python3.10/site-packages/librosa/core/intervals.py:8: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+go-service      | 2025/12/04 16:15:11 Go Service (SaaS Edition) listening on :8080
 python-service  |   from pkg_resources import resource_filename
 python-service  | INFO:     Started server process [1]
 python-service  | INFO:     Waiting for application startup.
+tts-db          |
+tts-db          | PostgreSQL Database directory appears to contain a database; Skipping initialization
+tts-db          |
+tts-db          | 2025-12-04 16:15:00.243 UTC [1] LOG:  starting PostgreSQL 15.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+tts-db          | 2025-12-04 16:15:00.243 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+tts-db          | 2025-12-04 16:15:00.243 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+tts-db          | 2025-12-04 16:15:00.246 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+tts-db          | 2025-12-04 16:15:00.250 UTC [29] LOG:  database system was shut down at 2025-12-04 16:14:53 UTC
+tts-db          | 2025-12-04 16:15:00.255 UTC [1] LOG:  database system is ready to accept connections
 python-service  | INFO:     Application startup complete.
 python-service  | INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
 python-service  |  > Downloading model to /root/.local/share/tts/tts_models--en--vctk--vits
@@ -28,19 +52,10 @@ python-service  |  | > log_func:np.log10
 python-service  |  | > min_level_db:0
 python-service  |  | > frame_shift_ms:None
 python-service  |  | > frame_length_ms:None
-tts-frontend    | > next start
 python-service  |  | > ref_level_db:None
 python-service  |  | > fft_size:1024
-tts-frontend    |
-tts-frontend    |    ▲ Next.js 16.0.6
-tts-frontend    |    - Local:         http://localhost:3000
-tts-frontend    |    - Network:       http://172.18.0.5:3000
-tts-frontend    |
-tts-frontend    |  ✓ Starting...
-tts-frontend    |  ✓ Ready in 343ms
 python-service  |  | > power:None
 python-service  |  | > preemphasis:0.0
-go-service    | 2025/12/04 15:54:42 Go Service (SaaS Edition) listening on :8080
 python-service  |  | > griffin_lim_iters:None
 python-service  |  | > signal_norm:None
 python-service  |  | > symmetric_norm:None
@@ -60,28 +75,15 @@ python-service  |  | > do_amp_to_db_mel:True
 python-service  |  | > do_rms_norm:False
 python-service  |  | > db_level:None
 python-service  |  | > stats_path:None
-caddy-proxy     | {"level":"info","ts":1764863682.7844183,"msg":"maxprocs: Leaving GOMAXPROCS=4: CPU quota undefined"}
-caddy-proxy     | {"level":"info","ts":1764863682.7845788,"msg":"GOMEMLIMIT is updated","package":"github.com/KimMachineGun/automemlimit/memlimit","GOMEMLIMIT":7314967756,"previous":9223372036854775807}
-caddy-proxy     | {"level":"info","ts":1764863682.7846112,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
-caddy-proxy     | {"level":"info","ts":1764863682.7858505,"msg":"adapted config to JSON","adapter":"caddyfile"}
-caddy-proxy     | {"level":"warn","ts":1764863682.7858849,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/etc/caddy/Caddyfile","line":3}
-caddy-proxy     | {"level":"warn","ts":1764863682.7862172,"logger":"admin","msg":"admin endpoint disabled"}
 python-service  |  | > base:10
 python-service  |  | > hop_length:256
 python-service  |  | > win_length:1024
 python-service  |  > initialization of speaker-embedding layers.
 python-service  |  > Text splitted to sentences.
 python-service  | ['hi this is test']
- 96%|█████████▋| 142M/148M [00:01<00:00, 83.9MiB/s]ERROR:tts_service:Voice cloning with speaker_wav failed: conv1d() received an invalid combination of arguments - got (NoneType, Parameter, Parameter, tuple, tuple, tuple, int), but expected one of:
+ 96%|█████████▌| 141M/148M [00:01<00:00, 79.1MiB/s]ERROR:tts_service:Voice synthesis failed: conv1d() received an invalid combination of arguments - got (NoneType, Parameter, Parameter, tuple, tuple, tuple, int), but expected one of:
 python-service  |  * (Tensor input, Tensor weight, Tensor bias = None, tuple of ints stride = 1, tuple of ints padding = 0, tuple of ints dilation = 1, int groups = 1)
 python-service  |       didn't match because some of the arguments have invalid types: (!NoneType!, !Parameter!, !Parameter!, !tuple of (int,)!, !tuple of (int,)!, !tuple of (int,)!, !int!)
-caddy-proxy     | {"level":"info","ts":1764863682.786398,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
-caddy-proxy     | {"level":"info","ts":1764863682.7864742,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc000151200"}
-caddy-proxy     | {"level":"warn","ts":1764863682.7869244,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
-caddy-proxy     | {"level":"warn","ts":1764863682.7869563,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
-caddy-proxy     | {"level":"info","ts":1764863682.78697,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
-caddy-proxy     | {"level":"info","ts":1764863682.7872524,"msg":"autosaved config (load with --resume flag)","file":"/config/caddy/autosave.json"}
-caddy-proxy     | {"level":"info","ts":1764863682.7872918,"msg":"serving initial configuration"}
 python-service  |  * (Tensor input, Tensor weight, Tensor bias = None, tuple of ints stride = 1, str padding = "valid", tuple of ints dilation = 1, int groups = 1)
 python-service  |       didn't match because some of the arguments have invalid types: (!NoneType!, !Parameter!, !Parameter!, !tuple of (int,)!, !tuple of (int,)!, !tuple of (int,)!, !int!)
 python-service  | Traceback (most recent call last):
@@ -144,8 +146,6 @@ python-service  |     return self._call_impl(*args, **kwargs)
 python-service  |   File "/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
 python-service  |     return forward_call(*args, **kwargs)
 python-service  |   File "/usr/local/lib/python3.10/site-packages/TTS/vocoder/models/hifigan_generator.py", line 251, in forward
-caddy-proxy     | {"level":"info","ts":1764863682.7895477,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/data/caddy","instance":"d8065e38-ac18-4c56-9718-355cfc33b1f3","try_again":1764950082.7895436,"try_again_in":86399.999999649}
-caddy-proxy     | {"level":"info","ts":1764863682.7897065,"logger":"tls","msg":"finished cleaning storage units"}
 python-service  |     o = o + self.cond_layer(g)
 python-service  |   File "/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
 python-service  |     return self._call_impl(*args, **kwargs)
@@ -176,12 +176,12 @@ python-service  |     return await future
 python-service  |   File "/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 986, in run
 python-service  |     result = context.run(func, *args)
 python-service  |   File "/app/app/main.py", line 228, in _clone_voice
-python-service  |     raise HTTPException(status_code=500, detail=f"Voice cloning failed: {str(err)}") from err
-python-service  | fastapi.exceptions.HTTPException: 500: Voice cloning failed: conv1d() received an invalid combination of arguments - got (NoneType, Parameter, Parameter, tuple, tuple, tuple, int), but expected one of:
+python-service  |     raise HTTPException(status_code=500, detail=f"Voice synthesis failed: {str(err)}") from err
+python-service  | fastapi.exceptions.HTTPException: 500: Voice synthesis failed: conv1d() received an invalid combination of arguments - got (NoneType, Parameter, Parameter, tuple, tuple, tuple, int), but expected one of:
 python-service  |  * (Tensor input, Tensor weight, Tensor bias = None, tuple of ints stride = 1, tuple of ints padding = 0, tuple of ints dilation = 1, int groups = 1)
 python-service  |       didn't match because some of the arguments have invalid types: (!NoneType!, !Parameter!, !Parameter!, !tuple of (int,)!, !tuple of (int,)!, !tuple of (int,)!, !int!)
 python-service  |  * (Tensor input, Tensor weight, Tensor bias = None, tuple of ints stride = 1, str padding = "valid", tuple of ints dilation = 1, int groups = 1)
 python-service  |       didn't match because some of the arguments have invalid types: (!NoneType!, !Parameter!, !Parameter!, !tuple of (int,)!, !tuple of (int,)!, !tuple of (int,)!, !int!)
 python-service  |
-python-service  | INFO:     172.18.0.4:58986 - "POST /voice-clone HTTP/1.1" 500 Internal Server Error
+python-service  | INFO:     172.18.0.4:52262 - "POST /voice-clone HTTP/1.1" 500 Internal Server Error
 root@Automations:/opt/TTS#
