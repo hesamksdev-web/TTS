@@ -214,11 +214,25 @@ async def voice_clone(
         def _clone_voice():
             try:
                 # Use the reference audio for speaker embedding
+                # For VITS models, speaker_wav parameter enables voice cloning
                 engine.tts_to_file(
                     text=text,
                     speaker_wav=voice_sample_path,
-                    file_path=output_path
+                    file_path=output_path,
+                    gpu=False
                 )
+            except TypeError as err:
+                # Fallback: Some models don't support speaker_wav, use default speaker
+                logger.warning("Voice cloning with speaker_wav failed, using default speaker: %s", err)
+                try:
+                    engine.tts_to_file(
+                        text=text,
+                        file_path=output_path,
+                        gpu=False
+                    )
+                except Exception as fallback_err:
+                    logger.exception("Fallback synthesis also failed")
+                    raise HTTPException(status_code=500, detail="Voice cloning failed") from fallback_err
             except Exception as err:
                 logger.exception("Voice cloning synthesis failed")
                 raise HTTPException(status_code=500, detail="Voice cloning failed") from err
