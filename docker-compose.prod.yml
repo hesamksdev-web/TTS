@@ -121,18 +121,18 @@ services:
         max-file: "3"
 
   # ========================================================================
-  # Nginx Reverse Proxy & SSL
+  # Caddy Reverse Proxy & SSL
   # ========================================================================
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-proxy
+  caddy:
+    image: caddy:latest
+    container_name: caddy-proxy
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-      - nginx_cache:/var/cache/nginx
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
       - frontend
       - go-service
@@ -151,7 +151,9 @@ services:
 volumes:
   postgres_data:
     driver: local
-  nginx_cache:
+  caddy_data:
+    driver: local
+  caddy_config:
     driver: local
 
 # ============================================================================
