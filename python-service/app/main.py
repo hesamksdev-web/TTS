@@ -276,8 +276,9 @@ async def voice_clone(
         # Map language to model that supports voice cloning
         # Support two model types: your_tts (better quality) and glow_tts (faster)
         if model_type == "your_tts":
+            # YourTTS supports: en, fr-fr, pt-br
             language_config = {
-                "fa": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
+                "fa": {"model": "tts_models/fa/cv/vits"},  # Fallback to language-specific for Farsi
                 "de": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
                 "en": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
             }
@@ -303,8 +304,9 @@ async def voice_clone(
                 logger.info("Synthesizing with speaker_wav: %s, speed: %f, emotion: %s", wav_sample_path, speed_float, emotion)
                 
                 # Use tts_to_file with speaker_wav for voice cloning
-                # YourTTS requires language parameter even with speaker_wav
-                if model_type == "your_tts":
+                # Different models have different requirements
+                if model_type == "your_tts" and language in ["en", "de"]:
+                    # YourTTS with supported languages
                     engine.tts_to_file(
                         text=text,
                         speaker_wav=wav_sample_path,
@@ -312,7 +314,8 @@ async def voice_clone(
                         file_path=output_path,
                         gpu=False
                     )
-                else:  # glow_tts
+                else:
+                    # Language-specific models or Glow-TTS don't need language parameter
                     engine.tts_to_file(
                         text=text,
                         speaker_wav=wav_sample_path,
