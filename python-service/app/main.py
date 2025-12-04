@@ -266,11 +266,11 @@ async def voice_clone(
         await run_in_threadpool(_validate_audio)
         
         # Map language to model that supports voice cloning
-        # YourTTS is specifically designed for voice cloning and supports speaker_wav
+        # Use language-specific models for better pronunciation and clarity
         language_config = {
-            "fa": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
-            "de": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
-            "en": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
+            "fa": {"model": "tts_models/fa/cv/vits"},  # Persian-specific model
+            "de": {"model": "tts_models/de/thorsten/vits"},  # German-specific model
+            "en": {"model": "tts_models/en/ljspeech/vits"},  # English-specific model
         }
         
         config = language_config[language]
@@ -287,12 +287,11 @@ async def voice_clone(
                 
                 logger.info("Synthesizing with speaker_wav: %s, speed: %f, emotion: %s", wav_sample_path, speed_float, emotion)
                 
-                # Use tts_to_file with speaker_wav as file path
-                # YourTTS model supports voice cloning with speaker_wav
+                # Use tts_to_file with speaker_wav for voice cloning
+                # Language-specific models provide better pronunciation
                 engine.tts_to_file(
                     text=text,
                     speaker_wav=wav_sample_path,
-                    language=language,
                     file_path=output_path,
                     gpu=False
                 )
@@ -310,6 +309,14 @@ async def voice_clone(
                     )
                     sf.write(output_path, wav_data_adjusted, sr)
                     logger.info("Speed adjustment applied")
+                
+                # Normalize audio to prevent clipping
+                wav_data, sr = sf.read(output_path)
+                max_val = np.max(np.abs(wav_data))
+                if max_val > 0:
+                    wav_data = wav_data / max_val * 0.95  # Normalize to 95% to avoid clipping
+                    sf.write(output_path, wav_data, sr)
+                    logger.info("Audio normalized")
                 
                 logger.info("Voice synthesis succeeded with speaker_wav")
             except Exception as err:
