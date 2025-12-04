@@ -243,15 +243,28 @@ async def voice_clone(
         # Synthesize with voice cloning using the uploaded voice sample
         def _clone_voice():
             try:
+                import soundfile as sf
+                import numpy as np
+                
                 logger.info("Synthesizing with speaker_wav: %s", voice_sample_path)
+                
+                # Load the speaker wav file as numpy array
+                speaker_wav, sr = sf.read(voice_sample_path)
+                if len(speaker_wav.shape) > 1:
+                    speaker_wav = np.mean(speaker_wav, axis=1)
+                
+                # Ensure it's float32
+                speaker_wav = speaker_wav.astype(np.float32)
+                
+                logger.info("Speaker wav shape: %s, dtype: %s", speaker_wav.shape, speaker_wav.dtype)
+                
                 # Use speaker_wav parameter for voice cloning
                 # This extracts speaker embedding from the provided audio
                 engine.tts_to_file(
                     text=text,
-                    speaker_wav=voice_sample_path,
+                    speaker_wav=speaker_wav,
                     file_path=output_path,
-                    gpu=False,
-                    verbose=True
+                    gpu=False
                 )
                 logger.info("Voice synthesis succeeded")
             except Exception as err:
