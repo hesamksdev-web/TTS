@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"os/exec"
@@ -132,6 +133,7 @@ func main() {
 	mux.HandleFunc("/api/v1/synthesize", authMiddleware(synthesizeHandler))
 	mux.HandleFunc("/api/v1/synthesize-trained", authMiddleware(synthesizeTrainedHandler))
 	mux.HandleFunc("/api/v1/trained-models", authMiddleware(listTrainedModelsHandler))
+	mux.HandleFunc("/api/v1/voice-clone", authMiddleware(voiceCloneHandler))
 
 	mux.HandleFunc("/api/v1/admin/users", adminMiddleware(handleListUsers))
 	mux.HandleFunc("/api/v1/admin/approve", adminMiddleware(handleApproveUser))
@@ -389,6 +391,88 @@ func listTrainedModelsHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 	if _, err := w.Write(respBody); err != nil {
 		log.Printf("failed to write response body: %v", err)
+	}
+}
+
+func voiceCloneHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	if err := r.ParseMultipartForm(50 << 20); err != nil {
+		writeError(w, http.StatusBadRequest, "failed to parse form data")
+		return
+	}
+
+	text := strings.TrimSpace(r.FormValue("text"))
+	language := strings.TrimSpace(r.FormValue("language"))
+	if text == "" || language == "" {
+		writeError(w, http.StatusBadRequest, "text and language are required")
+		return
+	}
+
+	file, handler, err := r.FormFile("audio")
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "audio file is required")
+		return
+	}
+	defer file.Close()
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "failed to read audio file")
+		return
+	}
+
+	// Create multipart request to Python service
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	// Add text field
+	if err := writer.WriteField("text", text); err != nil {
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	// Add language field
+	if err := writer.WriteField("language", language); err != nil {
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	// Add file field
+	part, err := writer.CreateFormFile("file", handler.Filename)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	if _, err := part.Write(fileBytes); err != nil {
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	writer.Close()
+
+	proxyReq, err := http.NewRequest(http.MethodPost, PYTHON_SERVICE_URL+"/voice-clone", body)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	proxyReq.Header.Set("Content-Type", writer.FormDataContentType())
+
+	resp, err := httpClient.Do(proxyReq)
+	if err != nil {
+		log.Printf("python service request failed: %v", err)
+		writeError(w, http.StatusBadGateway, "python service unavailable")
+		return
+	}
+	defer resp.Body.Close()
+
+	w.Header().Set("Content-Type", "audio/wav")
+	w.WriteHeader(resp.StatusCode)
+	if _, err := io.Copy(w, resp.Body); err != nil {
+		log.Printf("failed to write response: %v", err)
 	}
 }
 

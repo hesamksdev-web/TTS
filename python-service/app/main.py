@@ -135,6 +135,11 @@ class SynthesizeTrainedRequest(BaseModel):
     job_id: str = Field(..., min_length=1, description="Training job ID (e.g., my_dataset_20251204145511)")
 
 
+class VoiceCloneRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=5000)
+    language: str = Field(..., description="Language code: fa (Farsi), de (German), en (English)")
+
+
 @app.post("/tts-trained", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech from trained model"}})
 async def synthesize_trained(payload: SynthesizeTrainedRequest, background_tasks: BackgroundTasks):
     """Synthesize audio using a trained model"""
@@ -165,6 +170,62 @@ async def synthesize_trained(payload: SynthesizeTrainedRequest, background_tasks
     except Exception as err:
         logger.exception("Synthesis from trained model failed")
         raise HTTPException(status_code=500, detail="Synthesis failed") from err
+
+
+@app.post("/voice-clone", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech with cloned voice"}})
+async def voice_clone(file: bytes = None, text: str = None, language: str = None, background_tasks: BackgroundTasks = None):
+    """Clone a voice from uploaded audio and synthesize text"""
+    if not file or not text or not language:
+        raise HTTPException(status_code=400, detail="file, text, and language are required")
+    
+    if language not in ["fa", "de", "en"]:
+        raise HTTPException(status_code=400, detail="language must be 'fa', 'de', or 'en'")
+    
+    logger.info("Voice cloning request: language=%s, text_length=%d", language, len(text))
+    
+    # Save uploaded voice sample temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_voice:
+        tmp_voice.write(file)
+        voice_sample_path = tmp_voice.name
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_output:
+        output_path = tmp_output.name
+    
+    try:
+        # Map language to model
+        language_models = {
+            "fa": "tts_models/fa/cv/vits",
+            "de": "tts_models/de/thorsten/vits",
+            "en": "tts_models/en/vctk/vits",
+        }
+        
+        model_name = language_models[language]
+        logger.info("Loading model: %s", model_name)
+        engine = get_tts_engine(model_name)
+        
+        # Synthesize with voice cloning
+        # Note: Voice cloning in TTS requires speaker embedding from the reference audio
+        def _clone_voice():
+            try:
+                # Use the reference audio for speaker embedding
+                engine.tts_to_file(
+                    text=text,
+                    speaker_wav=voice_sample_path,
+                    file_path=output_path
+                )
+            except Exception as err:
+                logger.exception("Voice cloning synthesis failed")
+                raise HTTPException(status_code=500, detail="Voice cloning failed") from err
+        
+        await run_in_threadpool(_clone_voice)
+        _schedule_cleanup(background_tasks, voice_sample_path)
+        _schedule_cleanup(background_tasks, output_path)
+        
+        filename = f"voice_clone_{language}.wav"
+        return FileResponse(path=output_path, media_type="audio/wav", filename=filename)
+    except Exception as err:
+        logger.exception("Voice cloning failed")
+        raise HTTPException(status_code=500, detail="Voice cloning failed") from err
 
 
 @app.get("/trained-models")

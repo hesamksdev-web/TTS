@@ -36,6 +36,12 @@ export default function Dashboard() {
   const [synthesisMode, setSynthesisMode] = useState<"pretrained" | "trained">("pretrained");
   const [trainedJobId, setTrainedJobId] = useState("");
   const [trainedModels, setTrainedModels] = useState<Array<{ job_id: string; model_path: string }>>([]);
+  
+  // Voice Clone states
+  const [voiceCloneFile, setVoiceCloneFile] = useState<File | null>(null);
+  const [voiceCloneLanguage, setVoiceCloneLanguage] = useState("fa");
+  const [voiceCloneText, setVoiceCloneText] = useState("سلام، این یک نمونه از صدای شما است.");
+  const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
 
   const speakers = [
     { id: "fa_cv", label: "🌍 Persian (Farsi) - Pre-trained" },
@@ -162,6 +168,39 @@ export default function Dashboard() {
       toast.success("Audio generated successfully!");
     } catch (error: any) {
       setStatus("❌ Generation failed");
+      toast.error(getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVoiceClone = async () => {
+    if (!voiceCloneFile) {
+      toast.error("Please select an audio file");
+      return;
+    }
+
+    setLoading(true);
+    setStatus("🎙️ Cloning voice...");
+    setClonedAudioUrl(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("audio", voiceCloneFile);
+      formData.append("text", voiceCloneText);
+      formData.append("language", voiceCloneLanguage);
+
+      const res = await axios.post(`${API_BASE_URL}/voice-clone`, formData, {
+        ...getHeaders(),
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      setClonedAudioUrl(url);
+      setStatus("✅ Voice cloned successfully!");
+      toast.success("Voice cloned successfully!");
+    } catch (error: any) {
+      setStatus("❌ Voice cloning failed");
       toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
@@ -401,6 +440,84 @@ export default function Dashboard() {
                   <audio
                     controls
                     src={audioUrl}
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Voice Clone Section */}
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="border-b border-slate-200 bg-slate-50">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Mic className="w-5 h-5 text-purple-600" />
+                Voice Clone
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Language
+                </label>
+                <select
+                  value={voiceCloneLanguage}
+                  onChange={(e) => setVoiceCloneLanguage(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  <option value="fa">🇮🇷 Persian (Farsi)</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="de">🇩🇪 German</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Voice Sample (Audio File)
+                </label>
+                <Input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(e) => setVoiceCloneFile(e.target.files?.[0] || null)}
+                  className="border-slate-200"
+                />
+                {voiceCloneFile && (
+                  <p className="text-xs text-slate-500 mt-2">
+                    Selected: {voiceCloneFile.name}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Text to Speak
+                </label>
+                <textarea
+                  placeholder="Enter text to be spoken with cloned voice"
+                  value={voiceCloneText}
+                  onChange={(e) => setVoiceCloneText(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  rows={4}
+                />
+              </div>
+
+              <Button
+                onClick={handleVoiceClone}
+                disabled={loading}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+              >
+                <Mic className="w-4 h-4 mr-2" />
+                Clone Voice
+              </Button>
+
+              {clonedAudioUrl && (
+                <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <p className="text-xs font-medium text-purple-600 mb-3 uppercase tracking-wider">
+                    Cloned Voice Output
+                  </p>
+                  <audio
+                    controls
+                    src={clonedAudioUrl}
                     className="w-full"
                   />
                 </div>
