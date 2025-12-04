@@ -176,7 +176,7 @@ async def synthesize_trained(payload: SynthesizeTrainedRequest, background_tasks
 
 @app.post("/voice-clone", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech with cloned voice"}})
 async def voice_clone(
-    file: UploadFile = File(...),
+    audio: UploadFile = File(...),
     text: str = Form(...),
     language: str = Form(...),
     speed: float = Form(1.0),
@@ -184,8 +184,8 @@ async def voice_clone(
     background_tasks: BackgroundTasks = None
 ):
     """Clone a voice from uploaded audio and synthesize text with optional speed and emotion control"""
-    if not file or not text or not language:
-        raise HTTPException(status_code=400, detail="file, text, and language are required")
+    if not audio or not text or not language:
+        raise HTTPException(status_code=400, detail="audio, text, and language are required")
     
     # Validate speed parameter
     if speed < 0.5 or speed > 2.0:
@@ -202,10 +202,10 @@ async def voice_clone(
     logger.info("Voice cloning request: language=%s, text_length=%d", language, len(text))
     
     # Save uploaded voice sample temporarily
-    file_content = await file.read()
+    file_content = await audio.read()
     
     # Determine file extension from original filename
-    original_filename = file.filename or "audio.wav"
+    original_filename = audio.filename or "audio.wav"
     file_ext = Path(original_filename).suffix.lower() or ".wav"
     
     with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp_voice:
