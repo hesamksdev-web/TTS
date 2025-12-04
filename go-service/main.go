@@ -462,10 +462,21 @@ func proxyJSON(w http.ResponseWriter, targetURL string, payload any) {
 	}
 	defer resp.Body.Close()
 
+	// Read response body
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("failed to read response body: %v", err)
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	// Log response for debugging
+	log.Printf("Python service response: status=%d, body=%s", resp.StatusCode, string(respBody))
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.StatusCode)
-	if _, err := io.Copy(w, resp.Body); err != nil {
-		log.Printf("failed to copy response body: %v", err)
+	if _, err := w.Write(respBody); err != nil {
+		log.Printf("failed to write response body: %v", err)
 	}
 }
 
