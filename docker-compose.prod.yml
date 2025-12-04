@@ -46,6 +46,9 @@ services:
     container_name: go-service
     ports:
       - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./training_runs:/app/training_runs
     environment:
       DB_HOST: postgres
       DB_USER: admin
