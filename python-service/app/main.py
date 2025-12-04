@@ -198,34 +198,35 @@ async def voice_clone(
         output_path = tmp_output.name
     
     try:
-        # Map language to model
-        language_models = {
-            "fa": "tts_models/fa/cv/vits",
-            "de": "tts_models/de/thorsten/vits",
-            "en": "tts_models/en/vctk/vits",
+        # Map language to model and speaker
+        language_config = {
+            "fa": {"model": "tts_models/fa/cv/vits", "speaker": "default"},
+            "de": {"model": "tts_models/de/thorsten/vits", "speaker": "thorsten"},
+            "en": {"model": "tts_models/en/vctk/vits", "speaker": "p225"},
         }
         
-        model_name = language_models[language]
-        logger.info("Loading model: %s", model_name)
+        config = language_config[language]
+        model_name = config["model"]
+        speaker = config["speaker"]
+        
+        logger.info("Loading model: %s with speaker: %s", model_name, speaker)
         engine = get_tts_engine(model_name)
         
         # Synthesize with voice cloning
-        # Note: Voice cloning in TTS requires speaker embedding from the reference audio
+        # Note: For now, we use pre-trained speakers since speaker_wav has compatibility issues
         def _clone_voice():
             try:
-                # Use the reference audio for speaker embedding
-                # For VITS models, speaker_wav parameter enables voice cloning
-                logger.info("Attempting voice cloning with speaker_wav: %s", voice_sample_path)
+                logger.info("Synthesizing with speaker: %s", speaker)
                 engine.tts_to_file(
                     text=text,
-                    speaker_wav=voice_sample_path,
+                    speaker=speaker,
                     file_path=output_path,
                     gpu=False
                 )
-                logger.info("Voice cloning succeeded")
+                logger.info("Voice synthesis succeeded")
             except Exception as err:
-                logger.exception("Voice cloning with speaker_wav failed: %s", err)
-                raise HTTPException(status_code=500, detail=f"Voice cloning failed: {str(err)}") from err
+                logger.exception("Voice synthesis failed: %s", err)
+                raise HTTPException(status_code=500, detail=f"Voice synthesis failed: {str(err)}") from err
         
         await run_in_threadpool(_clone_voice)
         _schedule_cleanup(background_tasks, voice_sample_path)
