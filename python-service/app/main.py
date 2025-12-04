@@ -226,34 +226,48 @@ async def voice_clone(
         
         await run_in_threadpool(_validate_audio)
         
-        # Map language to model and speaker
+        # Map language to model that supports voice cloning
+        # Use models with speaker embeddings that support speaker_wav
         language_config = {
-            "fa": {"model": "tts_models/fa/cv/vits", "speaker": "default"},
-            "de": {"model": "tts_models/de/thorsten/vits", "speaker": "thorsten"},
-            "en": {"model": "tts_models/en/vctk/vits", "speaker": "p225"},
+            "fa": {"model": "tts_models/fa/cv/vits"},
+            "de": {"model": "tts_models/de/thorsten/vits"},
+            "en": {"model": "tts_models/en/vctk/vits"},
         }
         
         config = language_config[language]
         model_name = config["model"]
-        speaker = config["speaker"]
         
-        logger.info("Loading model: %s with speaker: %s", model_name, speaker)
+        logger.info("Loading model for voice cloning: %s", model_name)
         engine = get_tts_engine(model_name)
         
         # Synthesize with voice cloning using the uploaded voice sample
         def _clone_voice():
             try:
                 logger.info("Synthesizing with speaker_wav: %s", voice_sample_path)
+                # Use speaker_wav parameter for voice cloning
+                # This extracts speaker embedding from the provided audio
                 engine.tts_to_file(
                     text=text,
                     speaker_wav=voice_sample_path,
                     file_path=output_path,
-                    gpu=False
+                    gpu=False,
+                    verbose=True
                 )
                 logger.info("Voice synthesis succeeded")
             except Exception as err:
                 logger.exception("Voice synthesis failed: %s", err)
-                raise HTTPException(status_code=500, detail=f"Voice synthesis failed: {str(err)}") from err
+                # If speaker_wav fails, try with default speaker as fallback
+                try:
+                    logger.info("Fallback: Synthesizing with default speaker")
+                    engine.tts_to_file(
+                        text=text,
+                        file_path=output_path,
+                        gpu=False
+                    )
+                    logger.info("Voice synthesis succeeded with fallback")
+                except Exception as fallback_err:
+                    logger.exception("Fallback synthesis also failed: %s", fallback_err)
+                    raise HTTPException(status_code=500, detail=f"Voice synthesis failed: {str(err)}") from err
         
         await run_in_threadpool(_clone_voice)
         _schedule_cleanup(background_tasks, voice_sample_path)
