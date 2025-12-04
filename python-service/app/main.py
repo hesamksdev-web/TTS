@@ -238,11 +238,11 @@ async def voice_clone(
         await run_in_threadpool(_validate_audio)
         
         # Map language to model that supports voice cloning
-        # Use models with speaker embeddings that support speaker_wav
+        # Use Glow-TTS models which support speaker_wav for voice cloning
         language_config = {
-            "fa": {"model": "tts_models/fa/cv/vits"},
-            "de": {"model": "tts_models/de/thorsten/vits"},
-            "en": {"model": "tts_models/en/vctk/vits"},
+            "fa": {"model": "tts_models/fa/cv/glow-tts"},
+            "de": {"model": "tts_models/de/thorsten/glow-tts"},
+            "en": {"model": "tts_models/en/ljspeech/glow-tts"},
         }
         
         config = language_config[language]
@@ -254,57 +254,21 @@ async def voice_clone(
         # Synthesize with voice cloning using the uploaded voice sample
         def _clone_voice():
             try:
-                import soundfile as sf
-                import numpy as np
-                
                 logger.info("Synthesizing with speaker_wav: %s", wav_sample_path)
                 
-                # Load the speaker wav as numpy array for speaker embedding extraction
-                speaker_wav_data, sr = sf.read(wav_sample_path)
-                if len(speaker_wav_data.shape) > 1:
-                    speaker_wav_data = np.mean(speaker_wav_data, axis=1)
-                speaker_wav_data = speaker_wav_data.astype(np.float32)
-                
-                logger.info("Speaker wav data shape: %s, dtype: %s", speaker_wav_data.shape, speaker_wav_data.dtype)
-                
-                # Use the synthesizer directly with speaker_wav
-                # This should extract the speaker embedding from the audio
-                wav = engine.synthesizer.tts(
+                # Use tts_to_file with speaker_wav as file path
+                # Glow-TTS models support speaker_wav for voice cloning
+                engine.tts_to_file(
                     text=text,
-                    speaker_wav=speaker_wav_data,
-                    language=language
+                    speaker_wav=wav_sample_path,
+                    file_path=output_path,
+                    gpu=False
                 )
-                
-                # Save the output
-                sf.write(output_path, wav, 22050)
-                logger.info("Voice synthesis succeeded")
+                logger.info("Voice synthesis succeeded with speaker_wav")
             except Exception as err:
                 logger.exception("Voice synthesis failed with speaker_wav: %s", err)
-                # If speaker_wav fails, try with a speaker from the model
-                try:
-                    logger.info("Fallback: Synthesizing with default speaker")
-                    # Get available speakers from the model
-                    speakers = engine.speakers
-                    if speakers and len(speakers) > 0:
-                        default_speaker = speakers[0]
-                        logger.info("Using default speaker: %s", default_speaker)
-                        engine.tts_to_file(
-                            text=text,
-                            speaker=default_speaker,
-                            file_path=output_path,
-                            gpu=False
-                        )
-                    else:
-                        # Single speaker model
-                        engine.tts_to_file(
-                            text=text,
-                            file_path=output_path,
-                            gpu=False
-                        )
-                    logger.info("Voice synthesis succeeded with fallback")
-                except Exception as fallback_err:
-                    logger.exception("Fallback synthesis also failed: %s", fallback_err)
-                    raise HTTPException(status_code=500, detail=f"Voice synthesis failed: {str(err)}") from err
+                # If speaker_wav fails, raise error
+                raise HTTPException(status_code=500, detail=f"Voice cloning failed: {str(err)}") from err
         
         await run_in_threadpool(_clone_voice)
         _schedule_cleanup(background_tasks, voice_sample_path)
