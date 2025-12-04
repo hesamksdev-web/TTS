@@ -15,7 +15,7 @@ from app.audio_patch import patch_torchaudio, patch_phoneme_dataset
 patch_torchaudio()
 patch_phoneme_dataset()
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
@@ -173,7 +173,12 @@ async def synthesize_trained(payload: SynthesizeTrainedRequest, background_tasks
 
 
 @app.post("/voice-clone", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech with cloned voice"}})
-async def voice_clone(file: bytes = None, text: str = None, language: str = None, background_tasks: BackgroundTasks = None):
+async def voice_clone(
+    file: UploadFile = File(...),
+    text: str = Form(...),
+    language: str = Form(...),
+    background_tasks: BackgroundTasks = None
+):
     """Clone a voice from uploaded audio and synthesize text"""
     if not file or not text or not language:
         raise HTTPException(status_code=400, detail="file, text, and language are required")
@@ -184,8 +189,9 @@ async def voice_clone(file: bytes = None, text: str = None, language: str = None
     logger.info("Voice cloning request: language=%s, text_length=%d", language, len(text))
     
     # Save uploaded voice sample temporarily
+    file_content = await file.read()
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_voice:
-        tmp_voice.write(file)
+        tmp_voice.write(file_content)
         voice_sample_path = tmp_voice.name
     
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_output:
