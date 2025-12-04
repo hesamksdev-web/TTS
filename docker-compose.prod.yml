@@ -44,6 +44,8 @@ services:
       dockerfile: Dockerfile
     image: tts-go-service:latest
     container_name: go-service
+    ports:
+      - "8080:8080"
     environment:
       DB_HOST: postgres
       DB_USER: admin
@@ -76,6 +78,8 @@ services:
       dockerfile: Dockerfile
     image: tts-python-service:latest
     container_name: python-service
+    ports:
+      - "5000:5000"
     volumes:
       - ./data:/app/data
       - ./training_runs:/app/training_runs
