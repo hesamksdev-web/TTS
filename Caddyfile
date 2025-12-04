@@ -9,32 +9,13 @@
 
 # HTTP server - accept all domains
 :80 {
-	# Frontend routes
-	@frontend {
-		not path /api/* /health
-	}
-	
-	handle @frontend {
-		reverse_proxy frontend:3000 {
-			header_uri Host {host}
-			header_uri X-Real-IP {remote_host}
-			header_uri X-Forwarded-For {remote_host}
-			header_uri X-Forwarded-Proto {scheme}
-		}
-	}
-
 	# API routes
 	@api {
 		path /api/*
 	}
 	
 	handle @api {
-		reverse_proxy go-service:8080 {
-			header_uri Host {host}
-			header_uri X-Real-IP {remote_host}
-			header_uri X-Forwarded-For {remote_host}
-			header_uri X-Forwarded-Proto {scheme}
-		}
+		reverse_proxy go-service:8080
 	}
 
 	# Health check
@@ -43,21 +24,11 @@
 	}
 	
 	handle @health {
-		reverse_proxy go-service:8080 {
-			header_uri Host {host}
-			header_uri X-Real-IP {remote_host}
-			header_uri X-Forwarded-For {remote_host}
-			header_uri X-Forwarded-Proto {scheme}
-		}
+		reverse_proxy go-service:8080
 	}
 
 	# Catch-all for frontend
 	handle {
-		reverse_proxy frontend:3000 {
-			header_uri Host {host}
-			header_uri X-Real-IP {remote_host}
-			header_uri X-Forwarded-For {remote_host}
-			header_uri X-Forwarded-Proto {scheme}
-		}
+		reverse_proxy frontend:3000
 	}
 }
