@@ -1,1046 +1,1230 @@
-root@Automations:/opt/TTS# docker-compose -f docker-compose.prod.yml up -d
-[+] Running 7/7
- ✔ Network tts_tts-network   Created                                                                                                                                            0.0s
- ✔ Volume tts_nginx_cache    Created                                                                                                                                            0.0s
- ✔ Container python-service  Started                                                                                                                                            0.6s
- ✔ Container tts-db          Healthy                                                                                                                                           11.1s
- ✔ Container go-service      Started                                                                                                                                           11.2s
- ✔ Container tts-frontend    Started                                                                                                                                           11.3s
- ✔ Container nginx-proxy     Started                                                                                                                                           11.4s
-root@Automations:/opt/TTS# docker ps
-CONTAINER ID   IMAGE                       COMMAND                  CREATED         STATUS                   PORTS                                                                          NAMES
-e85ac3100332   nginx:alpine                "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes             0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp   nginx-proxy
-551720d5f6c4   tts-frontend:latest         "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes             3000/tcp                                                                       tts-frontend
-54598ddb1241   tts-go-service:latest       "./go-service"           4 minutes ago   Up 2 seconds             8080/tcp                                                                       go-service
-1548135cba72   postgres:15-alpine          "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes (healthy)   5432/tcp                                                                       tts-db
-d1e62c5d0aba   tts-python-service:latest   "uvicorn app.main:ap…"   4 minutes ago   Up 4 minutes             5000/tcp                                                                       python-service
-root@Automations:/opt/TTS# client_loop: send disconnect: Connection reset
+root@Automations:/opt/TTS# cat training_runs/my_dataset_20251204145511/train.log
+/usr/local/lib/python3.10/site-packages/librosa/core/intervals.py:8: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+ | > Found 1 files in /app/data/my_dataset
+ > Using model: vits
+ > Setting up Audio Processor...
+ | > sample_rate:22050
+ | > resample:False
+ | > num_mels:80
+ | > log_func:np.log10
+ | > min_level_db:0
+ | > frame_shift_ms:None
+ | > frame_length_ms:None
+ | > ref_level_db:None
+ | > fft_size:1024
+ | > power:None
+ | > preemphasis:0.0
+ | > griffin_lim_iters:None
+ | > signal_norm:None
+ | > symmetric_norm:None
+ | > mel_fmin:0
+ | > mel_fmax:None
+ | > pitch_fmin:None
+ | > pitch_fmax:None
+ | > spec_gain:20.0
+ | > stft_pad_mode:reflect
+ | > max_norm:1.0
+ | > clip_norm:True
+ | > do_trim_silence:False
+ | > trim_db:60
+ | > do_sound_norm:False
+ | > do_amp_to_db_linear:True
+ | > do_amp_to_db_mel:True
+ | > do_rms_norm:False
+ | > db_level:None
+ | > stats_path:None
+ | > base:10
+ | > hop_length:256
+ | > win_length:1024
+ > Training Environment:
+ | > Backend: Torch
+ | > Mixed precision: False
+ | > Precision: float32
+ | > Num. of CPUs: 4
+ | > Num. of Torch Threads: 4
+ | > Torch seed: 54321
+ | > Torch CUDNN: True
+ | > Torch CUDNN deterministic: False
+ | > Torch CUDNN benchmark: False
+ | > Torch TF32 MatMul: False
+ > Start Tensorboard: tensorboard --logdir=/app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+ > Restoring from model_file.pth ...
+ > Restoring Model...
+ > Partial model initialization...
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.0.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.0.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.1.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.1.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.2.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.2.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.3.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.3.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.4.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.4.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.5.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.5.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.6.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.6.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.7.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.7.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.8.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.8.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.9.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.9.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.10.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.10.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.11.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.11.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.12.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.12.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.13.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.13.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.14.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.14.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.15.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.in_layers.15.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.0.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.0.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.1.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.1.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.2.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.2.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.3.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.3.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.4.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.4.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.5.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.5.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.6.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.6.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.7.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.7.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.8.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.8.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.9.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.9.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.10.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.10.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.11.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.11.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.12.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.12.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.13.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.13.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.14.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.14.weight_v
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.15.weight_g
+ | > Layer missing in the model definition: posterior_encoder.enc.res_skip_layers.15.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.in_layers.3.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.0.enc.res_skip_layers.3.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.in_layers.3.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.1.enc.res_skip_layers.3.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.in_layers.3.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.2.enc.res_skip_layers.3.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.in_layers.3.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.0.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.0.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.1.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.1.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.2.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.2.weight_v
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.3.weight_g
+ | > Layer missing in the model definition: flow.flows.3.enc.res_skip_layers.3.weight_v
+ | > Layer missing in the model definition: waveform_decoder.ups.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.ups.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.ups.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.ups.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.ups.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.ups.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.ups.3.weight_g
+ | > Layer missing in the model definition: waveform_decoder.ups.3.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.0.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.1.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.2.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.3.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.4.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.5.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.6.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.7.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.8.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.9.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.10.convs2.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs1.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs1.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs1.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs1.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs1.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs1.2.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs2.0.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs2.0.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs2.1.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs2.1.weight_v
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs2.2.weight_g
+ | > Layer missing in the model definition: waveform_decoder.resblocks.11.convs2.2.weight_v
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.5.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.5.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.6.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.6.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.7.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.7.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.8.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.8.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.9.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.9.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.10.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.10.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.11.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.11.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.12.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.12.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.13.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.13.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.14.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.14.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.15.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.in_layers.15.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.5.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.5.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.6.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.6.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.7.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.7.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.8.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.8.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.9.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.9.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.10.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.10.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.11.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.11.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.12.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.12.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.13.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.13.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.14.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.14.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.15.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: posterior_encoder.enc.res_skip_layers.15.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.in_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.0.enc.res_skip_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.in_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.1.enc.res_skip_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.in_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.2.enc.res_skip_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.in_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: flow.flows.3.enc.res_skip_layers.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.ups.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.ups.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.ups.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.ups.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.ups.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.ups.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.ups.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.ups.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.0.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.1.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.2.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.3.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.4.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.5.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.6.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.7.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.8.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.9.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.10.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs1.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs1.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs1.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs1.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs1.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs1.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs2.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs2.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs2.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs2.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs2.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: waveform_decoder.resblocks.11.convs2.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.0.convs.0.bias
+ | > Layer missing in the checkpoint: disc.nets.0.convs.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.0.convs.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.0.convs.1.bias
+ | > Layer missing in the checkpoint: disc.nets.0.convs.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.0.convs.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.0.convs.2.bias
+ | > Layer missing in the checkpoint: disc.nets.0.convs.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.0.convs.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.0.convs.3.bias
+ | > Layer missing in the checkpoint: disc.nets.0.convs.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.0.convs.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.0.convs.4.bias
+ | > Layer missing in the checkpoint: disc.nets.0.convs.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.0.convs.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.0.convs.5.bias
+ | > Layer missing in the checkpoint: disc.nets.0.convs.5.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.0.convs.5.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.0.conv_post.bias
+ | > Layer missing in the checkpoint: disc.nets.0.conv_post.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.0.conv_post.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.1.convs.0.bias
+ | > Layer missing in the checkpoint: disc.nets.1.convs.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.1.convs.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.1.convs.1.bias
+ | > Layer missing in the checkpoint: disc.nets.1.convs.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.1.convs.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.1.convs.2.bias
+ | > Layer missing in the checkpoint: disc.nets.1.convs.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.1.convs.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.1.convs.3.bias
+ | > Layer missing in the checkpoint: disc.nets.1.convs.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.1.convs.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.1.convs.4.bias
+ | > Layer missing in the checkpoint: disc.nets.1.convs.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.1.convs.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.1.conv_post.bias
+ | > Layer missing in the checkpoint: disc.nets.1.conv_post.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.1.conv_post.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.2.convs.0.bias
+ | > Layer missing in the checkpoint: disc.nets.2.convs.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.2.convs.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.2.convs.1.bias
+ | > Layer missing in the checkpoint: disc.nets.2.convs.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.2.convs.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.2.convs.2.bias
+ | > Layer missing in the checkpoint: disc.nets.2.convs.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.2.convs.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.2.convs.3.bias
+ | > Layer missing in the checkpoint: disc.nets.2.convs.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.2.convs.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.2.convs.4.bias
+ | > Layer missing in the checkpoint: disc.nets.2.convs.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.2.convs.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.2.conv_post.bias
+ | > Layer missing in the checkpoint: disc.nets.2.conv_post.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.2.conv_post.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.3.convs.0.bias
+ | > Layer missing in the checkpoint: disc.nets.3.convs.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.3.convs.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.3.convs.1.bias
+ | > Layer missing in the checkpoint: disc.nets.3.convs.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.3.convs.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.3.convs.2.bias
+ | > Layer missing in the checkpoint: disc.nets.3.convs.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.3.convs.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.3.convs.3.bias
+ | > Layer missing in the checkpoint: disc.nets.3.convs.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.3.convs.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.3.convs.4.bias
+ | > Layer missing in the checkpoint: disc.nets.3.convs.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.3.convs.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.3.conv_post.bias
+ | > Layer missing in the checkpoint: disc.nets.3.conv_post.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.3.conv_post.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.4.convs.0.bias
+ | > Layer missing in the checkpoint: disc.nets.4.convs.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.4.convs.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.4.convs.1.bias
+ | > Layer missing in the checkpoint: disc.nets.4.convs.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.4.convs.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.4.convs.2.bias
+ | > Layer missing in the checkpoint: disc.nets.4.convs.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.4.convs.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.4.convs.3.bias
+ | > Layer missing in the checkpoint: disc.nets.4.convs.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.4.convs.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.4.convs.4.bias
+ | > Layer missing in the checkpoint: disc.nets.4.convs.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.4.convs.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.4.conv_post.bias
+ | > Layer missing in the checkpoint: disc.nets.4.conv_post.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.4.conv_post.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.5.convs.0.bias
+ | > Layer missing in the checkpoint: disc.nets.5.convs.0.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.5.convs.0.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.5.convs.1.bias
+ | > Layer missing in the checkpoint: disc.nets.5.convs.1.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.5.convs.1.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.5.convs.2.bias
+ | > Layer missing in the checkpoint: disc.nets.5.convs.2.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.5.convs.2.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.5.convs.3.bias
+ | > Layer missing in the checkpoint: disc.nets.5.convs.3.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.5.convs.3.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.5.convs.4.bias
+ | > Layer missing in the checkpoint: disc.nets.5.convs.4.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.5.convs.4.parametrizations.weight.original1
+ | > Layer missing in the checkpoint: disc.nets.5.conv_post.bias
+ | > Layer missing in the checkpoint: disc.nets.5.conv_post.parametrizations.weight.original0
+ | > Layer missing in the checkpoint: disc.nets.5.conv_post.parametrizations.weight.original1
+ | > 558 / 949 layers are restored.
+ > Model restored from step 1000000
+/usr/local/lib/python3.10/site-packages/trainer/trainer.py:561: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler()
+/usr/local/lib/python3.10/site-packages/torch/cuda/amp/grad_scaler.py:31: UserWarning: torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.
+  super().__init__(
 
-C:\Windows\System32>docker-compose logs
-'docker-compose' is not recognized as an internal or external command,
-operable program or batch file.
+ > Model has 83068396 parameters
 
-C:\Windows\System32>ssh bbauto@46.224.57.222
-bbauto@46.224.57.222's password:
-Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-88-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/pro
-
- System information as of Thu Dec  4 12:04:52 PM CET 2025
-
-  System load:  0.08               Processes:             196
-  Usage of /:   54.3% of 74.79GB   Users logged in:       1
-  Memory usage: 19%                IPv4 address for eth0: 46.224.57.222
-  Swap usage:   1%                 IPv6 address for eth0: 2a01:4f8:1c1a:6823::1
+ > EPOCH: 0/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
 
 
-Expanded Security Maintenance for Applications is not enabled.
+> DataLoader initialization
+| > Tokenizer:
+        | > add_blank: True
+        | > use_eos_bos: False
+        | > use_phonemes: True
+        | > phonemizer:
+                | > phoneme language: en-us
+                | > phoneme backend: espeak
+| > Number of instances : 1
+ | > Preprocessing samples
+ | > Max text length: 72
+ | > Min text length: 72
+ | > Avg text length: 72.0
+ |
+ | > Max audio length: 101991.0
+ | > Min audio length: 101991.0
+ | > Avg audio length: 101991.0
+ | > Num. instances discarded samples: 0
+ | > Batch group size: 0.
 
-9 updates can be applied immediately.
-To see these additional updates run: apt list --upgradable
+ > TRAINING (2025-12-04 14:55:26)
+/usr/local/lib/python3.10/site-packages/torch/functional.py:681: UserWarning: stft with return_complex=False is deprecated. In a future pytorch release, stft will return complex tensors for all inputs, and return_complex=False will raise an error.
+Note: you can still call torch.view_as_real on the complex output to recover the old return format. (Triggered internally at /pytorch/aten/src/ATen/native/SpectralOps.cpp:875.)
+  return _VF.stft(  # type: ignore[attr-defined]
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
 
-12 additional security updates can be applied with ESM Apps.
-Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+> DataLoader initialization
+| > Tokenizer:
+        | > add_blank: True
+        | > use_eos_bos: False
+        | > use_phonemes: True
+        | > phonemizer:
+                | > phoneme language: en-us
+                | > phoneme backend: espeak
+| > Number of instances : 1
+ | > Preprocessing samples
+ | > Max text length: 72
+ | > Min text length: 72
+ | > Avg text length: 72.0
+ |
+ | > Max audio length: 101991.0
+ | > Min audio length: 101991.0
+ | > Avg audio length: 101991.0
+ | > Num. instances discarded samples: 0
+ | > Batch group size: 0.
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1455: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /pytorch/aten/src/ATen/native/TensorShape.cpp:4416.)
+  test_figures["{}-alignment".format(idx)] = plot_alignment(alignment.T, output_fig=False)
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.006119728088378906 (+0)
+     | > avg_loss_disc: 4.5814948081970215 (+0)
+     | > avg_loss_disc_real_0: 0.62183678150177 (+0)
+     | > avg_loss_disc_real_1: 0.7922453880310059 (+0)
+     | > avg_loss_disc_real_2: 0.7934720516204834 (+0)
+     | > avg_loss_disc_real_3: 0.7719997763633728 (+0)
+     | > avg_loss_disc_real_4: 0.7112516164779663 (+0)
+     | > avg_loss_disc_real_5: 0.7622858285903931 (+0)
+     | > avg_loss_0: 4.5814948081970215 (+0)
+     | > avg_loss_gen: 4.453646659851074 (+0)
+     | > avg_loss_kl: 21.429943084716797 (+0)
+     | > avg_loss_feat: 0.17062613368034363 (+0)
+     | > avg_loss_mel: 30.747154235839844 (+0)
+     | > avg_loss_duration: 1.8812894821166992 (+0)
+     | > avg_loss_1: 58.68266296386719 (+0)
+
+ > BEST MODEL : /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000/best_model_1000002.pth
+
+ > EPOCH: 1/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:55:59)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.00559544563293457 (-0.0005242824554443359)
+     | > avg_loss_disc: 3.410338878631592 (-1.1711559295654297)
+     | > avg_loss_disc_real_0: 0.34364357590675354 (-0.2781932055950165)
+     | > avg_loss_disc_real_1: 0.5103206634521484 (-0.2819247245788574)
+     | > avg_loss_disc_real_2: 0.5063145160675049 (-0.2871575355529785)
+     | > avg_loss_disc_real_3: 0.4664575457572937 (-0.3055422306060791)
+     | > avg_loss_disc_real_4: 0.39988645911216736 (-0.31136515736579895)
+     | > avg_loss_disc_real_5: 0.4908544719219208 (-0.2714313566684723)
+     | > avg_loss_0: 3.410338878631592 (-1.1711559295654297)
+     | > avg_loss_gen: 2.724057197570801 (-1.7295894622802734)
+     | > avg_loss_kl: 13.253870964050293 (-8.176072120666504)
+     | > avg_loss_feat: 0.40507030487060547 (+0.23444417119026184)
+     | > avg_loss_mel: 34.39110565185547 (+3.643951416015625)
+     | > avg_loss_duration: 1.5965768098831177 (-0.28471267223358154)
+     | > avg_loss_1: 52.37068176269531 (-6.311981201171875)
+
+ > BEST MODEL : /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000/best_model_1000003.pth
+
+ > EPOCH: 2/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:56:32)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.0498805046081543 (+0.04428505897521973)
+     | > avg_loss_disc: 3.4558277130126953 (+0.045488834381103516)
+     | > avg_loss_disc_real_0: 0.1574803739786148 (-0.18616320192813873)
+     | > avg_loss_disc_real_1: 0.16291925311088562 (-0.3474014103412628)
+     | > avg_loss_disc_real_2: 0.1653490960597992 (-0.3409654200077057)
+     | > avg_loss_disc_real_3: 0.12681680917739868 (-0.339640736579895)
+     | > avg_loss_disc_real_4: 0.09213787317276001 (-0.30774858593940735)
+     | > avg_loss_disc_real_5: 0.1723603904247284 (-0.3184940814971924)
+     | > avg_loss_0: 3.4558277130126953 (+0.045488834381103516)
+     | > avg_loss_gen: 0.8771001100540161 (-1.8469570875167847)
+     | > avg_loss_kl: 8.99279499053955 (-4.261075973510742)
+     | > avg_loss_feat: 0.20059524476528168 (-0.2044750601053238)
+     | > avg_loss_mel: 25.032686233520508 (-9.358419418334961)
+     | > avg_loss_duration: 1.6070560216903687 (+0.010479211807250977)
+     | > avg_loss_1: 36.71023178100586 (-15.660449981689453)
+
+ > BEST MODEL : /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000/best_model_1000004.pth
+
+ > EPOCH: 3/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:57:05)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.004311561584472656 (-0.04556894302368164)
+     | > avg_loss_disc: 3.7104458808898926 (+0.25461816787719727)
+     | > avg_loss_disc_real_0: 0.10241949558258057 (-0.05506087839603424)
+     | > avg_loss_disc_real_1: 0.06858160346746445 (-0.09433764964342117)
+     | > avg_loss_disc_real_2: 0.0756978914141655 (-0.0896512046456337)
+     | > avg_loss_disc_real_3: 0.10995330661535263 (-0.01686350256204605)
+     | > avg_loss_disc_real_4: 0.14562708139419556 (+0.05348920822143555)
+     | > avg_loss_disc_real_5: 0.13080115616321564 (-0.041559234261512756)
+     | > avg_loss_0: 3.7104458808898926 (+0.25461816787719727)
+     | > avg_loss_gen: 0.636505126953125 (-0.2405949831008911)
+     | > avg_loss_kl: 8.577470779418945 (-0.41532421112060547)
+     | > avg_loss_feat: 0.37989386916160583 (+0.17929862439632416)
+     | > avg_loss_mel: 28.022321701049805 (+2.989635467529297)
+     | > avg_loss_duration: 1.6366750001907349 (+0.02961897850036621)
+     | > avg_loss_1: 39.25286865234375 (+2.5426368713378906)
 
 
-Last login: Thu Dec  4 11:55:49 2025 from 4.180.63.136
-bbauto@Automations:~$ sudo -i
-[sudo] password for bbauto:
-root@Automations:~# cd /opt/TTS/
-root@Automations:/opt/TTS# docker-compose -f docker-compose.prod.yml logs
-nginx-proxy  | /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
-nginx-proxy  | /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
-nginx-proxy  | /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
-nginx-proxy  | 10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
-nginx-proxy  | 10-listen-on-ipv6-by-default.sh: info: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf
-nginx-proxy  | /docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
-nginx-proxy  | /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
-nginx-proxy  | /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
-nginx-proxy  | /docker-entrypoint.sh: Configuration complete; ready for start up
-python-service  | /usr/local/lib/python3.10/site-packages/librosa/core/intervals.py:8: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-python-service  |   from pkg_resources import resource_filename
-python-service  | INFO:     Started server process [1]
-python-service  | INFO:     Waiting for application startup.
-python-service  | INFO:     Application startup complete.
-python-service  | INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
-tts-db          |
-tts-db          | PostgreSQL Database directory appears to contain a database; Skipping initialization
-tts-db          |
-tts-db          | 2025-12-04 10:59:47.716 UTC [1] LOG:  starting PostgreSQL 15.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
-tts-db          | 2025-12-04 10:59:47.717 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
-tts-db          | 2025-12-04 10:59:47.717 UTC [1] LOG:  listening on IPv6 address "::", port 5432
-tts-db          | 2025-12-04 10:59:47.719 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
-tts-db          | 2025-12-04 10:59:47.724 UTC [29] LOG:  database system was shut down at 2025-12-04 10:44:12 UTC
-tts-db          | 2025-12-04 10:59:47.730 UTC [1] LOG:  database system is ready to accept connections
-tts-db          | 2025-12-04 10:59:58.328 UTC [40] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 10:59:58.328 UTC [40] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:00.335 UTC [41] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:00.335 UTC [41] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:02.342 UTC [42] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:02.342 UTC [42] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:04.350 UTC [44] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:04.350 UTC [44] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:06.358 UTC [45] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:06.358 UTC [45] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:08.366 UTC [53] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:08.366 UTC [53] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:10.375 UTC [54] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:10.375 UTC [54] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:12.383 UTC [55] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:12.383 UTC [55] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:14.392 UTC [56] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:14.392 UTC [56] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:16.401 UTC [57] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:16.401 UTC [57] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:18.726 UTC [66] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:18.726 UTC [66] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:20.734 UTC [67] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:20.734 UTC [67] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:22.743 UTC [68] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:22.743 UTC [68] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:24.752 UTC [69] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:24.752 UTC [69] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:26.760 UTC [70] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:26.760 UTC [70] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:28.766 UTC [78] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:28.766 UTC [78] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:30.773 UTC [79] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:30.773 UTC [79] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:32.781 UTC [81] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:32.781 UTC [81] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:34.788 UTC [82] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:34.788 UTC [82] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:36.794 UTC [83] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:36.794 UTC [83] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:39.151 UTC [91] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:39.151 UTC [91] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:41.159 UTC [92] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:41.159 UTC [92] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:43.166 UTC [93] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:43.166 UTC [93] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:45.175 UTC [94] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:45.175 UTC [94] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:47.183 UTC [95] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:47.183 UTC [95] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:49.189 UTC [104] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:49.189 UTC [104] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:51.197 UTC [105] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:51.197 UTC [105] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:53.205 UTC [106] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:53.205 UTC [106] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:55.213 UTC [107] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:55.213 UTC [107] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:57.222 UTC [108] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:57.222 UTC [108] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:00:59.570 UTC [116] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:00:59.570 UTC [116] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:01.578 UTC [117] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:01.578 UTC [117] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:03.585 UTC [119] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:03.585 UTC [119] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:05.593 UTC [120] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:05.593 UTC [120] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:07.601 UTC [121] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:07.601 UTC [121] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:09.611 UTC [129] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:09.611 UTC [129] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:11.620 UTC [130] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:11.620 UTC [130] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:13.629 UTC [131] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:13.629 UTC [131] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:15.637 UTC [132] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:15.637 UTC [132] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:17.644 UTC [133] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:17.644 UTC [133] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:19.999 UTC [142] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:19.999 UTC [142] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:22.007 UTC [143] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:22.007 UTC [143] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:24.015 UTC [144] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:24.015 UTC [144] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-go-service      |
-go-service      | 2025/12/04 10:59:58 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:00 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:02 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:04 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:06 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:08 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:10 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:12 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:14 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:16 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:00:18 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:18 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:20 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:22 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-tts-frontend    |
-tts-frontend    | > frontend@0.1.0 start
-tts-frontend    | > next start
-go-service      |
-tts-frontend    |
-go-service      | 2025/12/04 11:00:24 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:26 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:28 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:30 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:32 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:34 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:36 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:00:38 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:39 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:41 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:43 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:45 /app/main.go:76
-tts-db          | 2025-12-04 11:01:26.022 UTC [145] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:26.022 UTC [145] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:28.030 UTC [146] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:28.030 UTC [146] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:30.039 UTC [154] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:30.039 UTC [154] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:32.047 UTC [155] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:32.047 UTC [155] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:34.056 UTC [157] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:34.056 UTC [157] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:36.063 UTC [158] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:36.063 UTC [158] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:38.071 UTC [159] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:38.071 UTC [159] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:40.397 UTC [167] FATAL:  password authentication failed for user "admin"
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:47 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:49 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:51 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-tts-db          | 2025-12-04 11:01:40.397 UTC [167] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:42.404 UTC [168] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:42.404 UTC [168] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:44.412 UTC [169] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:44.412 UTC [169] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:46.419 UTC [170] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:46.419 UTC [170] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:48.427 UTC [172] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:48.427 UTC [172] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:50.435 UTC [180] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:50.435 UTC [180] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:52.442 UTC [181] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:52.442 UTC [181] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:54.449 UTC [182] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:54.449 UTC [182] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:53 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:55 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-tts-frontend    |    ▲ Next.js 16.0.6
-tts-frontend    |    - Local:         http://localhost:3000
-tts-frontend    |    - Network:       http://172.18.0.5:3000
-tts-frontend    |
-tts-frontend    |  ✓ Starting...
-tts-frontend    |  ✓ Ready in 317ms
-tts-db          | 2025-12-04 11:01:56.458 UTC [183] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:56.458 UTC [183] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:01:58.466 UTC [184] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:01:58.466 UTC [184] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:00.810 UTC [192] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:00.810 UTC [192] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:02.818 UTC [194] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:02.818 UTC [194] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:04.826 UTC [195] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:04.826 UTC [195] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:06.835 UTC [196] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:06.835 UTC [196] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:08.841 UTC [204] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:08.841 UTC [204] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:10.848 UTC [205] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:10.848 UTC [205] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:12.855 UTC [206] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:12.855 UTC [206] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:14.862 UTC [207] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:14.862 UTC [207] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:16.869 UTC [208] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:16.869 UTC [208] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:18.877 UTC [217] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:18.877 UTC [217] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:21.223 UTC [218] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:21.223 UTC [218] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:23.231 UTC [219] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:23.231 UTC [219] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:57 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-tts-db          | 2025-12-04 11:02:25.238 UTC [220] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:25.238 UTC [220] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:27.247 UTC [221] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:27.247 UTC [221] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:29.256 UTC [229] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:29.256 UTC [229] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:31.263 UTC [230] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:31.263 UTC [230] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:33.272 UTC [232] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:33.272 UTC [232] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:35.281 UTC [233] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:35.281 UTC [233] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:37.288 UTC [234] FATAL:  password authentication failed for user "admin"
-go-service      | 2025/12/04 11:00:59 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:00:59 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:01 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:03 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:05 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:07 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:09 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:11 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:13 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:15 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:17 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:01:19 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:20 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:22 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:24 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:26 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:28 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:30 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:32 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:34 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:36 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-tts-db          | 2025-12-04 11:02:37.288 UTC [234] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:39.296 UTC [242] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:39.296 UTC [242] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:41.654 UTC [243] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:41.654 UTC [243] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:43.661 UTC [244] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:43.661 UTC [244] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:45.667 UTC [245] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:45.667 UTC [245] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:47.674 UTC [246] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:47.674 UTC [246] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:49.682 UTC [255] FATAL:  password authentication failed for user "admin"
-go-service      | 2025/12/04 11:01:38 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-tts-db          | 2025-12-04 11:02:49.682 UTC [255] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:51.690 UTC [256] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:51.690 UTC [256] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:53.696 UTC [257] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:53.696 UTC [257] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:55.704 UTC [258] FATAL:  password authentication failed for user "admin"
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:01:40 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:40 /app/main.go:76
-tts-db          | 2025-12-04 11:02:55.704 UTC [258] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:57.712 UTC [259] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:57.712 UTC [259] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:02:59.720 UTC [267] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:02:59.720 UTC [267] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:02.071 UTC [268] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:02.071 UTC [268] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:04.079 UTC [270] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:04.079 UTC [270] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:06.088 UTC [271] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:06.088 UTC [271] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:08.096 UTC [272] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:08.096 UTC [272] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:10.104 UTC [280] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:10.104 UTC [280] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:12.114 UTC [281] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:12.114 UTC [281] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:14.122 UTC [282] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:14.122 UTC [282] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:16.127 UTC [283] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:16.127 UTC [283] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:18.135 UTC [285] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:18.135 UTC [285] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:20.143 UTC [293] FATAL:  password authentication failed for user "admin"
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:42 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:44 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:46 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-tts-db          | 2025-12-04 11:03:20.143 UTC [293] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:22.479 UTC [294] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:22.479 UTC [294] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:24.487 UTC [295] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:24.487 UTC [295] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:26.494 UTC [296] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:26.494 UTC [296] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:28.504 UTC [297] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:28.504 UTC [297] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:30.509 UTC [305] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:30.509 UTC [305] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:32.518 UTC [306] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:32.518 UTC [306] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:34.525 UTC [308] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:34.525 UTC [308] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:36.534 UTC [309] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:36.534 UTC [309] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:38.543 UTC [310] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:38.543 UTC [310] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:40.551 UTC [318] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:40.551 UTC [318] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:42.892 UTC [319] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:42.892 UTC [319] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:44.901 UTC [320] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:44.901 UTC [320] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:46.908 UTC [321] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:46.908 UTC [321] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:48.917 UTC [323] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:48.917 UTC [323] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:50.924 UTC [331] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:50.924 UTC [331] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:52.930 UTC [332] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:52.930 UTC [332] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:54.936 UTC [333] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:54.936 UTC [333] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:56.945 UTC [334] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:56.945 UTC [334] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:03:58.953 UTC [335] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:03:58.953 UTC [335] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:00.962 UTC [343] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:00.962 UTC [343] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:03.298 UTC [345] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:03.298 UTC [345] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:05.306 UTC [346] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:05.306 UTC [346] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:07.314 UTC [347] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:07.314 UTC [347] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:09.321 UTC [348] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:09.321 UTC [348] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:11.329 UTC [356] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:11.329 UTC [356] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:13.337 UTC [357] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:13.337 UTC [357] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:15.347 UTC [358] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:15.347 UTC [358] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:17.355 UTC [359] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:17.355 UTC [359] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:19.363 UTC [361] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:19.363 UTC [361] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:21.371 UTC [369] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:21.371 UTC [369] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:23.716 UTC [370] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:23.716 UTC [370] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:25.725 UTC [371] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:25.725 UTC [371] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:27.734 UTC [372] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:27.734 UTC [372] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:29.742 UTC [378] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:29.742 UTC [378] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:31.751 UTC [380] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:31.751 UTC [380] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:33.759 UTC [382] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:33.759 UTC [382] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:35.766 UTC [383] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:35.766 UTC [383] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:37.774 UTC [384] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:37.774 UTC [384] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:39.783 UTC [385] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:39.783 UTC [385] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:41.791 UTC [393] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:41.791 UTC [393] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:44.145 UTC [394] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:44.145 UTC [394] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:46.153 UTC [395] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:46.153 UTC [395] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:47.804 UTC [27] LOG:  checkpoint starting: time
-tts-db          | 2025-12-04 11:04:47.816 UTC [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.012 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB
-tts-db          | 2025-12-04 11:04:48.161 UTC [397] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:48.161 UTC [397] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:50.169 UTC [405] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:50.169 UTC [405] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:52.175 UTC [406] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:52.175 UTC [406] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:54.184 UTC [407] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:54.184 UTC [407] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:56.193 UTC [408] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:56.193 UTC [408] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:04:58.201 UTC [409] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:04:58.201 UTC [409] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:00.209 UTC [417] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:00.209 UTC [417] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:02.218 UTC [418] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:02.218 UTC [418] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:04.544 UTC [420] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:04.544 UTC [420] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:06.552 UTC [421] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:06.552 UTC [421] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:08.561 UTC [422] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:08.561 UTC [422] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:10.568 UTC [430] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:10.568 UTC [430] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:12.575 UTC [431] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:12.575 UTC [431] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:14.584 UTC [432] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:14.584 UTC [432] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-tts-db          | 2025-12-04 11:05:16.591 UTC [433] FATAL:  password authentication failed for user "admin"
-tts-db          | 2025-12-04 11:05:16.591 UTC [433] DETAIL:  Connection matched pg_hba.conf line 100: "host all all all scram-sha-256"
-go-service      | 2025/12/04 11:01:48 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:50 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:52 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:54 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:56 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:01:58 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:02:00 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:00 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:02 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:04 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:06 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:08 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:10 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:12 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:14 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:16 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:18 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:02:20 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:21 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:23 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:25 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:27 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:29 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:31 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:33 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:35 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:37 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:39 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:02:41 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:41 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:43 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:45 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:47 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:49 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:51 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:53 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:55 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:57 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:02:59 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:03:01 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:02 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:04 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:06 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:08 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:10 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:12 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:14 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:16 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:18 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:20 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:03:22 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:22 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:24 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:26 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:28 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:30 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:32 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:34 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:36 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:38 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:40 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:03:42 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:42 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:44 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:46 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:48 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:50 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:52 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:54 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:56 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:03:58 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:00 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:04:02 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:03 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:05 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:07 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:09 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:11 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:13 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:15 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:17 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:19 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:21 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:04:23 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:23 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:25 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:27 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:29 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:31 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:33 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:35 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:37 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:39 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:41 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:04:43 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:44 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:46 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:48 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:50 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:52 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:54 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:56 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:04:58 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:00 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:02 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | 2025/12/04 11:05:04 Failed to connect to database:failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:04 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:06 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:08 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:10 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:12 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:14 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      |
-go-service      | 2025/12/04 11:05:16 /app/main.go:76
-go-service      | [error] failed to initialize database, got error failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
-go-service      | Waiting for Database... failed to connect to `user=admin database=tts_db`: 172.18.0.3:5432 (postgres): failed SASL auth: FATAL: password authentication failed for user "admin" (SQLSTATE 28P01)
+ > EPOCH: 4/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:57:32)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.008492231369018555 (+0.0041806697845458984)
+     | > avg_loss_disc: 3.309513568878174 (-0.40093231201171875)
+     | > avg_loss_disc_real_0: 0.10300500690937042 (+0.000585511326789856)
+     | > avg_loss_disc_real_1: 0.12794607877731323 (+0.059364475309848785)
+     | > avg_loss_disc_real_2: 0.13300541043281555 (+0.057307519018650055)
+     | > avg_loss_disc_real_3: 0.19537030160427094 (+0.0854169949889183)
+     | > avg_loss_disc_real_4: 0.2661876082420349 (+0.12056052684783936)
+     | > avg_loss_disc_real_5: 0.1986822783946991 (+0.06788112223148346)
+     | > avg_loss_0: 3.309513568878174 (-0.40093231201171875)
+     | > avg_loss_gen: 1.0342037677764893 (+0.39769864082336426)
+     | > avg_loss_kl: 6.739046573638916 (-1.8384242057800293)
+     | > avg_loss_feat: 0.4253697693347931 (+0.045475900173187256)
+     | > avg_loss_mel: 31.806814193725586 (+3.7844924926757812)
+     | > avg_loss_duration: 1.7139593362808228 (+0.07728433609008789)
+     | > avg_loss_1: 41.719390869140625 (+2.466522216796875)
+
+
+ > EPOCH: 5/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:57:59)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.006452083587646484 (-0.0020401477813720703)
+     | > avg_loss_disc: 3.1470208168029785 (-0.1624927520751953)
+     | > avg_loss_disc_real_0: 0.15595649182796478 (+0.05295148491859436)
+     | > avg_loss_disc_real_1: 0.29472264647483826 (+0.16677656769752502)
+     | > avg_loss_disc_real_2: 0.2951781749725342 (+0.16217276453971863)
+     | > avg_loss_disc_real_3: 0.3437584638595581 (+0.14838816225528717)
+     | > avg_loss_disc_real_4: 0.37970733642578125 (+0.11351972818374634)
+     | > avg_loss_disc_real_5: 0.34114667773246765 (+0.14246439933776855)
+     | > avg_loss_0: 3.1470208168029785 (-0.1624927520751953)
+     | > avg_loss_gen: 1.8226349353790283 (+0.7884311676025391)
+     | > avg_loss_kl: 6.652072429656982 (-0.0869741439819336)
+     | > avg_loss_feat: 0.3849424421787262 (-0.040427327156066895)
+     | > avg_loss_mel: 27.028528213500977 (-4.778285980224609)
+     | > avg_loss_duration: 1.6306160688400269 (-0.0833432674407959)
+     | > avg_loss_1: 37.518795013427734 (-4.200595855712891)
+
+
+ > EPOCH: 6/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:58:28)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.00570368766784668 (-0.0007483959197998047)
+     | > avg_loss_disc: 3.23134708404541 (+0.08432626724243164)
+     | > avg_loss_disc_real_0: 0.236568883061409 (+0.08061239123344421)
+     | > avg_loss_disc_real_1: 0.40677300095558167 (+0.11205035448074341)
+     | > avg_loss_disc_real_2: 0.411217600107193 (+0.11603942513465881)
+     | > avg_loss_disc_real_3: 0.4081677794456482 (+0.06440931558609009)
+     | > avg_loss_disc_real_4: 0.40221789479255676 (+0.022510558366775513)
+     | > avg_loss_disc_real_5: 0.41955456137657166 (+0.078407883644104)
+     | > avg_loss_0: 3.23134708404541 (+0.08432626724243164)
+     | > avg_loss_gen: 2.298447370529175 (+0.4758124351501465)
+     | > avg_loss_kl: 5.661383152008057 (-0.9906892776489258)
+     | > avg_loss_feat: 0.4114537835121155 (+0.026511341333389282)
+     | > avg_loss_mel: 34.57725143432617 (+7.548723220825195)
+     | > avg_loss_duration: 1.6677111387252808 (+0.037095069885253906)
+     | > avg_loss_1: 44.61624526977539 (+7.097450256347656)
+
+
+ > EPOCH: 7/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:58:58)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.006796836853027344 (+0.001093149185180664)
+     | > avg_loss_disc: 3.213514804840088 (-0.017832279205322266)
+     | > avg_loss_disc_real_0: 0.31301257014274597 (+0.07644368708133698)
+     | > avg_loss_disc_real_1: 0.4145524203777313 (+0.007779419422149658)
+     | > avg_loss_disc_real_2: 0.4209626019001007 (+0.009745001792907715)
+     | > avg_loss_disc_real_3: 0.388883501291275 (-0.01928427815437317)
+     | > avg_loss_disc_real_4: 0.35483893752098083 (-0.04737895727157593)
+     | > avg_loss_disc_real_5: 0.4048769176006317 (-0.014677643775939941)
+     | > avg_loss_0: 3.213514804840088 (-0.017832279205322266)
+     | > avg_loss_gen: 2.308960437774658 (+0.010513067245483398)
+     | > avg_loss_kl: 6.33433723449707 (+0.6729540824890137)
+     | > avg_loss_feat: 0.40203434228897095 (-0.009419441223144531)
+     | > avg_loss_mel: 25.961559295654297 (-8.615692138671875)
+     | > avg_loss_duration: 1.6798441410064697 (+0.012133002281188965)
+     | > avg_loss_1: 36.68673324584961 (-7.929512023925781)
+
+ > BEST MODEL : /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000/best_model_1000009.pth
+
+ > EPOCH: 8/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 14:59:34)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.0078067779541015625 (+0.0010099411010742188)
+     | > avg_loss_disc: 3.1148433685302734 (-0.09867143630981445)
+     | > avg_loss_disc_real_0: 0.3623775243759155 (+0.049364954233169556)
+     | > avg_loss_disc_real_1: 0.34351059794425964 (-0.07104182243347168)
+     | > avg_loss_disc_real_2: 0.3581702709197998 (-0.0627923309803009)
+     | > avg_loss_disc_real_3: 0.3101358711719513 (-0.07874763011932373)
+     | > avg_loss_disc_real_4: 0.276631623506546 (-0.07820731401443481)
+     | > avg_loss_disc_real_5: 0.3360292911529541 (-0.06884762644767761)
+     | > avg_loss_0: 3.1148433685302734 (-0.09867143630981445)
+     | > avg_loss_gen: 2.0128798484802246 (-0.2960805892944336)
+     | > avg_loss_kl: 4.431258678436279 (-1.903078556060791)
+     | > avg_loss_feat: 0.4861384928226471 (+0.08410415053367615)
+     | > avg_loss_mel: 24.48224449157715 (-1.4793148040771484)
+     | > avg_loss_duration: 1.6176711320877075 (-0.06217300891876221)
+     | > avg_loss_1: 33.03019332885742 (-3.6565399169921875)
+
+ > BEST MODEL : /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000/best_model_1000010.pth
+
+ > EPOCH: 9/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 15:00:11)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.007678508758544922 (-0.00012826919555664062)
+     | > avg_loss_disc: 3.106476306915283 (-0.008367061614990234)
+     | > avg_loss_disc_real_0: 0.37629252672195435 (+0.013915002346038818)
+     | > avg_loss_disc_real_1: 0.2580568790435791 (-0.08545371890068054)
+     | > avg_loss_disc_real_2: 0.27399492263793945 (-0.08417534828186035)
+     | > avg_loss_disc_real_3: 0.22784456610679626 (-0.08229130506515503)
+     | > avg_loss_disc_real_4: 0.2229522317647934 (-0.053679391741752625)
+     | > avg_loss_disc_real_5: 0.25885918736457825 (-0.07717010378837585)
+     | > avg_loss_0: 3.106476306915283 (-0.008367061614990234)
+     | > avg_loss_gen: 1.6291559934616089 (-0.3837238550186157)
+     | > avg_loss_kl: 4.531954288482666 (+0.10069561004638672)
+     | > avg_loss_feat: 0.1486668884754181 (-0.337471604347229)
+     | > avg_loss_mel: 31.783254623413086 (+7.3010101318359375)
+     | > avg_loss_duration: 1.610673427581787 (-0.00699770450592041)
+     | > avg_loss_1: 39.70370101928711 (+6.6735076904296875)
+
+
+ > EPOCH: 10/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 15:00:40)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.005582332611083984 (-0.0020961761474609375)
+     | > avg_loss_disc: 3.1368932723999023 (+0.03041696548461914)
+     | > avg_loss_disc_real_0: 0.3575332760810852 (-0.01875925064086914)
+     | > avg_loss_disc_real_1: 0.17923328280448914 (-0.07882359623908997)
+     | > avg_loss_disc_real_2: 0.1938566118478775 (-0.08013831079006195)
+     | > avg_loss_disc_real_3: 0.20071308314800262 (-0.02713148295879364)
+     | > avg_loss_disc_real_4: 0.2198261022567749 (-0.0031261295080184937)
+     | > avg_loss_disc_real_5: 0.20886772871017456 (-0.049991458654403687)
+     | > avg_loss_0: 3.1368932723999023 (+0.03041696548461914)
+     | > avg_loss_gen: 1.3778800964355469 (-0.251275897026062)
+     | > avg_loss_kl: 4.78898286819458 (+0.25702857971191406)
+     | > avg_loss_feat: 0.42466890811920166 (+0.27600201964378357)
+     | > avg_loss_mel: 35.32855987548828 (+3.5453052520751953)
+     | > avg_loss_duration: 1.5563570261001587 (-0.05431640148162842)
+     | > avg_loss_1: 43.4764518737793 (+3.7727508544921875)
+
+
+ > EPOCH: 11/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 15:01:10)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.055733442306518555 (+0.05015110969543457)
+     | > avg_loss_disc: 3.096923351287842 (-0.03996992111206055)
+     | > avg_loss_disc_real_0: 0.3197193741798401 (-0.03781390190124512)
+     | > avg_loss_disc_real_1: 0.1874074935913086 (+0.008174210786819458)
+     | > avg_loss_disc_real_2: 0.1869002729654312 (-0.006956338882446289)
+     | > avg_loss_disc_real_3: 0.2355770617723465 (+0.03486397862434387)
+     | > avg_loss_disc_real_4: 0.2629163861274719 (+0.04309028387069702)
+     | > avg_loss_disc_real_5: 0.22708649933338165 (+0.018218770623207092)
+     | > avg_loss_0: 3.096923351287842 (-0.03996992111206055)
+     | > avg_loss_gen: 1.4399088621139526 (+0.06202876567840576)
+     | > avg_loss_kl: 4.7269110679626465 (-0.062071800231933594)
+     | > avg_loss_feat: 0.3774986267089844 (-0.047170281410217285)
+     | > avg_loss_mel: 26.827089309692383 (-8.501470565795898)
+     | > avg_loss_duration: 1.4681248664855957 (-0.08823215961456299)
+     | > avg_loss_1: 34.83953094482422 (-8.636920928955078)
+
+
+ > EPOCH: 12/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 15:01:38)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
+
+  --> EVAL PERFORMANCE
+     | > avg_loader_time: 0.005896568298339844 (-0.04983687400817871)
+     | > avg_loss_disc: 3.0344018936157227 (-0.06252145767211914)
+     | > avg_loss_disc_real_0: 0.27538806200027466 (-0.04433131217956543)
+     | > avg_loss_disc_real_1: 0.2279210239648819 (+0.0405135303735733)
+     | > avg_loss_disc_real_2: 0.2260938286781311 (+0.03919355571269989)
+     | > avg_loss_disc_real_3: 0.28526681661605835 (+0.04968975484371185)
+     | > avg_loss_disc_real_4: 0.30110281705856323 (+0.03818643093109131)
+     | > avg_loss_disc_real_5: 0.27526846528053284 (+0.048181965947151184)
+     | > avg_loss_0: 3.0344018936157227 (-0.06252145767211914)
+     | > avg_loss_gen: 1.639206886291504 (+0.19929802417755127)
+     | > avg_loss_kl: 3.890453338623047 (-0.8364577293395996)
+     | > avg_loss_feat: 0.5137903690338135 (+0.1362917423248291)
+     | > avg_loss_mel: 38.097023010253906 (+11.269933700561523)
+     | > avg_loss_duration: 1.533678412437439 (+0.06555354595184326)
+     | > avg_loss_1: 45.67415237426758 (+10.83462142944336)
+
+
+ > EPOCH: 13/10000
+ --> /app/training_runs/my_dataset_20251204145511/my_dataset_20251204145511-December-04-2025_02+55PM-0000000
+
+ > TRAINING (2025-12-04 15:02:06)
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1273: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1284: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):
+/usr/local/lib/python3.10/site-packages/TTS/tts/models/vits.py:1311: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(enabled=False):  # use float32 for the criterion
+
+ > EVALUATION
+
+ | > Synthesizing test sentences.
 root@Automations:/opt/TTS#

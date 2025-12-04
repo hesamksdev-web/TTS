@@ -124,6 +124,12 @@ async def generate_audio(payload: GenerateRequest, background_tasks: BackgroundT
     return FileResponse(path=tmp_path, media_type="audio/wav", filename=filename)
 
 
+@app.post("/tts", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech"}})
+async def tts_endpoint(payload: GenerateRequest, background_tasks: BackgroundTasks):
+    """Alias for /generate endpoint to support Go service proxy"""
+    return await generate_audio(payload, background_tasks)
+
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {
