@@ -188,7 +188,7 @@ export default function Dashboard() {
 
     try {
       const formData = new FormData();
-      formData.append("file", voiceCloneFile);
+      formData.append("audio", voiceCloneFile);
       formData.append("text", voiceCloneText);
       formData.append("language", voiceCloneLanguage);
       formData.append("speed", voiceCloneSpeed.toString());
