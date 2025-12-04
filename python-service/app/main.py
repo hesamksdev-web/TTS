@@ -215,32 +215,17 @@ async def voice_clone(
             try:
                 # Use the reference audio for speaker embedding
                 # For VITS models, speaker_wav parameter enables voice cloning
+                logger.info("Attempting voice cloning with speaker_wav: %s", voice_sample_path)
                 engine.tts_to_file(
                     text=text,
                     speaker_wav=voice_sample_path,
                     file_path=output_path,
                     gpu=False
                 )
-            except (TypeError, ValueError) as err:
-                # Fallback: Some models don't support speaker_wav or need speaker parameter
-                logger.warning("Voice cloning with speaker_wav failed, trying with default speaker: %s", err)
-                try:
-                    # For multi-speaker models, use first available speaker
-                    speakers = engine.speakers if hasattr(engine, 'speakers') and engine.speakers else None
-                    speaker = speakers[0] if speakers else None
-                    
-                    engine.tts_to_file(
-                        text=text,
-                        speaker=speaker,
-                        file_path=output_path,
-                        gpu=False
-                    )
-                except Exception as fallback_err:
-                    logger.exception("Fallback synthesis also failed")
-                    raise HTTPException(status_code=500, detail="Voice cloning failed") from fallback_err
+                logger.info("Voice cloning succeeded")
             except Exception as err:
-                logger.exception("Voice cloning synthesis failed")
-                raise HTTPException(status_code=500, detail="Voice cloning failed") from err
+                logger.exception("Voice cloning with speaker_wav failed: %s", err)
+                raise HTTPException(status_code=500, detail=f"Voice cloning failed: {str(err)}") from err
         
         await run_in_threadpool(_clone_voice)
         _schedule_cleanup(background_tasks, voice_sample_path)
