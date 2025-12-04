@@ -21,11 +21,11 @@ import (
 
 const (
 	PYTHON_SERVICE_URL = "http://python-service:5000"
-	JWT_SECRET         = "my_super_secret_key_2025"
 )
 
 var db *gorm.DB
 var httpClient = &http.Client{Timeout: 60 * time.Second}
+var jwtSecret string
 
 type User struct {
 	gorm.Model
@@ -115,6 +115,7 @@ func (c *corsMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	initDB()
+	jwtSecret = getEnv("JWT_SECRET", "my_super_secret_key_2025")
 
 	mux := http.NewServeMux()
 
@@ -193,7 +194,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		"role": user.Role,
 		"exp":  time.Now().Add(time.Hour * 24).Unix(),
 	})
-	tokenString, _ := token.SignedString([]byte(JWT_SECRET))
+	tokenString, _ := token.SignedString([]byte(jwtSecret))
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(AuthResponse{Token: tokenString, Role: user.Role, Email: user.Email})
@@ -272,7 +273,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(JWT_SECRET), nil
+			return []byte(jwtSecret), nil
 		})
 
 		if err != nil || !token.Valid {
@@ -294,7 +295,7 @@ func adminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 		claims := jwt.MapClaims{}
 		token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(JWT_SECRET), nil
+			return []byte(jwtSecret), nil
 		})
 
 		if err != nil || !token.Valid {
