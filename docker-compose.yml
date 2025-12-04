@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # 1. سرویس دیتابیس
+  postgres:
+    image: postgres:15-alpine
+    container_name: tts-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: tts_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - tts-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. سرویس بک‌ند Go
+  go-service:
+    build:
+      context: ./go-service
+      dockerfile: Dockerfile
+    container_name: go-service
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      python-service:
+        condition: service_started
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=admin
+      - DB_PASSWORD=password123
+      - DB_NAME=tts_db
+      - DB_PORT=5432
+      - JWT_SECRET=my_super_secret_key_2025
+      - PYTHON_SERVICE_URL=http://python-service:5000
+      - PORT=8080
+    networks:
+      - tts-network
+    restart: unless-stopped
+
+  # 3. سرویس هوش مصنوعی Python
+  python-service:
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    container_name: python-service
+    volumes:
+      - ./data:/app/data
+      - ./training_runs:/app/training_runs
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    networks:
+      - tts-network
+    restart: unless-stopped
+
+  # 4. سرویس فرانت‌اند Next.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tts-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://go-service:8080/api/v1
+    depends_on:
+      - go-service
+    networks:
+      - tts-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  tts-network:
+    driver: bridge

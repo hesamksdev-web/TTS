@@ -1,0 +1,215 @@
+{
+  "info": {
+    "_postman_id": "3ca01ad0-0b4f-4a5c-9591-87bef72969a6",
+    "name": "TTS Inference Services",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection for interacting with Go proxy and Python TTS services."
+  },
+  "item": [
+    {
+      "name": "Go Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{go_base_url}}/health",
+              "host": [
+                "{{go_base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Synthesize",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"سلام!\",\n  \"speaker_id\": \"en_p225\"\n}"
+            },
+            "url": {
+              "raw": "{{go_base_url}}/api/v1/synthesize",
+              "host": [
+                "{{go_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "synthesize"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dataset Upload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "dataset_name",
+                  "value": "my_dataset",
+                  "type": "text"
+                },
+                {
+                  "key": "transcript",
+                  "value": "Crisp crickets click by creek.",
+                  "type": "text"
+                },
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": [
+                    "~/datasets/raw/en_002.mp3"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{go_base_url}}/api/v1/dataset/upload",
+              "host": [
+                "{{go_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dataset",
+                "upload"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Start Finetune",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dataset_name\": \"my_dataset\",\n  \"epochs\": 4,\n  \"batch_size\": 2\n}"
+            },
+            "url": {
+              "raw": "{{go_base_url}}/api/v1/finetune/start",
+              "host": [
+                "{{go_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finetune",
+                "start"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Python Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{python_base_url}}/health",
+              "host": [
+                "{{python_base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Hello from Python service!\",\n  \"speaker_id\": \"en_p225\"\n}"
+            },
+            "url": {
+              "raw": "{{python_base_url}}/generate",
+              "host": [
+                "{{python_base_url}}"
+              ],
+              "path": [
+                "generate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Train",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dataset_name\": \"my_dataset\",\n  \"epochs\": 4,\n  \"batch_size\": 2\n}"
+            },
+            "url": {
+              "raw": "{{python_base_url}}/train",
+              "host": [
+                "{{python_base_url}}"
+              ],
+              "path": [
+                "train"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "go_base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "python_base_url",
+      "value": "http://localhost:5001"
+    }
+  ]
+}

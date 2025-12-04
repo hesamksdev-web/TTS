@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: tts-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+      POSTGRES_DB: tts_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tts-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  go-service:
+    image: registry.hamdocker.ir/hesamksdev/tts-go-service:v1
+    container_name: go-service
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=admin
+      - DB_PASSWORD=${DB_PASSWORD:-password123}
+      - DB_NAME=tts_db
+      - DB_PORT=5432
+      - JWT_SECRET=${JWT_SECRET:-my_super_secret_key_2025}
+      - PYTHON_SERVICE_URL=http://python-service:5000
+      - PORT=8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      python-service:
+        condition: service_started
+    networks:
+      - tts-network
+    restart: always
+
+  python-service:
+    image: registry.hamdocker.ir/hesamksdev/tts-python-service:v1
+    container_name: python-service
+    volumes:
+      - ./data:/app/data
+      - ./training_runs:/app/training_runs
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    networks:
+      - tts-network
+    restart: always
+
+  frontend:
+    image: registry.hamdocker.ir/hesamksdev/tts-frontend:v1
+    container_name: tts-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=https://clone.bearbyte.cloud/api/v1
+    depends_on:
+      - go-service
+    networks:
+      - tts-network
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - go-service
+    networks:
+      - tts-network
+    restart: always
+
+volumes:
+  postgres_data:
+
+networks:
+  tts-network:
+    driver: bridge
