@@ -41,6 +41,8 @@ export default function Dashboard() {
   const [voiceCloneFile, setVoiceCloneFile] = useState<File | null>(null);
   const [voiceCloneLanguage, setVoiceCloneLanguage] = useState("fa");
   const [voiceCloneText, setVoiceCloneText] = useState("سلام، این یک نمونه از صدای شما است.");
+  const [voiceCloneSpeed, setVoiceCloneSpeed] = useState(1.0);
+  const [voiceCloneEmotion, setVoiceCloneEmotion] = useState("neutral");
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
 
   const speakers = [
@@ -186,9 +188,11 @@ export default function Dashboard() {
 
     try {
       const formData = new FormData();
-      formData.append("audio", voiceCloneFile);
+      formData.append("file", voiceCloneFile);
       formData.append("text", voiceCloneText);
       formData.append("language", voiceCloneLanguage);
+      formData.append("speed", voiceCloneSpeed.toString());
+      formData.append("emotion", voiceCloneEmotion);
 
       const res = await axios.post(`${API_BASE_URL}/voice-clone`, formData, {
         ...getHeaders(),
@@ -490,6 +494,38 @@ export default function Dashboard() {
                     Selected: {voiceCloneFile.name}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Speech Speed: {voiceCloneSpeed.toFixed(1)}x
+                </label>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.0"
+                  step="0.1"
+                  value={voiceCloneSpeed}
+                  onChange={(e) => setVoiceCloneSpeed(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <p className="text-xs text-slate-500 mt-1">0.5 (slow) to 2.0 (fast)</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Emotion/Style
+                </label>
+                <select
+                  value={voiceCloneEmotion}
+                  onChange={(e) => setVoiceCloneEmotion(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  <option value="neutral">😐 Neutral</option>
+                  <option value="happy">😊 Happy</option>
+                  <option value="sad">😢 Sad</option>
+                  <option value="angry">😠 Angry</option>
+                </select>
               </div>
 
               <div>

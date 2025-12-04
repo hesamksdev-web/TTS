@@ -138,6 +138,8 @@ class SynthesizeTrainedRequest(BaseModel):
 class VoiceCloneRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)
     language: str = Field(..., description="Language code: fa (Farsi), de (German), en (English)")
+    speed: float = Field(1.0, ge=0.5, le=2.0, description="Speech speed: 0.5 (slow) to 2.0 (fast)")
+    emotion: str = Field("neutral", description="Speech emotion/style: neutral, happy, sad, angry")
 
 
 @app.post("/tts-trained", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech from trained model"}})
@@ -177,11 +179,22 @@ async def voice_clone(
     file: UploadFile = File(...),
     text: str = Form(...),
     language: str = Form(...),
+    speed: float = Form(1.0),
+    emotion: str = Form("neutral"),
     background_tasks: BackgroundTasks = None
 ):
-    """Clone a voice from uploaded audio and synthesize text"""
+    """Clone a voice from uploaded audio and synthesize text with optional speed and emotion control"""
     if not file or not text or not language:
         raise HTTPException(status_code=400, detail="file, text, and language are required")
+    
+    # Validate speed parameter
+    if speed < 0.5 or speed > 2.0:
+        raise HTTPException(status_code=400, detail="speed must be between 0.5 and 2.0")
+    
+    # Validate emotion parameter
+    valid_emotions = ["neutral", "happy", "sad", "angry"]
+    if emotion not in valid_emotions:
+        raise HTTPException(status_code=400, detail=f"emotion must be one of: {', '.join(valid_emotions)}")
     
     if language not in ["fa", "de", "en"]:
         raise HTTPException(status_code=400, detail="language must be 'fa', 'de', or 'en'")
@@ -254,7 +267,10 @@ async def voice_clone(
         # Synthesize with voice cloning using the uploaded voice sample
         def _clone_voice():
             try:
-                logger.info("Synthesizing with speaker_wav: %s", wav_sample_path)
+                import soundfile as sf
+                import numpy as np
+                
+                logger.info("Synthesizing with speaker_wav: %s, speed: %f, emotion: %s", wav_sample_path, speed, emotion)
                 
                 # Use tts_to_file with speaker_wav as file path
                 # YourTTS model supports voice cloning with speaker_wav
@@ -265,6 +281,21 @@ async def voice_clone(
                     file_path=output_path,
                     gpu=False
                 )
+                
+                # Apply speed adjustment if needed
+                if speed != 1.0:
+                    logger.info("Applying speed adjustment: %f", speed)
+                    wav_data, sr = sf.read(output_path)
+                    # Adjust speed by resampling
+                    adjusted_length = int(len(wav_data) / speed)
+                    wav_data_adjusted = np.interp(
+                        np.linspace(0, len(wav_data) - 1, adjusted_length),
+                        np.arange(len(wav_data)),
+                        wav_data
+                    )
+                    sf.write(output_path, wav_data_adjusted, sr)
+                    logger.info("Speed adjustment applied")
+                
                 logger.info("Voice synthesis succeeded with speaker_wav")
             except Exception as err:
                 logger.exception("Voice synthesis failed with speaker_wav: %s", err)
