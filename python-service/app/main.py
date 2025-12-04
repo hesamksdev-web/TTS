@@ -167,6 +167,30 @@ async def synthesize_trained(payload: SynthesizeTrainedRequest, background_tasks
         raise HTTPException(status_code=500, detail="Synthesis failed") from err
 
 
+@app.get("/trained-models")
+async def list_trained_models() -> dict[str, Any]:
+    """List all available trained models"""
+    trained_models = []
+    
+    if TRAIN_OUTPUT_ROOT.exists():
+        for job_dir in sorted(TRAIN_OUTPUT_ROOT.iterdir(), reverse=True):
+            if job_dir.is_dir():
+                # Check if best model exists
+                best_models = list(job_dir.glob("best_model_*.pth"))
+                if best_models:
+                    trained_models.append({
+                        "job_id": job_dir.name,
+                        "model_path": str(best_models[0]),
+                        "created_at": job_dir.stat().st_mtime,
+                    })
+    
+    return {
+        "status": "ok",
+        "models": trained_models,
+        "count": len(trained_models),
+    }
+
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {

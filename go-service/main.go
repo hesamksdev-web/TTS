@@ -131,6 +131,7 @@ func main() {
 	mux.HandleFunc("/api/v1/finetune/start", authMiddleware(finetuneHandler))
 	mux.HandleFunc("/api/v1/synthesize", authMiddleware(synthesizeHandler))
 	mux.HandleFunc("/api/v1/synthesize-trained", authMiddleware(synthesizeTrainedHandler))
+	mux.HandleFunc("/api/v1/trained-models", authMiddleware(listTrainedModelsHandler))
 
 	mux.HandleFunc("/api/v1/admin/users", adminMiddleware(handleListUsers))
 	mux.HandleFunc("/api/v1/admin/approve", adminMiddleware(handleApproveUser))
@@ -354,6 +355,41 @@ func synthesizeTrainedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proxyJSON(w, PYTHON_SERVICE_URL+"/tts-trained", req)
+}
+
+func listTrainedModelsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	proxyRequest, err := http.NewRequest(http.MethodGet, PYTHON_SERVICE_URL+"/trained-models", nil)
+	if err != nil {
+		log.Printf("failed to create request: %v", err)
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	resp, err := httpClient.Do(proxyRequest)
+	if err != nil {
+		log.Printf("python service request failed: %v", err)
+		writeError(w, http.StatusBadGateway, "python service unavailable")
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("failed to read response body: %v", err)
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(resp.StatusCode)
+	if _, err := w.Write(respBody); err != nil {
+		log.Printf("failed to write response body: %v", err)
+	}
 }
 
 func finetuneHandler(w http.ResponseWriter, r *http.Request) {
