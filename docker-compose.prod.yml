@@ -106,7 +106,9 @@ services:
     image: tts-frontend:latest
     container_name: tts-frontend
     environment:
-      NEXT_PUBLIC_API_URL: https://${DOMAIN:-clone.bearbyte.cloud}/api/v1
+      # Inside Docker, use internal service name
+      # For browser, Nginx will handle the routing
+      NEXT_PUBLIC_API_URL: /api/v1
     depends_on:
       - go-service
     networks:
