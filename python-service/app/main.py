@@ -179,7 +179,7 @@ async def voice_clone(
     audio: UploadFile = File(...),
     text: str = Form(...),
     language: str = Form(...),
-    speed: float = Form(1.0),
+    speed: str = Form("1.0"),
     emotion: str = Form("neutral"),
     background_tasks: BackgroundTasks = None
 ):
@@ -187,8 +187,14 @@ async def voice_clone(
     if not audio or not text or not language:
         raise HTTPException(status_code=400, detail="audio, text, and language are required")
     
+    # Convert speed to float
+    try:
+        speed_float = float(speed)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="speed must be a valid number")
+    
     # Validate speed parameter
-    if speed < 0.5 or speed > 2.0:
+    if speed_float < 0.5 or speed_float > 2.0:
         raise HTTPException(status_code=400, detail="speed must be between 0.5 and 2.0")
     
     # Validate emotion parameter
@@ -270,7 +276,7 @@ async def voice_clone(
                 import soundfile as sf
                 import numpy as np
                 
-                logger.info("Synthesizing with speaker_wav: %s, speed: %f, emotion: %s", wav_sample_path, speed, emotion)
+                logger.info("Synthesizing with speaker_wav: %s, speed: %f, emotion: %s", wav_sample_path, speed_float, emotion)
                 
                 # Use tts_to_file with speaker_wav as file path
                 # YourTTS model supports voice cloning with speaker_wav
@@ -283,11 +289,11 @@ async def voice_clone(
                 )
                 
                 # Apply speed adjustment if needed
-                if speed != 1.0:
-                    logger.info("Applying speed adjustment: %f", speed)
+                if speed_float != 1.0:
+                    logger.info("Applying speed adjustment: %f", speed_float)
                     wav_data, sr = sf.read(output_path)
                     # Adjust speed by resampling
-                    adjusted_length = int(len(wav_data) / speed)
+                    adjusted_length = int(len(wav_data) / speed_float)
                     wav_data_adjusted = np.interp(
                         np.linspace(0, len(wav_data) - 1, adjusted_length),
                         np.arange(len(wav_data)),
