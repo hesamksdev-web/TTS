@@ -477,6 +477,23 @@ export default function Dashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Voice Sample Audio File
+                </label>
+                <Input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(e) => setVoiceCloneFile(e.target.files?.[0] || null)}
+                  className="border-slate-200"
+                />
+                {voiceCloneFile && (
+                  <p className="text-xs text-slate-500 mt-2">
+                    Selected: {voiceCloneFile.name}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Text to Speak
                 </label>
                 <textarea
