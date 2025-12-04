@@ -147,7 +147,7 @@ func main() {
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 	var req RegisterRequest
@@ -157,16 +157,15 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	user := User{Email: req.Email, Password: string(hashedPassword), Role: "user"}
 
 	if result := db.Create(&user); result.Error != nil {
-		http.Error(w, "User already exists", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "User already exists")
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "User registered"})
+	writeJSON(w, http.StatusCreated, map[string]string{"message": "User registered"})
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 	var req LoginRequest
@@ -174,18 +173,18 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	var user User
 	if err := db.Where("email = ?", req.Email).First(&user).Error; err != nil {
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		writeError(w, http.StatusUnauthorized, "Invalid credentials")
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		writeError(w, http.StatusUnauthorized, "Invalid credentials")
 		return
 	}
 
 	// Check if user is approved
 	if !user.Approved && user.Role != "admin" {
-		http.Error(w, "Account pending admin approval", http.StatusForbidden)
+		writeError(w, http.StatusForbidden, "Account pending admin approval")
 		return
 	}
 
@@ -196,13 +195,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	})
 	tokenString, _ := token.SignedString([]byte(jwtSecret))
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(AuthResponse{Token: tokenString, Role: user.Role, Email: user.Email})
+	writeJSON(w, http.StatusOK, AuthResponse{Token: tokenString, Role: user.Role, Email: user.Email})
 }
 
 func handleListUsers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
@@ -216,7 +214,7 @@ func handleListUsers(w http.ResponseWriter, r *http.Request) {
 
 	var users []User
 	if result := db.Select("id, email, role, approved, created_at").Find(&users); result.Error != nil {
-		http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "Failed to fetch users")
 		return
 	}
 
@@ -236,13 +234,12 @@ func handleListUsers(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	writeJSON(w, http.StatusOK, response)
 }
 
 func handleApproveUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
@@ -252,12 +249,12 @@ func handleApproveUser(w http.ResponseWriter, r *http.Request) {
 
 	var req ApproveRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "Invalid request")
 		return
 	}
 
 	if result := db.Model(&User{}).Where("id = ?", req.UserID).Update("approved", true); result.Error != nil {
-		http.Error(w, "Failed to approve user", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "Failed to approve user")
 		return
 	}
 
@@ -268,7 +265,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			http.Error(w, "Missing Authorization Header", http.StatusUnauthorized)
+			writeError(w, http.StatusUnauthorized, "Missing Authorization Header")
 			return
 		}
 		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
@@ -277,7 +274,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			http.Error(w, "Invalid Token", http.StatusUnauthorized)
+			writeError(w, http.StatusUnauthorized, "Invalid Token")
 			return
 		}
 		next(w, r)
@@ -288,7 +285,7 @@ func adminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			http.Error(w, "Missing Authorization Header", http.StatusUnauthorized)
+			writeError(w, http.StatusUnauthorized, "Missing Authorization Header")
 			return
 		}
 
@@ -299,13 +296,13 @@ func adminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			http.Error(w, "Invalid Token", http.StatusUnauthorized)
+			writeError(w, http.StatusUnauthorized, "Invalid Token")
 			return
 		}
 
 		role, ok := claims["role"].(string)
 		if !ok || role != "admin" {
-			http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+			writeError(w, http.StatusForbidden, "Forbidden: Admin access required")
 			return
 		}
 
@@ -515,4 +512,10 @@ func writeJSON(w http.ResponseWriter, statusCode int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(data)
+}
+
+func writeError(w http.ResponseWriter, statusCode int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
