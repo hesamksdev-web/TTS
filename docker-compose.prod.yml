@@ -1,5 +1,3 @@
-version: '3.8'
-
 # ============================================================================
 # TTS Application - Production Docker Compose Configuration
 # ============================================================================
@@ -41,7 +39,10 @@ services:
   # Go Backend Service
   # ========================================================================
   go-service:
-    image: registry.hamdocker.ir/hesamksdev/tts-go-service:v1
+    build:
+      context: ./go-service
+      dockerfile: Dockerfile
+    image: tts-go-service:latest
     container_name: go-service
     environment:
       DB_HOST: postgres
@@ -70,7 +71,10 @@ services:
   # Python AI Service (TTS)
   # ========================================================================
   python-service:
-    image: registry.hamdocker.ir/hesamksdev/tts-python-service:v1
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    image: tts-python-service:latest
     container_name: python-service
     volumes:
       - ./data:/app/data
@@ -96,7 +100,10 @@ services:
   # Next.js Frontend
   # ========================================================================
   frontend:
-    image: registry.hamdocker.ir/hesamksdev/tts-frontend:v1
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: tts-frontend:latest
     container_name: tts-frontend
     environment:
       NEXT_PUBLIC_API_URL: https://${DOMAIN:-clone.bearbyte.cloud}/api/v1
