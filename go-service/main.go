@@ -312,18 +312,18 @@ func adminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 func synthesizeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
 	var req synthesizeRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid JSON payload", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid JSON payload")
 		return
 	}
 
 	if req.Text == "" || req.SpeakerID == "" {
-		http.Error(w, "text and speaker_id are required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "text and speaker_id are required")
 		return
 	}
 
@@ -332,18 +332,18 @@ func synthesizeHandler(w http.ResponseWriter, r *http.Request) {
 
 func finetuneHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
 	var req finetuneRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid JSON payload", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid JSON payload")
 		return
 	}
 
 	if req.DatasetName == "" || req.Epochs <= 0 || req.BatchSize <= 0 {
-		http.Error(w, "dataset_name, epochs and batch_size are required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "dataset_name, epochs and batch_size are required")
 		return
 	}
 
@@ -352,25 +352,25 @@ func finetuneHandler(w http.ResponseWriter, r *http.Request) {
 
 func datasetUploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
 	if err := r.ParseMultipartForm(200 << 20); err != nil {
-		http.Error(w, "failed to parse form data", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "failed to parse form data")
 		return
 	}
 
 	datasetName := sanitizeName(r.FormValue("dataset_name"))
 	transcript := strings.TrimSpace(r.FormValue("transcript"))
 	if datasetName == "" || transcript == "" {
-		http.Error(w, "dataset_name and transcript are required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "dataset_name and transcript are required")
 		return
 	}
 
 	file, handler, err := r.FormFile("audio")
 	if err != nil {
-		http.Error(w, "audio file is required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "audio file is required")
 		return
 	}
 	defer file.Close()
@@ -392,12 +392,12 @@ func datasetUploadHandler(w http.ResponseWriter, r *http.Request) {
 	tmpDir := filepath.Join(datasetDir, "tmp")
 	if err := os.MkdirAll(wavDir, 0o755); err != nil {
 		log.Printf("failed to create wav dir: %v", err)
-		http.Error(w, "failed to prepare dataset directory", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to prepare dataset directory")
 		return
 	}
 	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		log.Printf("failed to create tmp dir: %v", err)
-		http.Error(w, "failed to prepare dataset directory", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to prepare dataset directory")
 		return
 	}
 
@@ -405,13 +405,13 @@ func datasetUploadHandler(w http.ResponseWriter, r *http.Request) {
 	dest, err := os.Create(mp3Path)
 	if err != nil {
 		log.Printf("failed to create temp file: %v", err)
-		http.Error(w, "failed to store audio", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to store audio")
 		return
 	}
 	if _, err := io.Copy(dest, file); err != nil {
 		dest.Close()
 		log.Printf("failed to copy audio: %v", err)
-		http.Error(w, "failed to store audio", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to store audio")
 		return
 	}
 	dest.Close()
@@ -419,14 +419,14 @@ func datasetUploadHandler(w http.ResponseWriter, r *http.Request) {
 	wavPath := filepath.Join(wavDir, wavName)
 	if err := convertToWav(mp3Path, wavPath); err != nil {
 		log.Printf("ffmpeg conversion failed: %v", err)
-		http.Error(w, "audio conversion failed", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "audio conversion failed")
 		return
 	}
 	_ = os.Remove(mp3Path)
 
 	if err := appendMetadata(datasetDir, wavName, transcript); err != nil {
 		log.Printf("failed to update metadata: %v", err)
-		http.Error(w, "unable to update metadata", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "unable to update metadata")
 		return
 	}
 
@@ -442,14 +442,14 @@ func proxyJSON(w http.ResponseWriter, targetURL string, payload any) {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		log.Printf("failed to marshal payload: %v", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
 
 	proxyReq, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewReader(body))
 	if err != nil {
 		log.Printf("failed to create request: %v", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
 	proxyReq.Header.Set("Content-Type", "application/json")
@@ -457,17 +457,12 @@ func proxyJSON(w http.ResponseWriter, targetURL string, payload any) {
 	resp, err := httpClient.Do(proxyReq)
 	if err != nil {
 		log.Printf("python service request failed: %v", err)
-		http.Error(w, "python service unavailable", http.StatusBadGateway)
+		writeError(w, http.StatusBadGateway, "python service unavailable")
 		return
 	}
 	defer resp.Body.Close()
 
-	for key, values := range resp.Header {
-		for _, value := range values {
-			w.Header().Add(key, value)
-		}
-	}
-
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.StatusCode)
 	if _, err := io.Copy(w, resp.Body); err != nil {
 		log.Printf("failed to copy response body: %v", err)
