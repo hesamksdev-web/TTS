@@ -56,6 +56,11 @@ type synthesizeRequest struct {
 	SpeakerID string `json:"speaker_id"`
 }
 
+type synthesizeTrainedRequest struct {
+	Text  string `json:"text"`
+	JobID string `json:"job_id"`
+}
+
 type finetuneRequest struct {
 	DatasetName string `json:"dataset_name"`
 	Epochs      int    `json:"epochs"`
@@ -125,6 +130,7 @@ func main() {
 	mux.HandleFunc("/api/v1/dataset/upload", authMiddleware(datasetUploadHandler))
 	mux.HandleFunc("/api/v1/finetune/start", authMiddleware(finetuneHandler))
 	mux.HandleFunc("/api/v1/synthesize", authMiddleware(synthesizeHandler))
+	mux.HandleFunc("/api/v1/synthesize-trained", authMiddleware(synthesizeTrainedHandler))
 
 	mux.HandleFunc("/api/v1/admin/users", adminMiddleware(handleListUsers))
 	mux.HandleFunc("/api/v1/admin/approve", adminMiddleware(handleApproveUser))
@@ -328,6 +334,26 @@ func synthesizeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proxyJSON(w, PYTHON_SERVICE_URL+"/tts", req)
+}
+
+func synthesizeTrainedHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	var req synthesizeTrainedRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid JSON payload")
+		return
+	}
+
+	if req.Text == "" || req.JobID == "" {
+		writeError(w, http.StatusBadRequest, "text and job_id are required")
+		return
+	}
+
+	proxyJSON(w, PYTHON_SERVICE_URL+"/tts-trained", req)
 }
 
 func finetuneHandler(w http.ResponseWriter, r *http.Request) {

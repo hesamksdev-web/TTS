@@ -130,6 +130,43 @@ async def tts_endpoint(payload: GenerateRequest, background_tasks: BackgroundTas
     return await generate_audio(payload, background_tasks)
 
 
+class SynthesizeTrainedRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=5000)
+    job_id: str = Field(..., min_length=1, description="Training job ID (e.g., my_dataset_20251204145511)")
+
+
+@app.post("/tts-trained", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech from trained model"}})
+async def synthesize_trained(payload: SynthesizeTrainedRequest, background_tasks: BackgroundTasks):
+    """Synthesize audio using a trained model"""
+    job_dir = TRAIN_OUTPUT_ROOT / payload.job_id
+    best_model_path = None
+    
+    # Find best model checkpoint
+    if job_dir.exists():
+        for file in job_dir.glob("best_model_*.pth"):
+            best_model_path = file
+            break
+    
+    if not best_model_path:
+        raise HTTPException(status_code=404, detail=f"No trained model found for job_id '{payload.job_id}'")
+    
+    logger.info("Loading trained model from: %s", best_model_path)
+    engine = TTS(model_path=str(best_model_path), gpu=False)
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+        tmp_path = tmp_file.name
+    
+    try:
+        await _synthesize_to_path(engine, payload.text, None, tmp_path)
+        _schedule_cleanup(background_tasks, tmp_path)
+        
+        filename = f"tts_trained_{payload.job_id}.wav"
+        return FileResponse(path=tmp_path, media_type="audio/wav", filename=filename)
+    except Exception as err:
+        logger.exception("Synthesis from trained model failed")
+        raise HTTPException(status_code=500, detail="Synthesis failed") from err
+
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {

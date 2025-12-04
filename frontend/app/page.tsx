@@ -33,11 +33,13 @@ export default function Dashboard() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedSpeaker, setSelectedSpeaker] = useState("fa_cv");
+  const [synthesisMode, setSynthesisMode] = useState<"pretrained" | "trained">("pretrained");
+  const [trainedJobId, setTrainedJobId] = useState("");
 
   const speakers = [
-    { id: "fa_cv", label: "Persian (Farsi)" },
-    { id: "en_p225", label: "English (VCTK)" },
-    { id: "de_thorsten", label: "German (Thorsten)" },
+    { id: "fa_cv", label: "🌍 Persian (Farsi) - Pre-trained" },
+    { id: "en_p225", label: "🌍 English (VCTK) - Pre-trained" },
+    { id: "de_thorsten", label: "🌍 German (Thorsten) - Pre-trained" },
   ];
 
   useEffect(() => {
@@ -113,17 +115,25 @@ export default function Dashboard() {
     setAudioUrl(null);
 
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/synthesize`,
-        {
-          text: textToSpeak,
-          speaker_id: selectedSpeaker,
-        },
-        {
-          ...getHeaders(),
-          responseType: "blob",
+      let endpoint = `${API_BASE_URL}/synthesize`;
+      let payload: any = { text: textToSpeak };
+
+      if (synthesisMode === "trained") {
+        if (!trainedJobId) {
+          toast.error("Please enter a trained model Job ID");
+          setLoading(false);
+          return;
         }
-      );
+        endpoint = `${API_BASE_URL}/synthesize-trained`;
+        payload.job_id = trainedJobId;
+      } else {
+        payload.speaker_id = selectedSpeaker;
+      }
+
+      const res = await axios.post(endpoint, payload, {
+        ...getHeaders(),
+        responseType: "blob",
+      });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
       setAudioUrl(url);
@@ -272,20 +282,65 @@ export default function Dashboard() {
             <CardContent className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Speaker Voice
+                  Synthesis Mode
                 </label>
-                <select
-                  value={selectedSpeaker}
-                  onChange={(e) => setSelectedSpeaker(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                >
-                  {speakers.map((speaker) => (
-                    <option key={speaker.id} value={speaker.id}>
-                      {speaker.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setSynthesisMode("pretrained")}
+                    className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
+                      synthesisMode === "pretrained"
+                        ? "bg-green-600 text-white"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    🌍 Pre-trained
+                  </button>
+                  <button
+                    onClick={() => setSynthesisMode("trained")}
+                    className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
+                      synthesisMode === "trained"
+                        ? "bg-blue-600 text-white"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    🎓 Trained Model
+                  </button>
+                </div>
               </div>
+
+              {synthesisMode === "pretrained" ? (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Speaker Voice
+                  </label>
+                  <select
+                    value={selectedSpeaker}
+                    onChange={(e) => setSelectedSpeaker(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    {speakers.map((speaker) => (
+                      <option key={speaker.id} value={speaker.id}>
+                        {speaker.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Trained Model Job ID
+                  </label>
+                  <Input
+                    placeholder="e.g., my_dataset_20251204145511"
+                    value={trainedJobId}
+                    onChange={(e) => setTrainedJobId(e.target.value)}
+                    className="border-slate-200"
+                  />
+                  <p className="text-xs text-slate-500 mt-2">
+                    Enter the Job ID from your training run
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
