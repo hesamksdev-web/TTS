@@ -221,12 +221,17 @@ async def voice_clone(
                     file_path=output_path,
                     gpu=False
                 )
-            except TypeError as err:
-                # Fallback: Some models don't support speaker_wav, use default speaker
-                logger.warning("Voice cloning with speaker_wav failed, using default speaker: %s", err)
+            except (TypeError, ValueError) as err:
+                # Fallback: Some models don't support speaker_wav or need speaker parameter
+                logger.warning("Voice cloning with speaker_wav failed, trying with default speaker: %s", err)
                 try:
+                    # For multi-speaker models, use first available speaker
+                    speakers = engine.speakers if hasattr(engine, 'speakers') and engine.speakers else None
+                    speaker = speakers[0] if speakers else None
+                    
                     engine.tts_to_file(
                         text=text,
+                        speaker=speaker,
                         file_path=output_path,
                         gpu=False
                     )
