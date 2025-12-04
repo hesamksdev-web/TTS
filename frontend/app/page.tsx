@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [voiceCloneText, setVoiceCloneText] = useState("سلام، این یک نمونه از صدای شما است.");
   const [voiceCloneSpeed, setVoiceCloneSpeed] = useState(1.0);
   const [voiceCloneEmotion, setVoiceCloneEmotion] = useState("neutral");
+  const [voiceCloneModelType, setVoiceCloneModelType] = useState("your_tts");
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
 
   const speakers = [
@@ -193,6 +194,7 @@ export default function Dashboard() {
       formData.append("language", voiceCloneLanguage);
       formData.append("speed", voiceCloneSpeed.toString());
       formData.append("emotion", voiceCloneEmotion);
+      formData.append("model_type", voiceCloneModelType);
 
       const res = await axios.post(`${API_BASE_URL}/voice-clone`, formData, {
         ...getHeaders(),
@@ -464,19 +466,35 @@ export default function Dashboard() {
                 💡 Select a language and enter text to synthesize speech in that language
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Language
-                </label>
-                <select
-                  value={voiceCloneLanguage}
-                  onChange={(e) => setVoiceCloneLanguage(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                >
-                  <option value="fa">🇮🇷 Persian (Farsi)</option>
-                  <option value="en">🇬🇧 English</option>
-                  <option value="de">🇩🇪 German</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Language
+                  </label>
+                  <select
+                    value={voiceCloneLanguage}
+                    onChange={(e) => setVoiceCloneLanguage(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="fa">🇮🇷 Persian (Farsi)</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="de">🇩🇪 German</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Model Type
+                  </label>
+                  <select
+                    value={voiceCloneModelType}
+                    onChange={(e) => setVoiceCloneModelType(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="your_tts">🎯 YourTTS (Better Quality)</option>
+                    <option value="glow_tts">⚡ Glow-TTS (Faster)</option>
+                  </select>
+                </div>
               </div>
 
               <div>

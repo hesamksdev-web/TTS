@@ -140,6 +140,7 @@ class VoiceCloneRequest(BaseModel):
     language: str = Field(..., description="Language code: fa (Farsi), de (German), en (English)")
     speed: float = Field(1.0, ge=0.5, le=2.0, description="Speech speed: 0.5 (slow) to 2.0 (fast)")
     emotion: str = Field("neutral", description="Speech emotion/style: neutral, happy, sad, angry")
+    model_type: str = Field("your_tts", description="Model type: 'your_tts' (better voice cloning) or 'glow_tts' (faster)")
 
 
 @app.post("/tts-trained", response_class=FileResponse, responses={200: {"content": {"audio/wav": {}}, "description": "Generated speech from trained model"}})
@@ -181,11 +182,12 @@ async def voice_clone(
     language: str = Form(...),
     speed: str = Form(default="1.0"),
     emotion: str = Form(default="neutral"),
+    model_type: str = Form(default="your_tts"),
     background_tasks: BackgroundTasks = None
 ):
     """Clone a voice from uploaded audio and synthesize text with optional speed and emotion control"""
-    logger.info("Voice clone request received: audio=%s, text_len=%d, language=%s, speed=%s, emotion=%s", 
-                audio.filename if audio else None, len(text), language, speed, emotion)
+    logger.info("Voice clone request received: audio=%s, text_len=%d, language=%s, speed=%s, emotion=%s, model_type=%s", 
+                audio.filename if audio else None, len(text), language, speed, emotion, model_type)
     
     if not audio or not text or not language:
         logger.error("Missing required fields: audio=%s, text=%s, language=%s", audio is not None, bool(text), bool(language))
@@ -213,6 +215,12 @@ async def voice_clone(
     if language not in ["fa", "de", "en"]:
         logger.error("Invalid language: %s", language)
         raise HTTPException(status_code=400, detail="language must be 'fa', 'de', or 'en'")
+    
+    # Validate model_type parameter
+    valid_models = ["your_tts", "glow_tts"]
+    if model_type not in valid_models:
+        logger.error("Invalid model_type: %s", model_type)
+        raise HTTPException(status_code=400, detail=f"model_type must be one of: {', '.join(valid_models)}")
     
     logger.info("Voice cloning request: language=%s, text_length=%d", language, len(text))
     
@@ -266,17 +274,24 @@ async def voice_clone(
         await run_in_threadpool(_validate_audio)
         
         # Map language to model that supports voice cloning
-        # Use language-specific models for better pronunciation and clarity
-        language_config = {
-            "fa": {"model": "tts_models/fa/cv/vits"},  # Persian-specific model
-            "de": {"model": "tts_models/de/thorsten/vits"},  # German-specific model
-            "en": {"model": "tts_models/en/ljspeech/vits"},  # English-specific model
-        }
+        # Support two model types: your_tts (better quality) and glow_tts (faster)
+        if model_type == "your_tts":
+            language_config = {
+                "fa": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
+                "de": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
+                "en": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
+            }
+        else:  # glow_tts
+            language_config = {
+                "fa": {"model": "tts_models/multilingual/multi-dataset/glow-tts"},
+                "de": {"model": "tts_models/multilingual/multi-dataset/glow-tts"},
+                "en": {"model": "tts_models/multilingual/multi-dataset/glow-tts"},
+            }
         
         config = language_config[language]
         model_name = config["model"]
         
-        logger.info("Loading model for voice cloning: %s", model_name)
+        logger.info("Loading model for voice cloning: %s (type: %s)", model_name, model_type)
         engine = get_tts_engine(model_name)
         
         # Synthesize with voice cloning using the uploaded voice sample
