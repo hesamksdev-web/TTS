@@ -473,6 +473,20 @@ func proxyJSON(w http.ResponseWriter, targetURL string, payload any) {
 	// Log response for debugging
 	log.Printf("Python service response: status=%d, body=%s", resp.StatusCode, string(respBody))
 
+	// Normalize error responses from FastAPI (convert "detail" to "error")
+	if resp.StatusCode >= 400 {
+		var errResp map[string]interface{}
+		if err := json.Unmarshal(respBody, &errResp); err == nil {
+			if detail, ok := errResp["detail"]; ok && errResp["error"] == nil {
+				errResp["error"] = detail
+				delete(errResp, "detail")
+				if normalizedBody, err := json.Marshal(errResp); err == nil {
+					respBody = normalizedBody
+				}
+			}
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.StatusCode)
 	if _, err := w.Write(respBody); err != nil {
