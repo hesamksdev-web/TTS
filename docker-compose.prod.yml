@@ -101,7 +101,7 @@ services:
   # ========================================================================
   frontend:
     build:
-      context: ./tts-frontend
+      context: ./frontend
       dockerfile: Dockerfile
     image: tts-frontend:latest
     container_name: tts-frontend
