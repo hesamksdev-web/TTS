@@ -32,6 +32,13 @@ export default function Dashboard() {
   const [textToSpeak, setTextToSpeak] = useState("Hello, this is a test of the voice synthesis system.");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [selectedSpeaker, setSelectedSpeaker] = useState("fa_cv");
+
+  const speakers = [
+    { id: "fa_cv", label: "Persian (Farsi)" },
+    { id: "en_p225", label: "English (VCTK)" },
+    { id: "de_thorsten", label: "German (Thorsten)" },
+  ];
 
   useEffect(() => {
     const t = localStorage.getItem("token");
@@ -110,7 +117,7 @@ export default function Dashboard() {
         `${API_BASE_URL}/synthesize`,
         {
           text: textToSpeak,
-          speaker_id: "my_speaker",
+          speaker_id: selectedSpeaker,
         },
         {
           ...getHeaders(),
@@ -263,6 +270,23 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Speaker Voice
+                </label>
+                <select
+                  value={selectedSpeaker}
+                  onChange={(e) => setSelectedSpeaker(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                >
+                  {speakers.map((speaker) => (
+                    <option key={speaker.id} value={speaker.id}>
+                      {speaker.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Text to Synthesize
