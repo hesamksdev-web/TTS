@@ -184,25 +184,34 @@ async def voice_clone(
     background_tasks: BackgroundTasks = None
 ):
     """Clone a voice from uploaded audio and synthesize text with optional speed and emotion control"""
+    logger.info("Voice clone request received: audio=%s, text_len=%d, language=%s, speed=%s, emotion=%s", 
+                audio.filename if audio else None, len(text), language, speed, emotion)
+    
     if not audio or not text or not language:
+        logger.error("Missing required fields: audio=%s, text=%s, language=%s", audio is not None, bool(text), bool(language))
         raise HTTPException(status_code=400, detail="audio, text, and language are required")
     
     # Convert speed to float
     try:
         speed_float = float(speed)
-    except (ValueError, TypeError):
+        logger.info("Speed converted to float: %f", speed_float)
+    except (ValueError, TypeError) as e:
+        logger.error("Speed conversion failed: %s", e)
         raise HTTPException(status_code=400, detail="speed must be a valid number")
     
     # Validate speed parameter
     if speed_float < 0.5 or speed_float > 2.0:
+        logger.error("Speed out of range: %f", speed_float)
         raise HTTPException(status_code=400, detail="speed must be between 0.5 and 2.0")
     
     # Validate emotion parameter
     valid_emotions = ["neutral", "happy", "sad", "angry"]
     if emotion not in valid_emotions:
+        logger.error("Invalid emotion: %s", emotion)
         raise HTTPException(status_code=400, detail=f"emotion must be one of: {', '.join(valid_emotions)}")
     
     if language not in ["fa", "de", "en"]:
+        logger.error("Invalid language: %s", language)
         raise HTTPException(status_code=400, detail="language must be 'fa', 'de', or 'en'")
     
     logger.info("Voice cloning request: language=%s, text_length=%d", language, len(text))
