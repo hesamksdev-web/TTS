@@ -442,7 +442,7 @@ func voiceCloneHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add file field
-	part, err := writer.CreateFormFile("file", handler.Filename)
+	part, err := writer.CreateFormFile("audio", handler.Filename)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "internal error")
 		return
