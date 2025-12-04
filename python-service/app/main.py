@@ -212,14 +212,13 @@ async def voice_clone(
         logger.info("Loading model: %s with speaker: %s", model_name, speaker)
         engine = get_tts_engine(model_name)
         
-        # Synthesize with voice cloning
-        # Note: For now, we use pre-trained speakers since speaker_wav has compatibility issues
+        # Synthesize with voice cloning using the uploaded voice sample
         def _clone_voice():
             try:
-                logger.info("Synthesizing with speaker: %s", speaker)
+                logger.info("Synthesizing with speaker_wav: %s", voice_sample_path)
                 engine.tts_to_file(
                     text=text,
-                    speaker=speaker,
+                    speaker_wav=voice_sample_path,
                     file_path=output_path,
                     gpu=False
                 )
