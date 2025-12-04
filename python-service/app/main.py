@@ -303,13 +303,22 @@ async def voice_clone(
                 logger.info("Synthesizing with speaker_wav: %s, speed: %f, emotion: %s", wav_sample_path, speed_float, emotion)
                 
                 # Use tts_to_file with speaker_wav for voice cloning
-                # Language-specific models provide better pronunciation
-                engine.tts_to_file(
-                    text=text,
-                    speaker_wav=wav_sample_path,
-                    file_path=output_path,
-                    gpu=False
-                )
+                # YourTTS requires language parameter even with speaker_wav
+                if model_type == "your_tts":
+                    engine.tts_to_file(
+                        text=text,
+                        speaker_wav=wav_sample_path,
+                        language=language,
+                        file_path=output_path,
+                        gpu=False
+                    )
+                else:  # glow_tts
+                    engine.tts_to_file(
+                        text=text,
+                        speaker_wav=wav_sample_path,
+                        file_path=output_path,
+                        gpu=False
+                    )
                 
                 # Apply speed adjustment if needed
                 if speed_float != 1.0:
