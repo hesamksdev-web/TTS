@@ -179,8 +179,8 @@ async def voice_clone(
     audio: UploadFile = File(...),
     text: str = Form(...),
     language: str = Form(...),
-    speed: str = Form("1.0"),
-    emotion: str = Form("neutral"),
+    speed: str = Form(default="1.0"),
+    emotion: str = Form(default="neutral"),
     background_tasks: BackgroundTasks = None
 ):
     """Clone a voice from uploaded audio and synthesize text with optional speed and emotion control"""
