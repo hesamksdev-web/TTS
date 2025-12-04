@@ -11,6 +11,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
 
+const getErrorMessage = (error: any): string => {
+  if (typeof error === "string") return error;
+  if (error?.response?.data?.error) return error.response.data.error;
+  if (error?.response?.data?.message) return error.response.data.message;
+  if (error?.response?.data?.detail) return error.response.data.detail;
+  if (typeof error?.response?.data === "string") return error.response.data;
+  return "An error occurred";
+};
+
 export default function Dashboard() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
@@ -61,7 +70,7 @@ export default function Dashboard() {
       setTranscript("");
     } catch (error: any) {
       setStatus("❌ Upload failed");
-      toast.error(error.response?.data || "Upload failed");
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -85,7 +94,7 @@ export default function Dashboard() {
       toast.success("Model trained successfully!");
     } catch (error: any) {
       setStatus("❌ Training failed");
-      toast.error(error.response?.data || "Training failed");
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -115,7 +124,7 @@ export default function Dashboard() {
       toast.success("Audio generated successfully!");
     } catch (error: any) {
       setStatus("❌ Generation failed");
-      toast.error(error.response?.data || "Synthesis failed");
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
