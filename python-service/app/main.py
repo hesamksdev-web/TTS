@@ -387,6 +387,44 @@ async def list_trained_models() -> dict[str, Any]:
     }
 
 
+@app.get("/training-jobs")
+async def list_training_jobs() -> dict[str, Any]:
+    """List all training jobs with their status"""
+    jobs = []
+    
+    if TRAIN_OUTPUT_ROOT.exists():
+        for job_dir in sorted(TRAIN_OUTPUT_ROOT.iterdir(), reverse=True):
+            if job_dir.is_dir():
+                job_info = {
+                    "job_id": job_dir.name,
+                    "created_at": datetime.fromtimestamp(job_dir.stat().st_mtime).isoformat(),
+                    "status": "completed",
+                    "has_model": False,
+                    "log_file": None,
+                }
+                
+                # Check if best model exists
+                best_models = list(job_dir.glob("best_model_*.pth"))
+                if best_models:
+                    job_info["has_model"] = True
+                
+                # Check for log file
+                log_file = job_dir / "train.log"
+                if log_file.exists():
+                    job_info["log_file"] = str(log_file)
+                    # Check if training is still running
+                    if not best_models:
+                        job_info["status"] = "training"
+                
+                jobs.append(job_info)
+    
+    return {
+        "status": "ok",
+        "jobs": jobs,
+        "count": len(jobs),
+    }
+
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {

@@ -140,6 +140,10 @@ func main() {
 	mux.HandleFunc("/api/v1/admin/test", adminMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"message": "Admin access granted"})
 	}))
+	mux.HandleFunc("/api/v1/admin/training/upload", adminMiddleware(adminTrainingUploadHandler))
+	mux.HandleFunc("/api/v1/admin/training/start", adminMiddleware(adminTrainingStartHandler))
+	mux.HandleFunc("/api/v1/admin/training/datasets", adminMiddleware(adminListDatasetsHandler))
+	mux.HandleFunc("/api/v1/admin/training/jobs", adminMiddleware(adminListTrainingJobsHandler))
 
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
@@ -684,4 +688,208 @@ func writeError(w http.ResponseWriter, statusCode int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+func adminTrainingUploadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	if err := r.ParseMultipartForm(200 << 20); err != nil {
+		writeError(w, http.StatusBadRequest, "failed to parse form data")
+		return
+	}
+
+	datasetName := sanitizeName(r.FormValue("dataset_name"))
+	transcript := strings.TrimSpace(r.FormValue("transcript"))
+	if datasetName == "" || transcript == "" {
+		writeError(w, http.StatusBadRequest, "dataset_name and transcript are required")
+		return
+	}
+
+	file, handler, err := r.FormFile("audio")
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "audio file is required")
+		return
+	}
+	defer file.Close()
+
+	sourceExt := strings.ToLower(filepath.Ext(handler.Filename))
+	if sourceExt == "" {
+		sourceExt = ".mp3"
+	}
+
+	baseName := sanitizeName(strings.TrimSuffix(handler.Filename, filepath.Ext(handler.Filename)))
+	if baseName == "" {
+		baseName = fmt.Sprintf("clip_%d", time.Now().Unix())
+	}
+	wavName := fmt.Sprintf("%s_%d.wav", baseName, time.Now().Unix())
+
+	dataRoot := getEnv("DATA_ROOT", "/app/data")
+	datasetDir := filepath.Join(dataRoot, datasetName)
+	wavDir := filepath.Join(datasetDir, "wavs")
+	tmpDir := filepath.Join(datasetDir, "tmp")
+	if err := os.MkdirAll(wavDir, 0o755); err != nil {
+		log.Printf("failed to create wav dir: %v", err)
+		writeError(w, http.StatusInternalServerError, "failed to prepare dataset directory")
+		return
+	}
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
+		log.Printf("failed to create tmp dir: %v", err)
+		writeError(w, http.StatusInternalServerError, "failed to prepare dataset directory")
+		return
+	}
+
+	mp3Path := filepath.Join(tmpDir, fmt.Sprintf("%s%s", baseName, sourceExt))
+	dest, err := os.Create(mp3Path)
+	if err != nil {
+		log.Printf("failed to create temp file: %v", err)
+		writeError(w, http.StatusInternalServerError, "failed to store audio")
+		return
+	}
+	if _, err := io.Copy(dest, file); err != nil {
+		dest.Close()
+		log.Printf("failed to copy audio: %v", err)
+		writeError(w, http.StatusInternalServerError, "failed to store audio")
+		return
+	}
+	dest.Close()
+
+	wavPath := filepath.Join(wavDir, wavName)
+	if err := convertToWav(mp3Path, wavPath); err != nil {
+		log.Printf("ffmpeg conversion failed: %v", err)
+		writeError(w, http.StatusInternalServerError, "audio conversion failed")
+		return
+	}
+	_ = os.Remove(mp3Path)
+
+	if err := appendMetadata(datasetDir, wavName, transcript); err != nil {
+		log.Printf("failed to update metadata: %v", err)
+		writeError(w, http.StatusInternalServerError, "unable to update metadata")
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, map[string]string{
+		"status":        "stored",
+		"dataset":       datasetName,
+		"wav_filename":  wavName,
+		"metadata_path": filepath.Join(datasetDir, "metadata.csv"),
+	})
+}
+
+func adminTrainingStartHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	var req finetuneRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid JSON payload")
+		return
+	}
+
+	if req.DatasetName == "" || req.Epochs <= 0 || req.BatchSize <= 0 {
+		writeError(w, http.StatusBadRequest, "dataset_name, epochs and batch_size are required")
+		return
+	}
+
+	proxyJSON(w, PYTHON_SERVICE_URL+"/train", req)
+}
+
+func adminListDatasetsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	dataRoot := getEnv("DATA_ROOT", "/app/data")
+
+	type DatasetInfo struct {
+		Name       string `json:"name"`
+		AudioCount int    `json:"audio_count"`
+		CreatedAt  string `json:"created_at"`
+	}
+
+	var datasets []DatasetInfo
+
+	entries, err := os.ReadDir(dataRoot)
+	if err != nil {
+		if os.IsNotExist(err) {
+			writeJSON(w, http.StatusOK, map[string]interface{}{
+				"status":   "ok",
+				"datasets": []DatasetInfo{},
+			})
+			return
+		}
+		log.Printf("failed to read data root: %v", err)
+		writeError(w, http.StatusInternalServerError, "failed to list datasets")
+		return
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		wavDir := filepath.Join(dataRoot, entry.Name(), "wavs")
+		audioCount := 0
+		if wavEntries, err := os.ReadDir(wavDir); err == nil {
+			audioCount = len(wavEntries)
+		}
+
+		datasetPath := filepath.Join(dataRoot, entry.Name())
+		info, err := os.Stat(datasetPath)
+		createdAt := ""
+		if err == nil {
+			createdAt = info.ModTime().Format("2006-01-02 15:04:05")
+		}
+
+		datasets = append(datasets, DatasetInfo{
+			Name:       entry.Name(),
+			AudioCount: audioCount,
+			CreatedAt:  createdAt,
+		})
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"status":   "ok",
+		"datasets": datasets,
+	})
+}
+
+func adminListTrainingJobsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	proxyRequest, err := http.NewRequest(http.MethodGet, PYTHON_SERVICE_URL+"/training-jobs", nil)
+	if err != nil {
+		log.Printf("failed to create request: %v", err)
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	resp, err := httpClient.Do(proxyRequest)
+	if err != nil {
+		log.Printf("python service request failed: %v", err)
+		writeError(w, http.StatusBadGateway, "python service unavailable")
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("failed to read response body: %v", err)
+		writeError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(resp.StatusCode)
+	if _, err := w.Write(respBody); err != nil {
+		log.Printf("failed to write response body: %v", err)
+	}
 }
