@@ -1,36 +1,57 @@
 version: '3.8'
 
+# ============================================================================
+# TTS Application - Production Docker Compose Configuration
+# ============================================================================
+# Environment Variables Required (.env file):
+#   DB_PASSWORD=<secure_password>
+#   JWT_SECRET=<secure_jwt_secret>
+#   DOMAIN=clone.bearbyte.cloud (optional, for frontend API URL)
+# ============================================================================
+
 services:
+  # ========================================================================
+  # PostgreSQL Database
+  # ========================================================================
   postgres:
     image: postgres:15-alpine
     container_name: tts-db
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: tts_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
     networks:
       - tts-network
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d tts_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
+  # ========================================================================
+  # Go Backend Service
+  # ========================================================================
   go-service:
     image: registry.hamdocker.ir/hesamksdev/tts-go-service:v1
     container_name: go-service
     environment:
-      - DB_HOST=postgres
-      - DB_USER=admin
-      - DB_PASSWORD=${DB_PASSWORD:-password123}
-      - DB_NAME=tts_db
-      - DB_PORT=5432
-      - JWT_SECRET=${JWT_SECRET:-my_super_secret_key_2025}
-      - PYTHON_SERVICE_URL=http://python-service:5000
-      - PORT=8080
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: tts_db
+      DB_PORT: "5432"
+      JWT_SECRET: ${JWT_SECRET}
+      PYTHON_SERVICE_URL: http://python-service:5000
+      PORT: "8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -39,7 +60,15 @@ services:
     networks:
       - tts-network
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
+  # ========================================================================
+  # Python AI Service (TTS)
+  # ========================================================================
   python-service:
     image: registry.hamdocker.ir/hesamksdev/tts-python-service:v1
     container_name: python-service
@@ -51,21 +80,40 @@ services:
         limits:
           cpus: '2.0'
           memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
     networks:
       - tts-network
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
+  # ========================================================================
+  # Next.js Frontend
+  # ========================================================================
   frontend:
     image: registry.hamdocker.ir/hesamksdev/tts-frontend:v1
     container_name: tts-frontend
     environment:
-      - NEXT_PUBLIC_API_URL=https://clone.bearbyte.cloud/api/v1
+      NEXT_PUBLIC_API_URL: https://${DOMAIN:-clone.bearbyte.cloud}/api/v1
     depends_on:
       - go-service
     networks:
       - tts-network
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
+  # ========================================================================
+  # Nginx Reverse Proxy & SSL
+  # ========================================================================
   nginx:
     image: nginx:alpine
     container_name: nginx-proxy
@@ -75,16 +123,31 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
     depends_on:
       - frontend
       - go-service
     networks:
       - tts-network
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
+# ============================================================================
+# Volumes
+# ============================================================================
 volumes:
   postgres_data:
+    driver: local
+  nginx_cache:
+    driver: local
 
+# ============================================================================
+# Networks
+# ============================================================================
 networks:
   tts-network:
     driver: bridge
