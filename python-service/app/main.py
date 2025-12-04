@@ -238,11 +238,11 @@ async def voice_clone(
         await run_in_threadpool(_validate_audio)
         
         # Map language to model that supports voice cloning
-        # Use Glow-TTS models which support speaker_wav for voice cloning
+        # YourTTS is specifically designed for voice cloning and supports speaker_wav
         language_config = {
-            "fa": {"model": "tts_models/fa/cv/glow-tts"},
-            "de": {"model": "tts_models/de/thorsten/glow-tts"},
-            "en": {"model": "tts_models/en/ljspeech/glow-tts"},
+            "fa": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
+            "de": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
+            "en": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
         }
         
         config = language_config[language]
@@ -257,10 +257,11 @@ async def voice_clone(
                 logger.info("Synthesizing with speaker_wav: %s", wav_sample_path)
                 
                 # Use tts_to_file with speaker_wav as file path
-                # Glow-TTS models support speaker_wav for voice cloning
+                # YourTTS model supports voice cloning with speaker_wav
                 engine.tts_to_file(
                     text=text,
                     speaker_wav=wav_sample_path,
+                    language=language,
                     file_path=output_path,
                     gpu=False
                 )
