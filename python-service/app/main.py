@@ -8,7 +8,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# Set environment variables before importing TTS
 os.environ.setdefault("TORCHAUDIO_FORCE_OLD_AUDIO_IO", "1")
+os.environ["TTS_HOME"] = "/root/.local/share/tts"
+# Auto-accept TTS license agreements
+os.environ["TTS_LICENSE_ACCEPTED"] = "1"
 
 # Patch torchaudio.load to use soundfile before importing TTS
 from app.audio_patch import patch_torchaudio, patch_phoneme_dataset
@@ -26,7 +30,7 @@ from TTS.tts import datasets as tts_datasets
 from app.formatter import tts_service_two_column
 from app.train_job import prepare_training_config, run_training_job as launch_training_job
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("tts_service")
 
 DATA_ROOT = Path(os.getenv("DATA_ROOT", "/app/data"))
@@ -274,20 +278,12 @@ async def voice_clone(
         await run_in_threadpool(_validate_audio)
         
         # Map language to model that supports voice cloning
-        # Support two model types: your_tts (better quality) and glow_tts (faster)
-        if model_type == "your_tts":
-            # YourTTS supports: en, fr-fr, pt-br
-            language_config = {
-                "fa": {"model": "tts_models/fa/cv/vits"},  # Fallback to language-specific for Farsi
-                "de": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
-                "en": {"model": "tts_models/multilingual/multi-dataset/your_tts"},
-            }
-        else:  # glow_tts
-            language_config = {
-                "fa": {"model": "tts_models/multilingual/multi-dataset/glow-tts"},
-                "de": {"model": "tts_models/multilingual/multi-dataset/glow-tts"},
-                "en": {"model": "tts_models/multilingual/multi-dataset/glow-tts"},
-            }
+        # Use XTTS v2 for best voice cloning quality
+        language_config = {
+            "fa": {"model": "tts_models/multilingual/multi-dataset/xtts_v2"},
+            "de": {"model": "tts_models/multilingual/multi-dataset/xtts_v2"},
+            "en": {"model": "tts_models/multilingual/multi-dataset/xtts_v2"},
+        }
         
         config = language_config[language]
         model_name = config["model"]
@@ -301,27 +297,17 @@ async def voice_clone(
                 import soundfile as sf
                 import numpy as np
                 
-                logger.info("Synthesizing with speaker_wav: %s, speed: %f, emotion: %s", wav_sample_path, speed_float, emotion)
+                logger.info("Synthesizing with XTTS v2 speaker_wav: %s, language: %s, speed: %f", wav_sample_path, language, speed_float)
                 
-                # Use tts_to_file with speaker_wav for voice cloning
-                # Different models have different requirements
-                if model_type == "your_tts" and language in ["en", "de"]:
-                    # YourTTS with supported languages
-                    engine.tts_to_file(
-                        text=text,
-                        speaker_wav=wav_sample_path,
-                        language=language,
-                        file_path=output_path,
-                        gpu=False
-                    )
-                else:
-                    # Language-specific models or Glow-TTS don't need language parameter
-                    engine.tts_to_file(
-                        text=text,
-                        speaker_wav=wav_sample_path,
-                        file_path=output_path,
-                        gpu=False
-                    )
+                # XTTS v2 supports voice cloning with speaker_wav parameter
+                # It handles multiple languages automatically
+                engine.tts_to_file(
+                    text=text,
+                    speaker_wav=wav_sample_path,
+                    language=language,
+                    file_path=output_path,
+                    gpu=False
+                )
                 
                 # Apply speed adjustment if needed
                 if speed_float != 1.0:
