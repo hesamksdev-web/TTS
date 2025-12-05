@@ -19,7 +19,7 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir 'numpy>=1.24.0,<2.0.0' 'scipy>=1.10.0' && \
-    pip install --no-cache-dir fastapi==0.111.0 uvicorn[standard]==0.30.3 soundfile transformers torch torchaudio librosa coqpit trainer pysbd matplotlib anyascii --retries 5 && \
+    pip install --no-cache-dir fastapi==0.111.0 uvicorn[standard]==0.30.3 soundfile transformers torch torchaudio librosa coqpit trainer pysbd matplotlib anyascii inflect --retries 5 && \
     pip install --no-cache-dir TTS==0.22.0 --no-deps && \
     pip install --no-cache-dir 'transformers>=4.30.0' --force-reinstall
 
