@@ -5,5 +5,5 @@ TTS==0.22.0
 transformers>=4.30.0
 torch>=2.0.0
 torchaudio>=2.0.0
-numpy<2.0.0
-scipy>=1.10.0
+numpy>=1.24.0,<2.0.0
+scipy>=1.10.0,<1.14.0
