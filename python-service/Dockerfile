@@ -17,8 +17,9 @@ RUN apt-get update && \
 WORKDIR /app
 
 COPY requirements.txt ./
-RUN pip install --upgrade pip setuptools && \
-    pip install --no-cache-dir -r requirements.txt --retries 5
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt --retries 5 && \
+    pip install --no-cache-dir 'transformers>=4.30.0' --force-reinstall
 
 COPY app ./app
 
