@@ -43,7 +43,7 @@ export default function Dashboard() {
   const [voiceCloneText, setVoiceCloneText] = useState("سلام، این یک نمونه از صدای شما است.");
   const [voiceCloneSpeed, setVoiceCloneSpeed] = useState(1.0);
   const [voiceCloneEmotion, setVoiceCloneEmotion] = useState("neutral");
-  const [voiceCloneModelType, setVoiceCloneModelType] = useState("your_tts");
+  const [voiceCloneModelType, setVoiceCloneModelType] = useState("xtts_v2");
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
 
   const speakers = [
@@ -491,8 +491,7 @@ export default function Dashboard() {
                     onChange={(e) => setVoiceCloneModelType(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
-                    <option value="your_tts">🎯 YourTTS (Better Quality)</option>
-                    <option value="glow_tts">⚡ Glow-TTS (Faster)</option>
+                    <option value="xtts_v2">🌟 XTTS v2 (Best Quality)</option>
                   </select>
                 </div>
               </div>
