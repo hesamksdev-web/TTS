@@ -31,7 +31,7 @@ logger = logging.getLogger("tts_service")
 
 DATA_ROOT = Path(os.getenv("DATA_ROOT", "/app/data"))
 TRAIN_OUTPUT_ROOT = Path(os.getenv("TRAIN_OUTPUT_ROOT", "/app/training_runs"))
-BASE_TRAIN_MODEL = os.getenv("BASE_TRAIN_MODEL", "tts_models/en/ljspeech/vits")
+BASE_TRAIN_MODEL = os.getenv("BASE_TRAIN_MODEL", "tts_models/multilingual/multi-dataset/xtts_v2")
 
 for path in (DATA_ROOT, TRAIN_OUTPUT_ROOT):
     path.mkdir(parents=True, exist_ok=True)
@@ -39,18 +39,18 @@ for path in (DATA_ROOT, TRAIN_OUTPUT_ROOT):
 setattr(tts_datasets, "tts_service_two_column", tts_service_two_column)
 
 VOICE_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
-    "en_p225": {
-        "model_name": os.getenv("TTS_MODEL_NAME_EN", "tts_models/en/vctk/vits"),
-        "speaker": "p225",
+    "en_xtts": {
+        "model_name": os.getenv("TTS_MODEL_NAME_EN", "tts_models/multilingual/multi-dataset/xtts_v2"),
+        "speaker": None,
         "language": "en",
     },
-    "de_thorsten": {
-        "model_name": os.getenv("TTS_MODEL_NAME_DE", "tts_models/de/thorsten/vits"),
+    "de_xtts": {
+        "model_name": os.getenv("TTS_MODEL_NAME_DE", "tts_models/multilingual/multi-dataset/xtts_v2"),
         "speaker": None,
         "language": "de",
     },
-    "fa_cv": {
-        "model_name": os.getenv("TTS_MODEL_NAME_FA", "tts_models/fa/cv/vits"),
+    "fa_xtts": {
+        "model_name": os.getenv("TTS_MODEL_NAME_FA", "tts_models/multilingual/multi-dataset/xtts_v2"),
         "speaker": None,
         "language": "fa",
     },
@@ -69,7 +69,7 @@ app = FastAPI(title="Python TTS Service", version="0.1.0")
 
 class GenerateRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)
-    speaker_id: str = Field(..., min_length=1, description="Allowed values: en_p225, de_thorsten, fa_cv")
+    speaker_id: str = Field(..., min_length=1, description="Allowed values: en_xtts, de_xtts, fa_xtts")
 
 
 class TrainRequest(BaseModel):
