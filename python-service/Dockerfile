@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY requirements.txt ./
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir numpy==1.23.5 scipy==1.10.1 && \
+    pip install --no-cache-dir numpy==1.26.4 scipy==1.11.4 && \
     pip install --no-cache-dir -r requirements.txt --retries 5 && \
     pip install --no-cache-dir 'transformers>=4.30.0' --force-reinstall
 
