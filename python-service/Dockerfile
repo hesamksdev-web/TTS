@@ -18,8 +18,6 @@ WORKDIR /app
 
 COPY requirements.txt ./
 RUN pip install --upgrade pip setuptools wheel && \
-    pip uninstall -y numpy scipy && \
-    pip install --no-cache-dir 'numpy<2.0.0' 'scipy>=1.10.0' && \
     pip install --no-cache-dir -r requirements.txt --retries 5 && \
     pip install --no-cache-dir 'transformers>=4.30.0' --force-reinstall
 
