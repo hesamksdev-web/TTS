@@ -12,3 +12,4 @@ librosa>=0.10.0
 coqpit>=0.0.17
 pysbd>=0.3.4
 matplotlib>=3.5.0
+anyascii>=0.3.0
