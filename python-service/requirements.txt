@@ -14,3 +14,4 @@ pysbd>=0.3.4
 matplotlib>=3.5.0
 anyascii>=0.3.0
 inflect>=7.0.0
+bangla>=0.0.2
