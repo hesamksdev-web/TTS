@@ -14,6 +14,23 @@ os.environ["TTS_HOME"] = "/root/.local/share/tts"
 # Auto-accept TTS license agreements
 os.environ["TTS_LICENSE_ACCEPTED"] = "1"
 
+# Patch TTS to auto-accept license agreements
+def patch_tts_license():
+    """Patch TTS ModelManager to auto-accept license agreements"""
+    try:
+        from TTS.utils.manage import ModelManager
+        original_ask_tos = ModelManager.ask_tos
+        
+        def patched_ask_tos(self, output_path):
+            """Auto-accept TOS without prompting"""
+            return True
+        
+        ModelManager.ask_tos = patched_ask_tos
+    except Exception as e:
+        print(f"Warning: Could not patch TTS license: {e}")
+
+patch_tts_license()
+
 # Patch torchaudio.load to use soundfile before importing TTS
 from app.audio_patch import patch_torchaudio, patch_phoneme_dataset
 patch_torchaudio()
