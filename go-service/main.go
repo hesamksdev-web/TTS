@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -19,15 +21,20 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const (
-	PYTHON_SERVICE_URL = "http://python-service:5000"
+	PYTHON_SERVICE_URL         = "http://python-service:5000"
+	voiceCloneWorkerIdleSleep  = 2 * time.Second
+	voiceCloneWorkerErrorSleep = 5 * time.Second
 )
 
-var db *gorm.DB
-var httpClient = newHTTPClient()
-var jwtSecret string
+var (
+	db         *gorm.DB
+	httpClient = newHTTPClient()
+	jwtSecret  string
+)
 
 type User struct {
 	gorm.Model
@@ -36,6 +43,42 @@ type User struct {
 	Role     string // "admin" or "user"
 	Approved bool   `gorm:"default:false"` // Admin approval required
 }
+
+type VoiceCloneJob struct {
+	gorm.Model
+	UserID       uint
+	Text         string
+	Language     string
+	Speed        float64
+	Emotion      string
+	ModelType    string
+	Status       string
+	InputPath    string
+	OutputPath   string
+	ErrorMessage string
+}
+
+type Notification struct {
+	gorm.Model
+	UserID  uint
+	JobID   uint
+	Message string
+	Read    bool `gorm:"default:false"`
+}
+
+type contextKey string
+
+const (
+	ctxKeyUserID   contextKey = "userID"
+	ctxKeyUserRole contextKey = "userRole"
+)
+
+const (
+	jobStatusPending    = "pending"
+	jobStatusProcessing = "processing"
+	jobStatusCompleted  = "completed"
+	jobStatusFailed     = "failed"
+)
 
 type RegisterRequest struct {
 	Email    string `json:"email"`
@@ -91,7 +134,9 @@ func initDB() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	db.AutoMigrate(&User{})
+	if err := db.AutoMigrate(&User{}, &VoiceCloneJob{}, &Notification{}); err != nil {
+		log.Fatal("Failed to run migrations:", err)
+	}
 
 	var count int64
 	db.Model(&User{}).Where("email = ?", "admin@tts.com").Count(&count)
@@ -123,6 +168,7 @@ func (c *corsMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	initDB()
 	jwtSecret = getEnv("JWT_SECRET", "my_super_secret_key_2025")
+	startVoiceCloneWorker()
 
 	mux := http.NewServeMux()
 
@@ -135,6 +181,11 @@ func main() {
 	mux.HandleFunc("/api/v1/synthesize-trained", authMiddleware(synthesizeTrainedHandler))
 	mux.HandleFunc("/api/v1/trained-models", authMiddleware(listTrainedModelsHandler))
 	mux.HandleFunc("/api/v1/voice-clone", authMiddleware(voiceCloneHandler))
+	mux.HandleFunc("/api/v1/voice-clone/jobs", authMiddleware(listVoiceCloneJobsHandler))
+	mux.HandleFunc("/api/v1/voice-clone/job", authMiddleware(getVoiceCloneJobHandler))
+	mux.HandleFunc("/api/v1/voice-clone/job/download", authMiddleware(downloadVoiceCloneJobHandler))
+	mux.HandleFunc("/api/v1/notifications", authMiddleware(listNotificationsHandler))
+	mux.HandleFunc("/api/v1/notifications/read", authMiddleware(markNotificationsReadHandler))
 
 	mux.HandleFunc("/api/v1/admin/users", adminMiddleware(handleListUsers))
 	mux.HandleFunc("/api/v1/admin/approve", adminMiddleware(handleApproveUser))
@@ -277,50 +328,118 @@ func handleApproveUser(w http.ResponseWriter, r *http.Request) {
 
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			writeError(w, http.StatusUnauthorized, "Missing Authorization Header")
+		rWithCtx, err := injectUserContextFromRequest(r)
+		if err != nil {
+			writeError(w, http.StatusUnauthorized, "Invalid or missing token")
 			return
 		}
-		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtSecret), nil
-		})
+		next(w, rWithCtx)
+	}
+}
 
-		if err != nil || !token.Valid {
-			writeError(w, http.StatusUnauthorized, "Invalid Token")
-			return
+func injectUserContextFromRequest(r *http.Request) (*http.Request, error) {
+	authHeader := strings.TrimSpace(r.Header.Get("Authorization"))
+	if authHeader == "" {
+		return nil, errors.New("missing Authorization header")
+	}
+
+	tokenString := authHeader
+	if strings.HasPrefix(strings.ToLower(tokenString), "bearer ") {
+		tokenString = strings.TrimSpace(tokenString[7:])
+	}
+	if tokenString == "" {
+		return nil, errors.New("missing bearer token")
+	}
+
+	claims := jwt.MapClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtSecret), nil
+	})
+	if err != nil || !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	userIDClaim, ok := claims["sub"]
+	if !ok {
+		return nil, errors.New("token missing subject")
+	}
+	userID, err := claimValueToUint(userIDClaim)
+	if err != nil {
+		return nil, err
+	}
+
+	role, _ := claims["role"].(string)
+
+	ctx := context.WithValue(r.Context(), ctxKeyUserID, userID)
+	ctx = context.WithValue(ctx, ctxKeyUserRole, role)
+	return r.WithContext(ctx), nil
+}
+
+func getUserIDFromContext(r *http.Request) (uint, error) {
+	val := r.Context().Value(ctxKeyUserID)
+	if id, ok := val.(uint); ok && id > 0 {
+		return id, nil
+	}
+	return 0, errors.New("missing user context")
+}
+
+func getUserRoleFromContext(r *http.Request) (string, error) {
+	val := r.Context().Value(ctxKeyUserRole)
+	if role, ok := val.(string); ok && role != "" {
+		return role, nil
+	}
+	return "", errors.New("missing role context")
+}
+
+func claimValueToUint(value any) (uint, error) {
+	switch v := value.(type) {
+	case float64:
+		if v < 0 {
+			return 0, errors.New("negative user id")
 		}
-		next(w, r)
+		return uint(v), nil
+	case int:
+		if v < 0 {
+			return 0, errors.New("negative user id")
+		}
+		return uint(v), nil
+	case int64:
+		if v < 0 {
+			return 0, errors.New("negative user id")
+		}
+		return uint(v), nil
+	case json.Number:
+		parsed, err := v.Int64()
+		if err != nil || parsed < 0 {
+			return 0, errors.New("invalid user id")
+		}
+		return uint(parsed), nil
+	case string:
+		parsed, err := strconv.ParseUint(v, 10, 64)
+		if err != nil {
+			return 0, errors.New("invalid user id string")
+		}
+		return uint(parsed), nil
+	default:
+		return 0, errors.New("unsupported user id type")
 	}
 }
 
 func adminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			writeError(w, http.StatusUnauthorized, "Missing Authorization Header")
+		rWithCtx, err := injectUserContextFromRequest(r)
+		if err != nil {
+			writeError(w, http.StatusUnauthorized, "Invalid or missing token")
 			return
 		}
 
-		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-		claims := jwt.MapClaims{}
-		token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtSecret), nil
-		})
-
-		if err != nil || !token.Valid {
-			writeError(w, http.StatusUnauthorized, "Invalid Token")
-			return
-		}
-
-		role, ok := claims["role"].(string)
-		if !ok || role != "admin" {
+		role, err := getUserRoleFromContext(rWithCtx)
+		if err != nil || role != "admin" {
 			writeError(w, http.StatusForbidden, "Forbidden: Admin access required")
 			return
 		}
 
-		next(w, r)
+		next(w, rWithCtx)
 	}
 }
 
@@ -405,7 +524,13 @@ func voiceCloneHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(50 << 20); err != nil {
+	userID, err := getUserIDFromContext(r)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "invalid user context")
+		return
+	}
+
+	if err := r.ParseMultipartForm(100 << 20); err != nil {
 		writeError(w, http.StatusBadRequest, "failed to parse form data")
 		return
 	}
@@ -417,6 +542,26 @@ func voiceCloneHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	speed := 1.0
+	if speedStr := strings.TrimSpace(r.FormValue("speed")); speedStr != "" {
+		if parsed, err := strconv.ParseFloat(speedStr, 64); err == nil && parsed > 0 {
+			speed = parsed
+		} else {
+			writeError(w, http.StatusBadRequest, "invalid speed value")
+			return
+		}
+	}
+
+	emotion := strings.TrimSpace(r.FormValue("emotion"))
+	if emotion == "" {
+		emotion = "neutral"
+	}
+
+	modelType := strings.TrimSpace(r.FormValue("model_type"))
+	if modelType == "" {
+		modelType = "your_tts"
+	}
+
 	file, handler, err := r.FormFile("audio")
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "audio file is required")
@@ -424,60 +569,383 @@ func voiceCloneHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	fileBytes, err := io.ReadAll(file)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "failed to read audio file")
+	voiceCloneRoot := getEnv("VOICE_CLONE_ROOT", "/app/data/voice_clone")
+	if err := os.MkdirAll(voiceCloneRoot, 0o755); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to prepare storage directory")
 		return
 	}
 
-	// Create multipart request to Python service
-	body := new(bytes.Buffer)
+	jobDir := filepath.Join(voiceCloneRoot, fmt.Sprintf("job_%d_%d", userID, time.Now().UnixNano()))
+	if err := os.MkdirAll(jobDir, 0o755); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to prepare job directory")
+		return
+	}
+
+	inputExt := strings.ToLower(filepath.Ext(handler.Filename))
+	if inputExt == "" {
+		inputExt = ".wav"
+	}
+	inputPath := filepath.Join(jobDir, fmt.Sprintf("input%s", inputExt))
+	outputPath := filepath.Join(jobDir, "output.wav")
+
+	dest, err := os.Create(inputPath)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to store audio file")
+		return
+	}
+	if _, err := io.Copy(dest, file); err != nil {
+		dest.Close()
+		writeError(w, http.StatusInternalServerError, "failed to save audio file")
+		return
+	}
+	dest.Close()
+
+	job := VoiceCloneJob{
+		UserID:     userID,
+		Text:       text,
+		Language:   language,
+		Speed:      speed,
+		Emotion:    emotion,
+		ModelType:  modelType,
+		Status:     jobStatusPending,
+		InputPath:  inputPath,
+		OutputPath: outputPath,
+	}
+
+	if err := db.Create(&job).Error; err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to queue job")
+		return
+	}
+
+	writeJSON(w, http.StatusAccepted, map[string]any{
+		"job_id":  job.ID,
+		"status":  job.Status,
+		"message": "Voice clone job queued",
+	})
+}
+
+func startVoiceCloneWorker() {
+	go func() {
+		log.Println("Voice clone worker started")
+		for {
+			job, err := claimNextVoiceCloneJob()
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					time.Sleep(voiceCloneWorkerIdleSleep)
+					continue
+				}
+				log.Printf("voice clone worker: failed to claim job: %v", err)
+				time.Sleep(voiceCloneWorkerErrorSleep)
+				continue
+			}
+
+			if err := processVoiceCloneJob(job); err != nil {
+				log.Printf("voice clone worker: job %d failed: %v", job.ID, err)
+			}
+		}
+	}()
+}
+
+func claimNextVoiceCloneJob() (*VoiceCloneJob, error) {
+	var job VoiceCloneJob
+
+	tx := db.Begin()
+	if err := tx.Clauses(clause.Locking{Strength: "UPDATE", Options: "SKIP LOCKED"}).
+		Where("status = ?", jobStatusPending).
+		Order("created_at ASC").
+		Take(&job).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Model(&job).Updates(map[string]any{
+		"status":        jobStatusProcessing,
+		"error_message": "",
+		"updated_at":    time.Now(),
+	}).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	return &job, nil
+}
+
+func processVoiceCloneJob(job *VoiceCloneJob) error {
+	err := runVoiceCloneJob(job)
+
+	status := jobStatusCompleted
+	errorMessage := ""
+	if err != nil {
+		status = jobStatusFailed
+		errorMessage = err.Error()
+	}
+
+	updatePayload := map[string]any{
+		"status":        status,
+		"error_message": errorMessage,
+		"updated_at":    time.Now(),
+	}
+
+	if status == jobStatusCompleted {
+		updatePayload["output_path"] = job.OutputPath
+	}
+
+	if err2 := db.Model(&VoiceCloneJob{}).Where("id = ?", job.ID).Updates(updatePayload).Error; err2 != nil {
+		log.Printf("voice clone worker: failed to update job %d status: %v", job.ID, err2)
+	}
+
+	if status == jobStatusCompleted {
+		createNotification(job.UserID, job.ID, "Voice clone job completed")
+	} else {
+		createNotification(job.UserID, job.ID, fmt.Sprintf("Voice clone job failed: %s", errorMessage))
+	}
+
+	return err
+}
+
+func runVoiceCloneJob(job *VoiceCloneJob) error {
+	audioFile, err := os.Open(job.InputPath)
+	if err != nil {
+		return fmt.Errorf("failed to open input audio: %w", err)
+	}
+	defer audioFile.Close()
+
+	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	// Add text field
-	if err := writer.WriteField("text", text); err != nil {
-		writeError(w, http.StatusInternalServerError, "internal error")
-		return
-	}
-
-	// Add language field
-	if err := writer.WriteField("language", language); err != nil {
-		writeError(w, http.StatusInternalServerError, "internal error")
-		return
-	}
-
-	// Add file field
-	part, err := writer.CreateFormFile("audio", handler.Filename)
+	formFile, err := writer.CreateFormFile("audio", filepath.Base(job.InputPath))
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "internal error")
-		return
+		return fmt.Errorf("failed to create form file: %w", err)
 	}
-	if _, err := part.Write(fileBytes); err != nil {
-		writeError(w, http.StatusInternalServerError, "internal error")
-		return
+	if _, err := io.Copy(formFile, audioFile); err != nil {
+		return fmt.Errorf("failed to copy audio data: %w", err)
 	}
 
-	writer.Close()
+	writer.WriteField("text", job.Text)
+	writer.WriteField("language", job.Language)
+	writer.WriteField("speed", fmt.Sprintf("%.2f", job.Speed))
+	writer.WriteField("emotion", job.Emotion)
+	writer.WriteField("model_type", job.ModelType)
 
-	proxyReq, err := http.NewRequest(http.MethodPost, PYTHON_SERVICE_URL+"/voice-clone", body)
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("failed to finalize multipart payload: %w", err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, PYTHON_SERVICE_URL+"/voice-clone", body)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "internal error")
-		return
+		return fmt.Errorf("failed to create python request: %w", err)
 	}
-	proxyReq.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Content-Type", writer.FormDataContentType())
 
-	resp, err := httpClient.Do(proxyReq)
+	resp, err := httpClient.Do(req)
 	if err != nil {
-		log.Printf("python service request failed: %v", err)
-		writeError(w, http.StatusBadGateway, "python service unavailable")
-		return
+		return fmt.Errorf("python service request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
+	respData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read python response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("python service returned %d: %s", resp.StatusCode, string(respData))
+	}
+
+	if err := os.MkdirAll(filepath.Dir(job.OutputPath), 0o755); err != nil {
+		return fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	if err := os.WriteFile(job.OutputPath, respData, 0o644); err != nil {
+		return fmt.Errorf("failed to write output audio: %w", err)
+	}
+
+	return nil
+}
+
+func listVoiceCloneJobsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	userID, err := getUserIDFromContext(r)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "invalid user context")
+		return
+	}
+
+	var jobs []VoiceCloneJob
+	if err := db.Where("user_id = ?", userID).Order("created_at DESC").Find(&jobs).Error; err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to load jobs")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"jobs": jobs,
+	})
+}
+
+func getVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	userID, err := getUserIDFromContext(r)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "invalid user context")
+		return
+	}
+
+	jobIDStr := r.URL.Query().Get("job_id")
+	if jobIDStr == "" {
+		writeError(w, http.StatusBadRequest, "job_id is required")
+		return
+	}
+	jobID, err := strconv.ParseUint(jobIDStr, 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid job_id")
+		return
+	}
+
+	var job VoiceCloneJob
+	if err := db.Where("id = ? AND user_id = ?", jobID, userID).First(&job).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			writeError(w, http.StatusNotFound, "job not found")
+			return
+		}
+		writeError(w, http.StatusInternalServerError, "failed to load job")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, job)
+}
+
+func downloadVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	userID, err := getUserIDFromContext(r)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "invalid user context")
+		return
+	}
+
+	jobIDStr := r.URL.Query().Get("job_id")
+	if jobIDStr == "" {
+		writeError(w, http.StatusBadRequest, "job_id is required")
+		return
+	}
+	jobID, err := strconv.ParseUint(jobIDStr, 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid job_id")
+		return
+	}
+
+	var job VoiceCloneJob
+	if err := db.Where("id = ? AND user_id = ?", jobID, userID).First(&job).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			writeError(w, http.StatusNotFound, "job not found")
+			return
+		}
+		writeError(w, http.StatusInternalServerError, "failed to load job")
+		return
+	}
+
+	if job.Status != jobStatusCompleted {
+		writeError(w, http.StatusBadRequest, "job not completed yet")
+		return
+	}
+
+	if _, err := os.Stat(job.OutputPath); err != nil {
+		writeError(w, http.StatusInternalServerError, "output file not found")
+		return
+	}
+
 	w.Header().Set("Content-Type", "audio/wav")
-	w.WriteHeader(resp.StatusCode)
-	if _, err := io.Copy(w, resp.Body); err != nil {
-		log.Printf("failed to write response: %v", err)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"voice_clone_%d.wav\"", job.ID))
+	http.ServeFile(w, r, job.OutputPath)
+}
+
+func listNotificationsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	userID, err := getUserIDFromContext(r)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "invalid user context")
+		return
+	}
+
+	var notifications []Notification
+	if err := db.Where("user_id = ?", userID).Order("created_at DESC").Find(&notifications).Error; err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to load notifications")
+		return
+	}
+
+	var unreadCount int64
+	db.Model(&Notification{}).Where("user_id = ? AND read = false", userID).Count(&unreadCount)
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"notifications": notifications,
+		"unread_count":  unreadCount,
+	})
+}
+
+func markNotificationsReadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	userID, err := getUserIDFromContext(r)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "invalid user context")
+		return
+	}
+
+	type markRequest struct {
+		NotificationIDs []uint `json:"notification_ids"`
+	}
+
+	var req markRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err != io.EOF {
+		writeError(w, http.StatusBadRequest, "invalid payload")
+		return
+	}
+
+	query := db.Model(&Notification{}).Where("user_id = ?", userID).Where("read = ?", false)
+	if len(req.NotificationIDs) > 0 {
+		query = query.Where("id IN ?", req.NotificationIDs)
+	}
+
+	if err := query.Update("read", true).Error; err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to update notifications")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{"status": "ok"})
+}
+
+func createNotification(userID uint, jobID uint, message string) {
+	notification := Notification{
+		UserID:  userID,
+		JobID:   jobID,
+		Message: message,
+		Read:    false,
+	}
+
+	if err := db.Create(&notification).Error; err != nil {
+		log.Printf("failed to create notification: %v", err)
 	}
 }
 

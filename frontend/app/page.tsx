@@ -1,6 +1,68 @@
+  const pollVoiceCloneJob = async (jobId: number, delay = 5000) => {
+    if (!jobId || !token) return;
+
+    try {
+      const res = await axios.get(`${API_BASE_URL}/voice-clone/job`, {
+        ...getHeaders(),
+        params: { job_id: jobId },
+      });
+      const job = res.data;
+      setVoiceCloneJobStatus(job.status);
+
+      if (job.status === "completed") {
+        setStatus("✅ Voice clone ready! Downloading...");
+        await downloadVoiceCloneJob(jobId);
+        fetchNotifications();
+      } else if (job.status === "failed") {
+        setStatus(`❌ Voice cloning failed: ${job.error_message || "Unknown error"}`);
+        toast.error(job.error_message || "Voice cloning failed");
+      } else {
+        jobPollTimeoutRef.current = setTimeout(() => pollVoiceCloneJob(jobId), delay);
+      }
+    } catch (error: any) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const downloadVoiceCloneJob = async (jobId: number) => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/voice-clone/job/download`, {
+        ...getHeaders(),
+        params: { job_id: jobId },
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      setClonedAudioUrl(url);
+      setStatus("✅ Voice clone ready!");
+      toast.success("Voice clone ready!");
+    } catch (error: any) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const fetchNotifications = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get(`${API_BASE_URL}/notifications`, getHeaders());
+      setNotifications(res.data.notifications || []);
+      setUnreadNotifications(res.data.unread_count || 0);
+    } catch (error) {
+      console.error("Failed to fetch notifications", error);
+    }
+  };
+
+  const markNotificationsRead = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/notifications/read`, {}, getHeaders());
+      fetchNotifications();
+    } catch (error) {
+      console.error("Failed to mark notifications read", error);
+    }
+  };
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
@@ -40,6 +102,11 @@ export default function Dashboard() {
   const [voiceCloneText, setVoiceCloneText] = useState("سلام، این یک نمونه از صدای شما است.");
   const [voiceCloneSpeed, setVoiceCloneSpeed] = useState(1.0);
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
+  const [voiceCloneJobId, setVoiceCloneJobId] = useState<number | null>(null);
+  const [voiceCloneJobStatus, setVoiceCloneJobStatus] = useState<string | null>(null);
+  const jobPollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [notifications, setNotifications] = useState<Array<{ id: number; message: string; read: boolean; created_at: string }>>([]);
+  const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
 
   const speakers = [
     { id: "fa_standard", label: "🇮🇷 Persian (Farsi) - VITS" },
@@ -63,6 +130,21 @@ export default function Dashboard() {
       fetchTrainedModels();
     }
   }, [token, synthesisMode]);
+
+  useEffect(() => {
+    if (!token) return;
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 15000);
+    return () => clearInterval(interval);
+  }, [token]);
+
+  useEffect(() => {
+    return () => {
+      if (jobPollTimeoutRef.current) {
+        clearTimeout(jobPollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const fetchTrainedModels = async () => {
     try {
@@ -127,8 +209,10 @@ export default function Dashboard() {
     }
 
     setLoading(true);
-    setStatus("🎙️ Cloning voice...");
+    setStatus("🎙️ Cloning voice (queued)...");
     setClonedAudioUrl(null);
+    setVoiceCloneJobStatus(null);
+    setVoiceCloneJobId(null);
 
     try {
       const formData = new FormData();
@@ -137,15 +221,12 @@ export default function Dashboard() {
       formData.append("language", voiceCloneLanguage);
       formData.append("speed", voiceCloneSpeed.toString());
 
-      const res = await axios.post(`${API_BASE_URL}/voice-clone`, formData, {
-        ...getHeaders(),
-        responseType: "blob",
-      });
-
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      setClonedAudioUrl(url);
-      setStatus("✅ Voice cloned successfully!");
-      toast.success("Voice cloned successfully!");
+      const res = await axios.post(`${API_BASE_URL}/voice-clone`, formData, getHeaders());
+      const jobId = res.data?.job_id;
+      setVoiceCloneJobId(jobId);
+      setVoiceCloneJobStatus(res.data?.status || "pending");
+      toast.success(`Voice clone job queued #${jobId}`);
+      pollVoiceCloneJob(jobId);
     } catch (error: any) {
       setStatus("❌ Voice cloning failed");
       toast.error(getErrorMessage(error));
@@ -333,7 +414,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700">
-                💡 Select a language and enter text to synthesize speech in that language
+                💡 Select a language and enter text to synthesize speech in that language. Voice clone jobs run asynchronously; you will be notified when the output is ready.
               </div>
 
               <div>
@@ -406,6 +487,20 @@ export default function Dashboard() {
                 Synthesize Speech
               </Button>
 
+              {voiceCloneJobId && (
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-md text-sm text-slate-700">
+                  <div className="flex items-center justify-between">
+                    <span>Job ID: #{voiceCloneJobId}</span>
+                    <span className="font-semibold">
+                      Status: {voiceCloneJobStatus || "pending"}
+                    </span>
+                  </div>
+                  {(voiceCloneJobStatus === "pending" || voiceCloneJobStatus === "processing") && (
+                    <p className="text-xs text-slate-500 mt-1">We will notify you when the job completes.</p>
+                  )}
+                </div>
+              )}
+
               {clonedAudioUrl && (
                 <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
                   <p className="text-xs font-medium text-purple-600 mb-3 uppercase tracking-wider">
@@ -417,6 +512,38 @@ export default function Dashboard() {
                     className="w-full"
                   />
                 </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Notifications */}
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+              <CardTitle className="text-lg">Notifications</CardTitle>
+              <div className="flex items-center gap-3 text-sm text-slate-500">
+                <span>{unreadNotifications} unread</span>
+                <Button variant="outline" size="sm" onClick={markNotificationsRead}>
+                  Mark all read
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-3">
+              {notifications.length === 0 ? (
+                <p className="text-sm text-slate-500">No notifications yet.</p>
+              ) : (
+                notifications.slice(0, 5).map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-3 rounded border ${
+                      notification.read ? "bg-white border-slate-100" : "bg-slate-50 border-slate-200"
+                    }`}
+                  >
+                    <p className="text-sm text-slate-800">{notification.message}</p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {new Date(notification.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))
               )}
             </CardContent>
           </Card>
