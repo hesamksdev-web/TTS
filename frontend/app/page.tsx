@@ -518,6 +518,17 @@ export default function Dashboard() {
                   {(voiceCloneJobStatus === "pending" || voiceCloneJobStatus === "processing") && (
                     <p className="text-xs text-slate-500 mt-1">We will notify you when the job completes.</p>
                   )}
+                  {voiceCloneJobStatus === "completed" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadVoiceCloneJob(voiceCloneJobId)}
+                      className="mt-2"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Download
+                    </Button>
+                  )}
                   {(voiceCloneJobStatus === "failed" || voiceCloneJobStatus === "timeout") && (
                     <Button
                       variant="outline"
