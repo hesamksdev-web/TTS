@@ -76,20 +76,20 @@ for path in (DATA_ROOT, TRAIN_OUTPUT_ROOT):
 setattr(tts_datasets, "tts_service_two_column", tts_service_two_column)
 
 VOICE_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
-    "en_xtts": {
-        "model_name": os.getenv("TTS_MODEL_NAME_EN", "tts_models/multilingual/multi-dataset/xtts_v2"),
-        "speaker": None,
-        "language": "en",
+    "fa_standard": {
+        "model_name": os.getenv("TTS_MODEL_NAME_FA", "tts_models/fa/cv/vits"),
+        "speaker": os.getenv("TTS_SPEAKER_ID_FA") or None,
+        "language": None,
     },
-    "de_xtts": {
-        "model_name": os.getenv("TTS_MODEL_NAME_DE", "tts_models/multilingual/multi-dataset/xtts_v2"),
-        "speaker": None,
-        "language": "de",
+    "de_standard": {
+        "model_name": os.getenv("TTS_MODEL_NAME_DE", "tts_models/de/thorsten/tacotron2-DCA"),
+        "speaker": os.getenv("TTS_SPEAKER_ID_DE") or None,
+        "language": None,
     },
-    "fa_xtts": {
-        "model_name": os.getenv("TTS_MODEL_NAME_FA", "tts_models/multilingual/multi-dataset/xtts_v2"),
-        "speaker": None,
-        "language": "fa",
+    "en_standard": {
+        "model_name": os.getenv("TTS_MODEL_NAME_EN", "tts_models/en/ljspeech/tacotron2-DDC"),
+        "speaker": os.getenv("TTS_SPEAKER_ID_EN") or None,
+        "language": None,
     },
 }
 

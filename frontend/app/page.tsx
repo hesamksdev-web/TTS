@@ -29,7 +29,7 @@ export default function Dashboard() {
   const [textToSpeak, setTextToSpeak] = useState("Hello, this is a test of the voice synthesis system.");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [selectedSpeaker, setSelectedSpeaker] = useState("fa_xtts");
+  const [selectedSpeaker, setSelectedSpeaker] = useState("fa_standard");
   const [synthesisMode, setSynthesisMode] = useState<"pretrained" | "trained">("pretrained");
   const [trainedJobId, setTrainedJobId] = useState("");
   const [trainedModels, setTrainedModels] = useState<Array<{ job_id: string; model_path: string }>>([]);
@@ -42,9 +42,9 @@ export default function Dashboard() {
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
 
   const speakers = [
-    { id: "fa_xtts", label: "🌍 Persian (Farsi) - XTTS v2" },
-    { id: "en_xtts", label: "🌍 English - XTTS v2" },
-    { id: "de_xtts", label: "🌍 German - XTTS v2" },
+    { id: "fa_standard", label: "🇮🇷 Persian (Farsi) - VITS" },
+    { id: "en_standard", label: "🇬🇧 English - Tacotron2 DDC" },
+    { id: "de_standard", label: "🇩🇪 German - Tacotron2 DCA" },
   ];
 
   useEffect(() => {
