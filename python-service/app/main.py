@@ -116,8 +116,10 @@ async def startup_event():
     logger.info("Service starting up, pre-loading TTS engines...")
     try:
         for speaker_id, config in VOICE_CONFIGS.items():
-            logger.info("Pre-loading engine for %s", speaker_id)
+            logger.info("Pre-loading engine for %s with model %s", speaker_id, config["model_name"])
             engine = get_tts_engine(config["model_name"])
+            speakers = getattr(engine, 'speakers', None)
+            logger.info("Engine %s loaded with speakers: %s", speaker_id, speakers)
             _tts_engines_loaded[speaker_id] = engine
         _service_ready = True
         logger.info("Service startup complete - all engines ready")
@@ -155,17 +157,27 @@ async def _synthesize_to_path(engine: TTS, text: str, speaker_id: Optional[str],
             if language:
                 # Get available speakers from the engine
                 speakers = getattr(engine, 'speakers', None)
+                logger.info("Engine speakers attribute: %s (type: %s)", speakers, type(speakers).__name__)
+                
                 if speakers:
                     # Use first available speaker as default
-                    default_speaker = speakers[0] if isinstance(speakers, list) else next(iter(speakers)) if isinstance(speakers, dict) else None
+                    if isinstance(speakers, list):
+                        default_speaker = speakers[0]
+                    elif isinstance(speakers, dict):
+                        default_speaker = next(iter(speakers))
+                    else:
+                        default_speaker = None
+                    
                     logger.info("Using default speaker '%s' for language '%s'", default_speaker, language)
                     engine.tts_to_file(text=text, speaker=default_speaker, language=language, file_path=file_path)
                 else:
-                    # Fallback if no speakers available
+                    # Fallback if no speakers available - try without speaker
+                    logger.warning("No speakers found, attempting synthesis without speaker parameter")
                     engine.tts_to_file(text=text, language=language, file_path=file_path)
             else:
                 engine.tts_to_file(text=text, speaker=speaker_id, file_path=file_path)
         except ValueError as err:
+            logger.error("ValueError during synthesis: %s", str(err))
             raise HTTPException(status_code=400, detail=str(err)) from err
         except Exception as err:  # pragma: no cover - unexpected failure
             logger.exception("Unexpected error during synthesis")
