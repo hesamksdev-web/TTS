@@ -483,11 +483,13 @@ async def voice_clone(
     speed: str = Form(default="1.0"),
     emotion: str = Form(default="neutral"),
     model_type: str = Form(default="your_tts"),
+    temperature: str = Form(default="0.75"),
+    top_p: str = Form(default="0.85"),
     background_tasks: BackgroundTasks = None
 ):
     """Clone a voice from uploaded audio and synthesize text with optional speed and emotion control"""
-    logger.info("Voice clone request received: audio=%s, text_len=%d, language=%s, speed=%s, emotion=%s, model_type=%s", 
-                audio.filename if audio else None, len(text), language, speed, emotion, model_type)
+    logger.info("Voice clone request received: audio=%s, text_len=%d, language=%s, speed=%s, emotion=%s, model_type=%s, temperature=%s, top_p=%s", 
+                audio.filename if audio else None, len(text), language, speed, emotion, model_type, temperature, top_p)
     
     if not audio or not text or not language:
         logger.error("Missing required fields: audio=%s, text=%s, language=%s", audio is not None, bool(text), bool(language))
@@ -522,7 +524,33 @@ async def voice_clone(
         logger.error("Invalid model_type: %s", model_type)
         raise HTTPException(status_code=400, detail=f"model_type must be one of: {', '.join(valid_models)}")
     
-    logger.info("Voice cloning request: language=%s, text_length=%d", language, len(text))
+    # Convert temperature to float
+    try:
+        temperature_float = float(temperature)
+        logger.info("Temperature converted to float: %f", temperature_float)
+    except (ValueError, TypeError) as e:
+        logger.error("Temperature conversion failed: %s", e)
+        raise HTTPException(status_code=400, detail="temperature must be a valid number")
+    
+    # Validate temperature parameter (0.0 to 1.0 for natural to creative)
+    if temperature_float < 0.0 or temperature_float > 1.0:
+        logger.error("Temperature out of range: %f", temperature_float)
+        raise HTTPException(status_code=400, detail="temperature must be between 0.0 and 1.0")
+    
+    # Convert top_p to float
+    try:
+        top_p_float = float(top_p)
+        logger.info("Top_p converted to float: %f", top_p_float)
+    except (ValueError, TypeError) as e:
+        logger.error("Top_p conversion failed: %s", e)
+        raise HTTPException(status_code=400, detail="top_p must be a valid number")
+    
+    # Validate top_p parameter (0.0 to 1.0)
+    if top_p_float < 0.0 or top_p_float > 1.0:
+        logger.error("Top_p out of range: %f", top_p_float)
+        raise HTTPException(status_code=400, detail="top_p must be between 0.0 and 1.0")
+    
+    logger.info("Voice cloning request: language=%s, text_length=%d, temperature=%f, top_p=%f", language, len(text), temperature_float, top_p_float)
     
     # Save uploaded voice sample temporarily
     file_content = await audio.read()
@@ -602,6 +630,10 @@ async def voice_clone(
                 
                 chunk_audio_paths = []
                 
+                # Map unsupported languages to supported ones
+                # Farsi (fa) is mapped to Arabic (ar) as they share similar phonetic characteristics
+                tts_language = "ar" if language == "fa" else language
+                
                 # Process each chunk
                 for idx, chunk in enumerate(text_chunks):
                     chunk_output = output_path.replace(".wav", f"_chunk_{idx}.wav")
@@ -611,8 +643,10 @@ async def voice_clone(
                     engine.tts_to_file(
                         text=chunk,
                         speaker_wav=wav_sample_path,
-                        language=language,
-                        file_path=chunk_output
+                        language=tts_language,
+                        file_path=chunk_output,
+                        temperature=temperature_float,
+                        top_p=top_p_float
                     )
                     chunk_audio_paths.append(chunk_output)
                 

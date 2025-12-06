@@ -39,6 +39,8 @@ export default function Dashboard() {
   const [voiceCloneLanguage, setVoiceCloneLanguage] = useState("fa");
   const [voiceCloneText, setVoiceCloneText] = useState("سلام، این یک نمونه از صدای شما است.");
   const [voiceCloneSpeed, setVoiceCloneSpeed] = useState(1.0);
+  const [voiceCloneTemperature, setVoiceCloneTemperature] = useState(0.75);
+  const [voiceCloneTopP, setVoiceCloneTopP] = useState(0.85);
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
   const [voiceCloneJobId, setVoiceCloneJobId] = useState<number | null>(null);
   const [voiceCloneJobStatus, setVoiceCloneJobStatus] = useState<string | null>(null);
@@ -282,6 +284,8 @@ export default function Dashboard() {
       formData.append("text", voiceCloneText);
       formData.append("language", voiceCloneLanguage);
       formData.append("speed", voiceCloneSpeed.toString());
+      formData.append("temperature", voiceCloneTemperature.toString());
+      formData.append("top_p", voiceCloneTopP.toString());
 
       const res = await axios.post(`${API_BASE_URL}/voice-clone`, formData, getHeaders());
       const jobId = res.data?.job_id;
@@ -526,6 +530,40 @@ export default function Dashboard() {
                   className="w-full"
                 />
                 <p className="text-xs text-slate-500 mt-1">0.5 (slow) to 2.0 (fast)</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Temperature: {voiceCloneTemperature.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0.0"
+                    max="1.0"
+                    step="0.05"
+                    value={voiceCloneTemperature}
+                    onChange={(e) => setVoiceCloneTemperature(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Lower = natural, Higher = creative</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Top P: {voiceCloneTopP.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0.0"
+                    max="1.0"
+                    step="0.05"
+                    value={voiceCloneTopP}
+                    onChange={(e) => setVoiceCloneTopP(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Lower = stable, Higher = varied</p>
+                </div>
               </div>
 
               <div>
