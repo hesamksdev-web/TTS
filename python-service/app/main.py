@@ -549,16 +549,17 @@ async def voice_clone(
                 if len(audio_data.shape) > 1:
                     audio_data = np.mean(audio_data, axis=1)
                 
-                # Resample to 22050 Hz if needed (standard for TTS)
-                if sr != 22050:
+                # Resample to 24000 Hz (standard for XTTS v2 model)
+                # This ensures consistency with the model's native sample rate
+                if sr != 24000:
                     import librosa
-                    audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=22050)
+                    audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=24000)
                 
                 # Ensure float32 dtype
                 audio_data = audio_data.astype(np.float32)
                 
                 # Save as WAV file
-                sf.write(wav_sample_path, audio_data, 22050)
+                sf.write(wav_sample_path, audio_data, 24000)
                 logger.info("Audio file validated and normalized to: %s", wav_sample_path)
             except Exception as err:
                 logger.exception("Audio validation failed: %s", err)
@@ -658,17 +659,16 @@ async def voice_clone(
                 
                 # Apply speed adjustment if needed
                 if speed_float != 1.0:
-                    logger.info("Applying speed adjustment: %f", speed_float)
+                    logger.info("Applying speed adjustment: %f (Time Stretch with Pitch Preservation)", speed_float)
                     wav_data, sr = sf.read(output_path)
-                    # Adjust speed by resampling
-                    adjusted_length = int(len(wav_data) / speed_float)
-                    wav_data_adjusted = np.interp(
-                        np.linspace(0, len(wav_data) - 1, adjusted_length),
-                        np.arange(len(wav_data)),
-                        wav_data
-                    )
+                    
+                    # Use librosa time stretching to preserve pitch while changing speed
+                    # This prevents the "Chipmunk effect" (pitch change) that np.interp causes
+                    import librosa
+                    wav_data_adjusted = librosa.effects.time_stretch(wav_data, rate=speed_float)
+                    
                     sf.write(output_path, wav_data_adjusted, sr)
-                    logger.info("Speed adjustment applied")
+                    logger.info("Speed adjustment applied with pitch preservation")
                 
                 # Final normalization
                 wav_data, sr = sf.read(output_path)
