@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [voiceCloneJobId, setVoiceCloneJobId] = useState<number | null>(null);
   const [voiceCloneJobStatus, setVoiceCloneJobStatus] = useState<string | null>(null);
   const jobPollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const jobStartTimeRef = useRef<number | null>(null);
   const [notifications, setNotifications] = useState<Array<{ id: number; message: string; read: boolean; created_at: string }>>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
 
@@ -105,6 +106,15 @@ export default function Dashboard() {
   const pollVoiceCloneJob = async (jobId: number, delay = 5000) => {
     if (!jobId || !token) return;
 
+    // Check if job has been polling for too long (2 hours = 7200 seconds)
+    const elapsedSeconds = jobStartTimeRef.current ? (Date.now() - jobStartTimeRef.current) / 1000 : 0;
+    if (elapsedSeconds > 7200) {
+      setStatus("❌ Voice cloning job timeout: Processing took too long");
+      setVoiceCloneJobStatus("timeout");
+      toast.error("Voice cloning job timeout after 2 hours");
+      return;
+    }
+
     try {
       const res = await axios.get(`${API_BASE_URL}/voice-clone/job`, {
         ...getHeaders(),
@@ -122,7 +132,7 @@ export default function Dashboard() {
         setStatus(`❌ Voice cloning failed: ${job.error_message || "Unknown error"}`);
         toast.error(job.error_message || "Voice cloning failed");
       } else {
-        console.log(`Job ${jobId} still ${job.status}, polling again in ${delay}ms`);
+        console.log(`Job ${jobId} still ${job.status}, polling again in ${delay}ms (elapsed: ${elapsedSeconds.toFixed(0)}s)`);
         jobPollTimeoutRef.current = setTimeout(() => pollVoiceCloneJob(jobId), delay);
       }
     } catch (error: any) {
@@ -228,6 +238,7 @@ export default function Dashboard() {
       const jobId = res.data?.job_id;
       setVoiceCloneJobId(jobId);
       setVoiceCloneJobStatus(res.data?.status || "pending");
+      jobStartTimeRef.current = Date.now();
       toast.success(`Voice clone job queued #${jobId}`);
       pollVoiceCloneJob(jobId);
     } catch (error: any) {
@@ -491,7 +502,13 @@ export default function Dashboard() {
               </Button>
 
               {voiceCloneJobId && (
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-md text-sm text-slate-700">
+                <div className={`p-3 border rounded-md text-sm ${
+                  voiceCloneJobStatus === "completed"
+                    ? "bg-green-50 border-green-200 text-green-700"
+                    : voiceCloneJobStatus === "failed" || voiceCloneJobStatus === "timeout"
+                    ? "bg-red-50 border-red-200 text-red-700"
+                    : "bg-slate-50 border-slate-200 text-slate-700"
+                }`}>
                   <div className="flex items-center justify-between">
                     <span>Job ID: #{voiceCloneJobId}</span>
                     <span className="font-semibold">
@@ -500,6 +517,22 @@ export default function Dashboard() {
                   </div>
                   {(voiceCloneJobStatus === "pending" || voiceCloneJobStatus === "processing") && (
                     <p className="text-xs text-slate-500 mt-1">We will notify you when the job completes.</p>
+                  )}
+                  {(voiceCloneJobStatus === "failed" || voiceCloneJobStatus === "timeout") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setVoiceCloneJobId(null);
+                        setVoiceCloneJobStatus(null);
+                        if (jobPollTimeoutRef.current) {
+                          clearTimeout(jobPollTimeoutRef.current);
+                        }
+                      }}
+                      className="mt-2"
+                    >
+                      Clear
+                    </Button>
                   )}
                 </div>
               )}
