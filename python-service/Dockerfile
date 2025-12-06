@@ -24,7 +24,7 @@ RUN pip install --upgrade pip setuptools wheel && \
         uvicorn[standard]==0.30.3 \
         soundfile \
         'trainer>=0.0.32' \
-        'transformers>=4.33.0' \
+        'transformers==4.39.3' \
         'torch>=2.1.0' \
         'torchaudio>=2.1.0' \
         librosa>=0.10.0 \
