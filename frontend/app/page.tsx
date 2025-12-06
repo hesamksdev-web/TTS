@@ -61,6 +61,19 @@ export default function Dashboard() {
     } else {
       setToken(t);
       setRole(r);
+      // Restore voice clone job state from localStorage
+      const savedJobId = localStorage.getItem("voiceCloneJobId");
+      const savedJobStatus = localStorage.getItem("voiceCloneJobStatus");
+      if (savedJobId && savedJobStatus) {
+        const jobId = parseInt(savedJobId, 10);
+        setVoiceCloneJobId(jobId);
+        setVoiceCloneJobStatus(savedJobStatus);
+        // Resume polling if job is still pending or processing
+        if (savedJobStatus === "pending" || savedJobStatus === "processing") {
+          jobStartTimeRef.current = Date.now();
+          pollVoiceCloneJob(jobId);
+        }
+      }
     }
   }, []);
 
@@ -84,6 +97,19 @@ export default function Dashboard() {
       }
     };
   }, []);
+
+  // Save voice clone job state to localStorage
+  useEffect(() => {
+    if (voiceCloneJobId) {
+      localStorage.setItem("voiceCloneJobId", voiceCloneJobId.toString());
+      if (voiceCloneJobStatus) {
+        localStorage.setItem("voiceCloneJobStatus", voiceCloneJobStatus);
+      }
+    } else {
+      localStorage.removeItem("voiceCloneJobId");
+      localStorage.removeItem("voiceCloneJobStatus");
+    }
+  }, [voiceCloneJobId, voiceCloneJobStatus]);
 
   const fetchTrainedModels = async () => {
     try {
