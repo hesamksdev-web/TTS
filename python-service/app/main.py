@@ -98,7 +98,8 @@ VOICE_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
 def get_tts_engine(model_name: str) -> TTS:
     logger.info("Loading TTS model: %s", model_name)
     engine = TTS(model_name=model_name)
-    logger.info("Loaded model '%s' with speakers: %s", model_name, engine.speakers)
+    speakers = getattr(engine, 'speakers', None)
+    logger.info("Loaded model '%s' with speakers: %s", model_name, speakers)
     return engine
 
 app = FastAPI(title="Python TTS Service", version="0.1.0")
