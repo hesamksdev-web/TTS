@@ -66,7 +66,7 @@ from app.train_job import prepare_training_config, run_training_job as launch_tr
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("tts_service")
 
-def split_text_into_chunks(text: str, max_chars: int = 240, language: str = "en") -> List[str]:
+def split_text_into_chunks(text: str, max_chars: int = 350, language: str = "en") -> List[str]:
     """
     Split long text into chunks that respect sentence and phrase boundaries.
     
@@ -76,7 +76,7 @@ def split_text_into_chunks(text: str, max_chars: int = 240, language: str = "en"
     
     Args:
         text: Input text to split
-        max_chars: Maximum characters per chunk (XTTS v2 limit is 250)
+        max_chars: Maximum characters per chunk (XTTS v2 limit is 400, default 350 for stability)
         language: Language code ('en', 'de', 'fa') for proper punctuation handling
     
     Returns:
@@ -182,19 +182,19 @@ def split_text_into_chunks(text: str, max_chars: int = 240, language: str = "en"
     
     return result
 
-def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_duration: float = 0.15, silence_duration: float = 0.02):
+def merge_audio_files(audio_paths: List[str], output_path: str, silence_duration: float = 0.25):
     """
-    Merge multiple audio files with smooth crossfade transitions and minimal silence.
-    Optimized for natural sounding concatenation without unnatural pauses.
+    Merge audio files by trimming silence and adding fixed natural pauses.
+    Uses Smart Concatenation (Trim & Pad) instead of Crossfade for better speech quality.
     
     Args:
         audio_paths: List of audio file paths to merge
         output_path: Output file path
-        crossfade_duration: Duration of crossfade between chunks in seconds (default 0.15s for natural transitions)
-        silence_duration: Duration of silence to add between chunks in seconds (default 0.02s for minimal pause)
+        silence_duration: Duration of silence to add between chunks in seconds (default 0.25s for natural pauses)
     """
     import soundfile as sf
     import numpy as np
+    import librosa
     
     if not audio_paths:
         raise ValueError("No audio files to merge")
@@ -205,74 +205,39 @@ def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_durati
         shutil.copy(audio_paths[0], output_path)
         return
     
-    # Load all audio files
-    audio_data_list = []
-    sample_rate = None
+    merged_segments = []
+    target_sr = 24000  # Standard sample rate for XTTS
     
-    for path in audio_paths:
-        data, sr = sf.read(path)
-        if sample_rate is None:
-            sample_rate = sr
-        elif sr != sample_rate:
-            # Resample if needed
-            import librosa
-            data = librosa.resample(data, orig_sr=sr, target_sr=sample_rate)
-        audio_data_list.append(data)
+    # Create fixed silence padding for natural pauses between sentences
+    silence_samples = int(silence_duration * target_sr)
+    silence_array = np.zeros(silence_samples, dtype=np.float32)
     
-    # Calculate crossfade and silence samples
-    crossfade_samples = int(crossfade_duration * sample_rate)
-    silence_samples = int(silence_duration * sample_rate)
-    
-    # Ensure crossfade is reasonable (50-150ms for natural sounding)
-    crossfade_samples = max(int(0.05 * sample_rate), min(crossfade_samples, int(0.15 * sample_rate)))
-    
-    # Create minimal silence padding (just 20ms for natural separation)
-    silence = np.zeros(silence_samples, dtype=np.float32)
-    
-    # Merge with smooth crossfade and minimal silence
-    merged = audio_data_list[0].copy()
-    
-    for i in range(1, len(audio_data_list)):
-        next_audio = audio_data_list[i]
+    for i, path in enumerate(audio_paths):
+        # Load audio with librosa for better sample rate handling
+        y, sr = librosa.load(path, sr=target_sr)
         
-        # Add minimal silence between chunks for natural separation
-        merged = np.concatenate([merged, silence])
+        # Trim leading and trailing silence from each chunk
+        # top_db=30 means sounds below 30dB are considered silence
+        y_trimmed, _ = librosa.effects.trim(y, top_db=30)
         
-        # Apply crossfade if both chunks are long enough
-        if len(merged) > crossfade_samples and len(next_audio) > crossfade_samples:
-            # Create smooth crossfade using linear fade (simpler and more natural)
-            fade_out = np.linspace(1.0, 0.0, crossfade_samples)
-            fade_in = np.linspace(0.0, 1.0, crossfade_samples)
-            
-            # Apply crossfade with overlap
-            merged[-crossfade_samples:] *= fade_out
-            next_audio[:crossfade_samples] *= fade_in
-            
-            # Combine overlapping sections
-            merged[-crossfade_samples:] += next_audio[:crossfade_samples]
-            merged = np.concatenate([merged, next_audio[crossfade_samples:]])
-        else:
-            # If files too short for crossfade, use simple concatenation with minimal fade
-            if len(merged) > 50 and len(next_audio) > 50:
-                # Apply very small fade at boundaries (just 30ms)
-                fade_samples = min(int(0.03 * sample_rate), len(merged) // 10, len(next_audio) // 10)
-                if fade_samples > 0:
-                    fade_out = np.linspace(1.0, 0.0, fade_samples)
-                    fade_in = np.linspace(0.0, 1.0, fade_samples)
-                    merged[-fade_samples:] *= fade_out
-                    next_audio[:fade_samples] *= fade_in
-            merged = np.concatenate([merged, next_audio])
+        merged_segments.append(y_trimmed)
+        
+        # Add fixed silence between chunks (except after the last chunk)
+        if i < len(audio_paths) - 1:
+            merged_segments.append(silence_array)
     
-    # Normalize final audio - use peak normalization to preserve dynamics
-    max_val = np.max(np.abs(merged))
+    # Concatenate all segments
+    final_audio = np.concatenate(merged_segments)
+    
+    # Normalize audio to prevent distortion
+    max_val = np.max(np.abs(final_audio))
     if max_val > 0:
-        # Use 0.95 to leave minimal headroom while preserving quality
-        merged = merged / max_val * 0.95
+        final_audio = final_audio / max_val * 0.95
     
-    # Save merged audio without filtering to preserve natural sound
-    sf.write(output_path, merged, sample_rate)
-    logger.info("Audio files merged successfully: %d files merged with %.2fs crossfade and %.2fs silence padding", 
-                len(audio_paths), crossfade_duration, silence_duration)
+    # Save merged audio
+    sf.write(output_path, final_audio, target_sr)
+    logger.info("Audio files merged successfully: %d files merged with smart trimming and %.2fs silence padding", 
+                len(audio_paths), silence_duration)
 
 DATA_ROOT = Path(os.getenv("DATA_ROOT", "/app/data"))
 TRAIN_OUTPUT_ROOT = Path(os.getenv("TRAIN_OUTPUT_ROOT", "/app/training_runs"))
@@ -622,8 +587,8 @@ async def voice_clone(
                 import numpy as np
                 
                 # Split text into chunks respecting language-specific punctuation
-                # XTTS v2 has a 250 character limit, we use 240 to be safe
-                text_chunks = split_text_into_chunks(text, max_chars=240, language=language)
+                # XTTS v2 has a 400 character limit, we use 350 to be safe
+                text_chunks = split_text_into_chunks(text, max_chars=350, language=language)
                 logger.info("Text split into %d chunks for processing (language: %s)", len(text_chunks), language)
                 for idx, chunk in enumerate(text_chunks):
                     logger.info("  Chunk %d: %d chars - %s", idx + 1, len(chunk), chunk[:60])
@@ -634,20 +599,48 @@ async def voice_clone(
                 # Farsi (fa) is mapped to Arabic (ar) as they share similar phonetic characteristics
                 tts_language = "ar" if language == "fa" else language
                 
+                # Extract speaker latents once before processing chunks
+                # This ensures consistent voice characteristics across all chunks
+                logger.info("Computing speaker latents for consistent voice cloning...")
+                try:
+                    gpt_cond_latent, speaker_embedding = engine.get_conditioning_latents(
+                        audio_path=[wav_sample_path],
+                        gpt_cond_len=30,
+                        max_ref_length=60
+                    )
+                    logger.info("Speaker latents computed successfully")
+                except Exception as latent_err:
+                    logger.warning("Could not extract latents, falling back to speaker_wav method: %s", latent_err)
+                    gpt_cond_latent = None
+                    speaker_embedding = None
+                
                 # Process each chunk
                 for idx, chunk in enumerate(text_chunks):
                     chunk_output = output_path.replace(".wav", f"_chunk_{idx}.wav")
                     logger.info("Processing chunk %d/%d: %s", idx + 1, len(text_chunks), chunk[:50])
                     
                     # Synthesize chunk with voice cloning
-                    engine.tts_to_file(
-                        text=chunk,
-                        speaker_wav=wav_sample_path,
-                        language=tts_language,
-                        file_path=chunk_output,
-                        temperature=temperature_float,
-                        top_p=top_p_float
-                    )
+                    # Use pre-computed latents if available for consistent voice, otherwise fall back to speaker_wav
+                    if gpt_cond_latent is not None and speaker_embedding is not None:
+                        engine.tts_to_file(
+                            text=chunk,
+                            language=tts_language,
+                            gpt_cond_latent=gpt_cond_latent,
+                            speaker_embedding=speaker_embedding,
+                            file_path=chunk_output,
+                            temperature=temperature_float,
+                            top_p=top_p_float
+                        )
+                    else:
+                        # Fallback to speaker_wav if latent extraction failed
+                        engine.tts_to_file(
+                            text=chunk,
+                            speaker_wav=wav_sample_path,
+                            language=tts_language,
+                            file_path=chunk_output,
+                            temperature=temperature_float,
+                            top_p=top_p_float
+                        )
                     chunk_audio_paths.append(chunk_output)
                 
                 logger.info("All chunks synthesized, merging audio files")
