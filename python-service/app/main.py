@@ -339,8 +339,7 @@ async def voice_clone(
                     text=text,
                     speaker_wav=wav_sample_path,
                     language=language,
-                    file_path=output_path,
-                    gpu=False
+                    file_path=output_path
                 )
                 
                 # Apply speed adjustment if needed
