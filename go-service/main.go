@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,7 +26,7 @@ const (
 )
 
 var db *gorm.DB
-var httpClient = &http.Client{Timeout: 60 * time.Second}
+var httpClient = newHTTPClient()
 var jwtSecret string
 
 type User struct {
@@ -676,6 +677,16 @@ func getEnv(key, defaultVal string) string {
 		return value
 	}
 	return defaultVal
+}
+
+func newHTTPClient() *http.Client {
+	timeoutStr := getEnv("HTTP_CLIENT_TIMEOUT_SECONDS", "180")
+	timeoutSeconds, err := strconv.Atoi(timeoutStr)
+	if err != nil || timeoutSeconds <= 0 {
+		log.Printf("invalid HTTP_CLIENT_TIMEOUT_SECONDS='%s', falling back to 180 seconds", timeoutStr)
+		timeoutSeconds = 180
+	}
+	return &http.Client{Timeout: time.Duration(timeoutSeconds) * time.Second}
 }
 
 func writeJSON(w http.ResponseWriter, statusCode int, data any) {
