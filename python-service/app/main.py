@@ -66,6 +66,108 @@ from app.train_job import prepare_training_config, run_training_job as launch_tr
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("tts_service")
 
+def split_text_into_chunks(text: str, max_chars: int = 240) -> List[str]:
+    """Split long text into chunks that respect sentence boundaries"""
+    sentences = text.replace('\r\n', '\n').split('.')
+    chunks = []
+    current_chunk = ""
+    
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        
+        sentence_with_period = sentence + "."
+        
+        # If single sentence exceeds limit, split by comma
+        if len(sentence_with_period) > max_chars:
+            parts = sentence.split(',')
+            for part in parts:
+                part = part.strip()
+                if not part:
+                    continue
+                part_with_comma = part + ","
+                if len(current_chunk) + len(part_with_comma) > max_chars:
+                    if current_chunk:
+                        chunks.append(current_chunk.rstrip(',').strip() + ".")
+                    current_chunk = part
+                else:
+                    current_chunk += (" " if current_chunk else "") + part
+        else:
+            if len(current_chunk) + len(sentence_with_period) > max_chars:
+                if current_chunk:
+                    chunks.append(current_chunk.rstrip('.').strip() + ".")
+                current_chunk = sentence
+            else:
+                current_chunk += (" " if current_chunk else "") + sentence
+    
+    if current_chunk:
+        chunks.append(current_chunk.rstrip('.').strip() + ".")
+    
+    return [chunk.strip() for chunk in chunks if chunk.strip()]
+
+def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_duration: float = 0.1):
+    """Merge multiple audio files with smooth crossfade transitions"""
+    import soundfile as sf
+    import numpy as np
+    
+    if not audio_paths:
+        raise ValueError("No audio files to merge")
+    
+    if len(audio_paths) == 1:
+        # If only one file, just copy it
+        import shutil
+        shutil.copy(audio_paths[0], output_path)
+        return
+    
+    # Load all audio files
+    audio_data_list = []
+    sample_rate = None
+    
+    for path in audio_paths:
+        data, sr = sf.read(path)
+        if sample_rate is None:
+            sample_rate = sr
+        elif sr != sample_rate:
+            # Resample if needed
+            import librosa
+            data = librosa.resample(data, orig_sr=sr, target_sr=sample_rate)
+        audio_data_list.append(data)
+    
+    # Calculate crossfade samples
+    crossfade_samples = int(crossfade_duration * sample_rate)
+    
+    # Merge with crossfade
+    merged = audio_data_list[0].copy()
+    
+    for i in range(1, len(audio_data_list)):
+        next_audio = audio_data_list[i]
+        
+        if len(merged) > crossfade_samples and len(next_audio) > crossfade_samples:
+            # Create crossfade
+            fade_out = np.linspace(1, 0, crossfade_samples)
+            fade_in = np.linspace(0, 1, crossfade_samples)
+            
+            # Apply crossfade
+            merged[-crossfade_samples:] *= fade_out
+            next_audio[:crossfade_samples] *= fade_in
+            
+            # Combine
+            merged[-crossfade_samples:] += next_audio[:crossfade_samples]
+            merged = np.concatenate([merged, next_audio[crossfade_samples:]])
+        else:
+            # No crossfade if files too short
+            merged = np.concatenate([merged, next_audio])
+    
+    # Normalize final audio
+    max_val = np.max(np.abs(merged))
+    if max_val > 0:
+        merged = merged / max_val * 0.95
+    
+    # Save merged audio
+    sf.write(output_path, merged, sample_rate)
+    logger.info("Audio files merged successfully: %d files merged with crossfade", len(audio_paths))
+
 DATA_ROOT = Path(os.getenv("DATA_ROOT", "/app/data"))
 TRAIN_OUTPUT_ROOT = Path(os.getenv("TRAIN_OUTPUT_ROOT", "/app/training_runs"))
 BASE_TRAIN_MODEL = os.getenv("BASE_TRAIN_MODEL", "tts_models/multilingual/multi-dataset/xtts_v2")
@@ -385,16 +487,37 @@ async def voice_clone(
                 import soundfile as sf
                 import numpy as np
                 
-                logger.info("Synthesizing with XTTS v2 speaker_wav: %s, language: %s, speed: %f", wav_sample_path, language, speed_float)
+                # Split text into chunks if it's too long
+                text_chunks = split_text_into_chunks(text, max_chars=240)
+                logger.info("Text split into %d chunks for processing", len(text_chunks))
                 
-                # XTTS v2 supports voice cloning with speaker_wav parameter
-                # It handles multiple languages automatically
-                engine.tts_to_file(
-                    text=text,
-                    speaker_wav=wav_sample_path,
-                    language=language,
-                    file_path=output_path
-                )
+                chunk_audio_paths = []
+                
+                # Process each chunk
+                for idx, chunk in enumerate(text_chunks):
+                    chunk_output = output_path.replace(".wav", f"_chunk_{idx}.wav")
+                    logger.info("Processing chunk %d/%d: %s", idx + 1, len(text_chunks), chunk[:50])
+                    
+                    # Synthesize chunk with voice cloning
+                    engine.tts_to_file(
+                        text=chunk,
+                        speaker_wav=wav_sample_path,
+                        language=language,
+                        file_path=chunk_output
+                    )
+                    chunk_audio_paths.append(chunk_output)
+                
+                logger.info("All chunks synthesized, merging audio files")
+                
+                # Merge all chunks with crossfade
+                merge_audio_files(chunk_audio_paths, output_path, crossfade_duration=0.1)
+                
+                # Clean up chunk files
+                for chunk_path in chunk_audio_paths:
+                    try:
+                        Path(chunk_path).unlink()
+                    except:
+                        pass
                 
                 # Apply speed adjustment if needed
                 if speed_float != 1.0:
@@ -410,18 +533,17 @@ async def voice_clone(
                     sf.write(output_path, wav_data_adjusted, sr)
                     logger.info("Speed adjustment applied")
                 
-                # Normalize audio to prevent clipping
+                # Final normalization
                 wav_data, sr = sf.read(output_path)
                 max_val = np.max(np.abs(wav_data))
                 if max_val > 0:
-                    wav_data = wav_data / max_val * 0.95  # Normalize to 95% to avoid clipping
+                    wav_data = wav_data / max_val * 0.95
                     sf.write(output_path, wav_data, sr)
                     logger.info("Audio normalized")
                 
-                logger.info("Voice synthesis succeeded with speaker_wav")
+                logger.info("Voice synthesis succeeded with speaker_wav and chunk merging")
             except Exception as err:
                 logger.exception("Voice synthesis failed with speaker_wav: %s", err)
-                # If speaker_wav fails, raise error
                 raise HTTPException(status_code=500, detail=f"Voice cloning failed: {str(err)}") from err
         
         await run_in_threadpool(_clone_voice)
