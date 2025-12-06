@@ -119,10 +119,14 @@ class TrainRequest(BaseModel):
     )
 
 
-async def _synthesize_to_path(engine: TTS, text: str, speaker_id: Optional[str], file_path: str) -> None:
+async def _synthesize_to_path(engine: TTS, text: str, speaker_id: Optional[str], file_path: str, language: Optional[str] = None) -> None:
     def _run() -> None:
         try:
-            engine.tts_to_file(text=text, speaker=speaker_id, file_path=file_path)
+            # XTTS v2 uses language parameter instead of speaker
+            if language:
+                engine.tts_to_file(text=text, language=language, file_path=file_path)
+            else:
+                engine.tts_to_file(text=text, speaker=speaker_id, file_path=file_path)
         except ValueError as err:
             raise HTTPException(status_code=400, detail=str(err)) from err
         except Exception as err:  # pragma: no cover - unexpected failure
@@ -155,7 +159,7 @@ async def generate_audio(payload: GenerateRequest, background_tasks: BackgroundT
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
         tmp_path = tmp_file.name
 
-    await _synthesize_to_path(engine, payload.text, voice_config["speaker"], tmp_path)
+    await _synthesize_to_path(engine, payload.text, voice_config["speaker"], tmp_path, language=voice_config["language"])
     _schedule_cleanup(background_tasks, tmp_path)
 
     filename = f"tts_{payload.speaker_id}.wav"
