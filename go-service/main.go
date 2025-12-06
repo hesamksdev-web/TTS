@@ -1148,11 +1148,11 @@ func getEnv(key, defaultVal string) string {
 }
 
 func newHTTPClient() *http.Client {
-	timeoutStr := getEnv("HTTP_CLIENT_TIMEOUT_SECONDS", "600")
+	timeoutStr := getEnv("HTTP_CLIENT_TIMEOUT_SECONDS", "1800")
 	timeoutSeconds, err := strconv.Atoi(timeoutStr)
 	if err != nil || timeoutSeconds <= 0 {
-		log.Printf("invalid HTTP_CLIENT_TIMEOUT_SECONDS='%s', falling back to 600 seconds", timeoutStr)
-		timeoutSeconds = 600
+		log.Printf("invalid HTTP_CLIENT_TIMEOUT_SECONDS='%s', falling back to 1800 seconds", timeoutStr)
+		timeoutSeconds = 1800
 	}
 	return &http.Client{Timeout: time.Duration(timeoutSeconds) * time.Second}
 }

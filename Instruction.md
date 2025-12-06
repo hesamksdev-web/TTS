@@ -1,758 +1,459 @@
- �����$�ԙ����� �R�������
-*����"*����M�� +��=Wp�N;ar��,��g         ��ܖ3�����0W�e)���
-                                �����4��}T$���\�/���������p�X�Y
-
-���xW                                                          �        '��
-go-service      | �ܣ1��F�l"B�E  v��             �����y���
-                                                         6
-��<R����,�������a��                                       د!B��
-                   u����
-1o-servi�������A| $�
-������������&�^␦�������R�Zl���VA�,�␦
-go-service      | �������{
-                          ��#
-                             y��␦d�S�G"�Gӳ!�5�(����$4�]�Q'�����%'����␦*�q���Qx�����b��D&���
-go-service      |  ��e�������:�%���`␦�������(�� =�����&
-                                                       ��~��Z@��4����z���!@�$�,"���[D
-                                                                                     [ݸ)E�8�o-)ޔ
-                                                                                                �m��
-                                                                                                    �   ���r3���
-                                                                                                                �A      T���f�
-                                                                                                                              ���?���s�)���w�.�P�%��-�TÇ1����; P���z�3��e�).�����
-go-service      | ���Z��h!7�^�
-
-                              �����V"y����8�q���-qS�@�|�AV��
-                                                            ����
-                                                                ��r�������
-go-service      | 6�a�/6�4      =
-                                 ���X�����y
-                                           �_����!2��&#K�E�����z���'��
-                                                                      e��� ����5���b�,��V��ut���'&�*    5f�M␦����B�a�!�O�Om     ���%�c������f   ]������0d�p�
-                                                                                                                                                            ��<���y��L�C��E<1����:���t�L��v�������5�[V�M�cr�����$���������N
-go-service      | ���{
-����C��               ��f��
-��qpz�<i���
-          ���   ~���\���;�����p���u�!������x�����
-��>�Ji���Y�q�����|�S�����:��U�  ������
-                                      ���O@���}����U���m
-���aervice      | ����v�S�������B����~��`�����}R����h�F�
-go-service      | ?�[�
-go-service      | k���
-go-service      | l����
-                       �����57��z���C�����3����n�6      UG���Ep�X��
-                                                                   ��w�W��U�o
-go-service      | �
-�������2���������\�����k
-                   <�AN������B����x�}����
-                                         ����_������K���V
+root@Automations:/opt/TTS# docker-compose -f docker-compose.prod.yml logs
+python-service  | /usr/local/lib/python3.10/site-packages/jieba/_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+python-service  |   import pkg_resources
+python-service  | INFO:     Started server process [1]
+python-service  | INFO:     Waiting for application startup.
+python-service  | ERROR:tts_service:Failed to pre-load engines: 'cv'
+python-service  | INFO:     Application startup complete.
+python-service  | INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+python-service  | INFO:     127.0.0.1:44782 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:49724 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:47754 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:45440 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:59788 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:56848 - "GET /health HTTP/1.1" 200 OK
+tts-db          |
+tts-db          | PostgreSQL Database directory appears to contain a database; Skipping initialization
+tts-db          |
+tts-db          | 2025-12-06 11:38:22.601 UTC [1] LOG:  starting PostgreSQL 15.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+tts-db          | 2025-12-06 11:38:22.601 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+tts-db          | 2025-12-06 11:38:22.601 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+tts-db          | 2025-12-06 11:38:22.608 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+tts-db          | 2025-12-06 11:38:22.613 UTC [29] LOG:  database system was shut down at 2025-12-06 11:34:26 UTC
+caddy-proxy     | {"level":"info","ts":1765021139.2788,"msg":"maxprocs: Leaving GOMAXPROCS=4: CPU quota undefined"}
+tts-frontend    |
+tts-frontend    | > frontend@0.1.0 start
+caddy-proxy     | {"level":"info","ts":1765021139.2789428,"msg":"GOMEMLIMIT is updated","package":"github.com/KimMachineGun/automemlimit/memlimit","GOMEMLIMIT":7314967756,"previous":9223372036854775807}
+caddy-proxy     | {"level":"info","ts":1765021139.2789896,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+caddy-proxy     | {"level":"info","ts":1765021139.2801132,"msg":"adapted config to JSON","adapter":"caddyfile"}
+caddy-proxy     | {"level":"warn","ts":1765021139.280128,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/etc/caddy/Caddyfile","line":3}
+caddy-proxy     | {"level":"warn","ts":1765021139.2804484,"logger":"admin","msg":"admin endpoint disabled"}
+caddy-proxy     | {"level":"info","ts":1765021139.2805667,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
+tts-frontend    | > next start
+caddy-proxy     | {"level":"info","ts":1765021139.2808456,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc0001b2180"}
+tts-frontend    |
+caddy-proxy     | {"level":"warn","ts":1765021139.2809296,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+tts-frontend    |    ▲ Next.js 16.0.6
+caddy-proxy     | {"level":"warn","ts":1765021139.280935,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+tts-frontend    |    - Local:         http://localhost:3000
+caddy-proxy     | {"level":"info","ts":1765021139.2809374,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+tts-frontend    |    - Network:       http://172.18.0.5:3000
+caddy-proxy     | {"level":"info","ts":1765021139.2811449,"msg":"autosaved config (load with --resume flag)","file":"/config/caddy/autosave.json"}
+caddy-proxy     | {"level":"info","ts":1765021139.2811635,"msg":"serving initial configuration"}
+caddy-proxy     | {"level":"info","ts":1765021139.2830472,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/data/caddy","instance":"d8065e38-ac18-4c56-9718-355cfc33b1f3","try_again":1765107539.2830462,"try_again_in":86399.999999649}
+caddy-proxy     | {"level":"info","ts":1765021139.283124,"logger":"tls","msg":"finished cleaning storage units"}
+go-service      | 2025/12/06 11:38:53 Go Service (SaaS Edition) listening on :8080
+go-service      | 2025/12/06 11:38:53 Voice clone worker started
 go-service      |
-go-service      | �����
-                       T���')���        B�����E����s�W
-                                                      �M�-G������       �����
-                                                                             Y������    a�8�q!������Y�����Q�b�!�r������i��)���������=���l��y�v�!�Q
-�����>�#�����j��a�����W�������
-go-service      | (�hv�=��@���� \���|�z�Z���������k�
-go-service      | �n�8E��<C�j��
-                               c���
-go-service      | ����M�����%��������e
-                                      w���1���7c���&�P��<���������
-go-service      | "�$����x      ,���v���p�)�S���Z␦
-                                                  _��-
-                                                      a7�{�����.�q���������
-��`��6�4�9����<y�x����Q2�\���~����������^��������'�U��z���yo���Js��,���Yz��cV�%k�n�\��� "�����K�G�B�j��1����$s��h�0�������MM�/����$�7�g�5��F�)��������(l␦�,�N��2�&���vm��������T���=�}!���p_��^&L���e���?+�Z�M������@���WBo�k�=������h�`iU���w2�_��}�8�������������.�K��␦��
-                                                                                      �.��-�!q�Q�bO��y���;N�+p�\������
-                                                                                                                      �J��������T]'��2���#�*2��@i���nwV�Nq7L\�X�������������x�u�������u�*�_�������{������=��h���H����P�R�r�Z�=�"���������*�n�����p�Q���B��������Y�����C�����y�A�v
-                                                                                           �
-go-service      | �
-                   �
-                    �
-                     �
-go-service      | �
-                   in
-�                    T
-go-service      | ��T�����/���3���+���y���B����`�����t��y�0��������$�����U�I���������v��E���E�?*���Y�E����^��������F�Z����M�I�)�����z������y�4�A�������B����7&�{���f��  �
-go-service      | G
-                   Y
-                    *8-�P�.���\���
-                                  �
-                                   +
-                                    �Y(v�>���M�G�<����������$��������������(�����������'�(�8�����       �
-                                                                                                         �
-                                                                                                          D
-
-                                                                                                           �
-go-service      | �
-                   \
-                    �
-go-service      | �     F               �
-                                         ��Z6��H������s�_���-�����F�R���r�
-go-service      | ��o���@�H���Y���Z���S�����4�}��V�$�{�i���Z�'�����8�J�o���6�@������N�� (��$
-P�����^������T�:�E� �������0�^�3���Z���j���E���N�����������                                 �
-�s�Ps`
- '
-  �
-go-service      | �     ���a�%�������������Z���?���F�R�F�W�A�Q�<���{����������zA7$6h�u�.�|[��A`�F�{���&�N���������3��R���S��@�b�������<�:����3��G
-�2�[����2����1�c��������������������w�G��������������8J����                                                                                      �
-go-service      | x
-                   y
-go-service      | 2
-go-service      | �
-go-service      | F
+go-service      | 2025/12/06 11:38:53 /app/main.go:656 record not found
+go-service      | [1.893ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-go-service      | r     ��p���(���B���������o�����
-                                                  �����k�␦������O����}���S�����fqAH��������q�����h�����?�d�0�/�=�����H��u�
-����o�����I�Y�}���~�l���������x�-��K�����o�M�5�����9��Zg�U�|�������6    O���8'1␦�!!  k�I␦��!
-go-service      | �
-                   �
-                    ��^|a�ys�
-                             6
-                              ;
-��-service      | o�����I�8�d��d���s�6�\�����|��␦������G���1���5����/���f�~��Zm��$�B�M�j����A������������
-  �������V�����"��,�<�����M�Z���y���_����^���u&q
-go-service      | 3
-                   �
-go-service      | 5
-d␦�                w�8�S�Q�
- �                      �pE3�����<�J����������E�a�������>�������p���.���9����
-M���:&��. ���␦�^�W��*�h���e�:b3u���q�����3��������.���p���F����I�y���7���?����������D   �
-                        ��p���0�1�w�J���]�S���P����b�������������{���� ^�5v�    ]
-                                                                                 t
-�                                                                                 M��$�}��
- �
-  �r�����1�;�������%�5����������i�v���4���%�Z������0�����x�gp^�4        ��      �
-go-service      | �)��;�H���f���.���w����m���������@�������������&�     �X�u�   ������������������s0���N���U�S����N��   �
-go-service      | �     �       �
-go-service      | �
+go-service      | 2025/12/06 11:38:55 /app/main.go:656 record not found
+go-service      | [0.938ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-go-service      | x     K       �       ���e��Q������!�����������������y�������f���������
-                                                                                         �z���x�_��������W�F���g
-                                                                                                                ���-�g�1��;��P
-                                                                                                                              l��(�     �.�M���_�a������*���������a�d������
-go-service      | �����n�����,� �
-                                 ���(*vt���������i�
-                                                   ��|�8�X�'��������!�8����7�f��f�G���������������������|��Y~   �       �
-�                                                                                                                        o
- �
-  `
-
-   �
-    �
-go-service      | ��,3�!%��n������9���.��8�����F���������d�������A�?�@��q���n��]3������0���������
-                                                                                                 �����K���n�;�^���/�������������t�i��������v�����Mv��r��`��V~���
-go-service      | 8
-
-                   f
-                    �
-JN=6����k            ^
-         �
-          "
-
-go-service      | 7��T��\�������a�]�����K�i���X���
-����������������                                  �d�a���q������K���A�;���      ���>�G��9t����R���������e�����V��������␦�����
-�p�J�{�j����>&�����kK��zA���w����C�l���v�m���y�T����:�  &B�\]v������K�������P����)�������b�������Z�␦�-���$����m�*���
-go-service      | ]� ����}������9
-                                 y�Dn�W�z�sM�j�&�����c�{�b���)�.��N �*������.g�����     ��������9���k��u�␦������^���o���O�����?����������+�1�-�$������]������T������>�|���\�����{0������
-   ��zK���vt��"m���r�(r���2n␦���wD��lN��p�B��������H�
-                                                     !<��`��fAL�
-
-                                                                �����i���o���F���7�����
-                                                                                       ��d���a"����f���/��v����������R���]�u�9�G7����`��������
-go-service      | ���NH�M�.-���!����CNz���p����Px��0������D�;��p������a��������p�������l        K�2����q�����+�5�_]���}
-                                                                                                                       ��W(
-��~��y�/G<�j����!�����q�6(����%w���@.�q�C�S�,�  ��g�8�m�}���1����o��+�t��HU����                                            ����fj�P�Z�  5�
-                                                                               ��Q�t
-����q�V!����[�� ���a�j���b-���$���!&�m4z��,     �����                               ������
-����g���6�������| ����
-                �;�oP�������T
-                             �����
-                                  �����[        �!�(
-                                                    6���9
-go-service      | 0��
-��K�P�vice      | {
-v���[�␦�S������j�@t@���r��B�����g�2����x���{��*�X2������O�hr����M����������     ����g   P���xI�@�JO��
-go-service      | L
-                   ��A
-                      �z��2�����C$����&�A����I�
-�����"��rk�����                                V�
-            W�I
-               �
-                ��>��b�1����J�
-                              ���j␦P��^����K
-                                            �,�&�ly��S�=�����   "�e����S�>��@}���␦��j�����%O-�������^������p    �]����������`��d������;
-K���6��Y�����k                                                                                                                         ���f"
-�#�����= ������ ��e���`���0
-d������^�[��               �޶���
-go-service      | ���V0�@��.�����������N�U��h�P��m46���o���j
-go-service      | \     $����_� �N/
-go-service      | ����]����hy�������
-                                    �f��
-                                        �_�_�G����%��
-                                                     �����,
-�z�␦����`�VHM�� | /�x���� r�
-go-service      | ���������G�
-go-service      | �����M�>���������2
-u��4ervi������Y�,�<��������w���>��
-��)     �                         U��� �=c���hڹ#��ޅ#���"��B��'����iE�D�6
-         ���
-go-service      | ���Y�
-                       ��IC��2��Q�)���C�����������B ���J���#���>*���%Q�|�bq�.��0���␦j����
-                                                                                         a�?�"x�� ��X
-                                                                                                     �M�?
-����|����*�)�����                                                                                        \���
-go-service      | ��Y���OL��*�`��D�����R�2
-go-service      | ����
-                      A␦�&�����"t���a"������"
-                                             �  ��#��9�� ����/t���zy��
-                                                                      Y�.�
-go-service      | �܊#��������   q�R�D   ���J��������b�� ����ZB'�[�����u�Gn�n
-����                                                                        �R�'
-    ��uM�� ��}�r����M
-go-service      | ���������"������Y�������.����O���?
-go-service      | �����������EA������S�i��`�k
-���%U�X�o(����  | @�&
-go-service      | >�A��x��r��
-go-service      | ��(�T -����s�E        ���k��je��z�����;��
-�l����,�vPR���q�� ��������#��)�
-��b�k��          �� 9���"�݀
-go-service      | ����
-                      N
-                       ����yS��m
-go-service      | C
-                   g�K
-go-service      | ����d������S| ���
+go-service      | 2025/12/06 11:38:57 /app/main.go:656 record not found
+go-service      | [0.738ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-                  �w
-�F=���l��
-         �����g�Ch����Z���t��.2">�j
-                                   hM�������&�
-�������^�p      /�������<��>���*��`U�O s�3�2�W������&i��j�^.��*���������-���#��
-                                                                               ���      ��k5��B��4�������`�l�
-go-service      |       �����^�������������6�   >�a�Z)���1-�ںr␦���<
-go-service      | I���a ���j�   5�:�I����M�Q���
-ac���������]�T�~"���������$�����������T"��?
-��j�xrvice      | +:����%����3������������r������D�p
-go-service      | ����'��Q@���␦��j��G�Z��������I��^��U���������r�����xC��5�����0
-���.h                                                                           ��5����"���␦��6v�������������@��w�)
-�o-service      | ��7{�܀���     ���
-J��p5����Q�d�a�c���F��_����-{���X*U��i�
-              ����M=�%�� S�C�
-4��v���>�g������VO�]}�*      :���?y�
-              ���3�|�����$��/�J"��B��␦�O���N��#��!
-go-service      | ������9�<��S�`I�����3���,��
-                                             d��i��     ��d�;/�\
-                                                                /7����E��&5�/�P␦����,J���
-go-service      | �����<��KC���
-go-service      | m�$   Q��w��$ ����
-                                    ��
-�-�����Q                              � 8��2�u� ������P�C�'��e�#���
-        ��␦�
-            ;٣L����>�E
-                      �������:��M
-go-service      | T�t'G
-                       r�W(�K
-                             ��\        ���g��O�����S�Q�����":�c��*��
-                                                                     �l��
-                                                                         )
-go-service      | =�?���
-                        |�N��{�������4�����/��-����␦���6`�.4���
-go-service      | ��:�  ������� `       ������p�s���/��
-S������u�'����;���
-(�f              ���9K
-go-service      | ��+�4�������z|.��
-                                   ��Y�n
-                                        �����-�b
-go-service      | ������U��
-                           ,����4�y�W
-go-service      | 8��
-                     u�z�I[�K
-go-service      | %�W��
-                       �����]��6��
-go-service      | �����R�{
-                          6�    �����ߏ�
-B��(��ev��!'�   | �ߺ����}
-go-service      | ��H�'��9�
-���                        ��&�i/�
-go-service      | #��   ��7
-                           K␦��
-                               �dm�C��!��Y�<��%�[����H�/��
-go-service      | e�D��
-go-service      | �F�d�
-go-service      | ����
-                      t������c��
-r�k�J��                         =��s�9�����(5�����$�K   +��R�=�W#���z
-       �����X
-             ������>
-                    5
-go-service      | ��r���D�IL�����
-��Z��                            ��V��h��
-    V�Y%�$���
-             ��1
-                ���C��P-���0�   ���
-                                   G�I���"��7
-Q�1����ice      | �����
-��1�_  �������, ����r��Q�=
-go-service      | ��
-go-service      | ����j����s�v
-go-service      | L����Z�����
-                             :���w�����J
-                                        ���     ����
-                                                    C��
-                                                       ?������  ������
-_�A�ervice      | W������       �a����'����\�g
-go-service      | p���[�=
-go-service      | }���X���i�L$���1
-go-service      | ������t
-go-service      | �5���)���L�����
-                                 �NX�}��Z�/␦4�T�
-                                                 ��*�+�3�m���߰0�.�2 ��4%��X��R�M␦?�>�\����L�E�q�9�:{�   �q=C��7 s����
-go-service      | i
-                   ���:�����\�����4�S
-                                     �����D����y8���-"�������%�~�M�b    ��{
-�������                                                                    ���
-go-service      | z���  �F����G=��A������������)
-go-service      | �     ��������s����v��\
-go-service      | �     �U�q�������%����4����M�=��Z��`��␦J
-��?�b�|8ce      | /�b��u�3����|���h␦�����������5���M�P�0���+�7�*��;��3������p   j
-        r��o���������   $��
-                           G���
-go-service      | �s/���3�'
-go-service      | �
-                   ��a+��F@J�2  \����e���N�t�OD��q      -�i������D�B��9�K
-go-service      | ��c1���p���sM���vN�������
-                                           ��p��!������ ����'��w����A��
-                                                                       ��M�:�)�K�����������G��xX��i�)�
-go-service      | ����
-��
-��_�TD����      ��A��
-           ����U���L
-|���E�'���\     T��C���N������t�v��j��xlg�h     ����Q���E�����  ��
-                                                                  �hv�A�(L����  v�\'�������L
-                                                                                            ��M�����<���
-go-service      | `���u �!�>�Hk���
-                                  �����nO�������␦���    ���d���{�7���~�=�!��
-�������u                                                                    {����A�     wK�f���������h�p9��gi��=0���<���\d�}�������~�J�j���     ��I:
-        �5��9x��p�����
-go-service      | �����$��*8}���-����m�/������y��*��������v�{��(���Q�� �        9�L     m�&I�����
-go-service      | �c�����p��v��J��L���������c��fj���{�<���_�����k9������<���@���<
-go-service      | ����c���{�u�������K��d����������0�n   +� ����������A�POe2����[�����N#HI���E���R�������yXC�������?�␦&����d�������P�U���x���g␦��5
-                                                                                                                                                 �i�I�M��w6���h������|
-                                                                                                                                                                      x������n����� ���{������^��E|����w��&���B����zZ��%     .j���������z�����o%m����;���D� ��������V���H���Ya�2�C
-�[�����z����#������;���:����_�u'��6��&�w��2�/|�C����������sd����g>�~7���Jn��9�-9(���XP]�U��ng�����'O���D                �-�������/����
-                                                                                                                                      ��-���������&J���!�&�O����V����7�`�Q�
-                                                                                                                                                                           ���v�d����������v�0y�     ������������������������^���R�_�F���I9��%���n␦��
-go-service      | ���~��������!�����*�M�:��K�7�z���h����T�y����������7��ou�������������������l���c'��-��d�����*�/�J��������������Z-�����<\���u�����g�$�l��Q3:�`�.�R�;.��@�jo/���9����������J��3�A)�F�����T��O�5���=������x�!9�����Z����������        �����Y$��[s��������DS�������;��x�[��M�������>��p����>�]��#n���^�␦���8[�X�����Zz�"�9ld�b���a��k�.�����������2����Z|���c���␦�VN���;q�����@������OON����U�k�k�(;����s�����F������p:��p�����C������|2����i�u���� :��t����%&�
-B�o�.�����E���!�]�C\��~���~���r������d��D���m�s��UY���&p��zf����X��:hf��'��j!����V���i����Q[������N���s�I��[q���        B���ee4����eE�.�������A�>����q��0������
-                                                              ���,D�t�����RX�R���&�������!��=�������������(�����������������h�H�P�.�����^b�N�4�Xt       m       '
-                                                                                                                                                                 �      �       7   td�,��!�Q�����}�8���u���%�{���L���������Z�&���
-                                             �e�=�r�&�����+������Y���^��B�}?�����z,��������H��q������x�d��������.7��"�9�j������ah�%XU�������6���7�B�%���$���L�1�V����P�
-                                                                                                                                                                       ���R�����x��������V�2����9��l�f�b�4���Z�����!>H       �       2
-go-service      | �
-                   �
-                    U
-                     l
-                      P�
-                        �
-                         k
-                          �
-go-service      | ��G���������E�d�
-                                  �M�H�������B�'�~�|�����������W�������$��.�������h���c�������r��A�b����7���!�j�����3���#���[���`���Z����_���)�����+�������?f_��:���a����cc�y�������$��;��%����������{�������+�+�������B�}��w�����r�l�F��;�����8��L�����k�F����cZ3�� O
-go-service      | �����U�?��B�w���������&� �������l�G���������F�����=����M�����N���$�&�`�Z���I�3�������@�����w�.���D���VM5���������     �       �
-go-service      | P
-go-service      | Z     �
-go-service      | �
-j�A����������a�F������-���������S�-�e��;���.�����������N�H���������     ���p���V��f����;�S�`�����[���=$�V�\␦��$w��|fS�qN���=�U�25����&�v���I��
-                                                                                                                                              �����*��7�D�9�����<�������'�J����������������K�0�NU�M�����9����9���,������V������K�q���������c�������C�'��PW����c
-go-service      |       Q
-                         x
-        Y                 n     $
-K       Q       �
-go-service      | �p�q���i���f�)����������
-���(��'���v���������H�����-�␦�w�����A���#���|�q�a����i������X��,���l���2���c��FW%a
-                                                        6���������g�
-                                                                    �
-                                                                     ��B��
-                                                                          -B�������^�^���0���������/�������q�S�I��5�0������R���0��������H�7�����53��������ZZ�h;���!��x���l��W�b���1�(����^�����������w���8�f�/�i��{���
-�]�9����K���uN�1���?���v����<4�������=␦����?�^�������s�F�=���n�-������b�+����n�7���h���V�?�k���������j�k��v����� ly:�������1�+7A���������# �MK���`����6�>�&���;�k�}���u�����)��)�Z��F�?���p�����5����J�T��0� �F�z�z�s�(x�����?�(�,��m����������(G��E=����M�����5��3���EJ�n�����F�����_���#�,�����%�X�����B�.�w�����V�7�n���D�7������D4�"'�   ��/���G����
-                                                                                                                                             k����
-go-service      | ����v .���A�G���
-                                  ����P�
-go-service      | ]���|�
-                        j����
-go-service      | ����!%U�3���^�}�������5���^����=����M��V6�j�
-                                                             �����M�A
-                                                                     5�V��
-�^6�\rvi(%��    | ����7
-                ����s�J���t���� �����P�.������@���      J���    ��7��2�U�1�����#i���   ����W����s/�
-                                                                                                   �{�/)��`4��������B��8��
-                                                                                                                          ��"��
-go-service      | ��������3�D�����%�:���        _�␦!��w��!��?���r{�"i��E�1�|��
-go-service      | ��[�V
-                       y���'���
-go-service      | �����~�����␦X�����)
-��R����"��5�V�����                   �
-                  ���e;0�t����?
-����b�������                   ��]O����7���!
-go-service      | ���   ��X��␦D����|�}��b���
-go-service      | �������N�����u�h��D�P���U��&��#��������������y        %K��z   ����
-���x
-    �
-go-service      | ���:A�S��i�ߢ\                                                                               ����'��␦���       �������.��$
-                               ��       ���]�D(�5��ߢ���l��!����J"v���K���Nc��#}�������V������"��t�,���,��m���;                             Aހ���@
-go-service      | ��Z��"
-go-service      | �<�����I
-go-service      | �-�X���������,
-go-service      | ��0
-                     �,�C�C
-go-service      | �����$M��������J��P����M��c��y��)���O�������  O���,:�8�K      �m��[u=.�T�D��!����������?L����C���!
-go-service      | ����
-                      u��S�;���4
-go-service      | ���~��ܿ*)f҂�
-go-service      | +�������5
-                           ��L�����E����j�x��|�����`�,q����     �)�����+���J
-                                                                            ���)��@�:$��
-                                                                                        � ��%�x�{��g����%�������B�����������
-go-service      | �:�6
-to�`���,����U�9C��J����������
-%���_���@��^                 ���Z��B�|�r#������/=����*������s�0a������{��
-            R�B�P��mK�m��M�A���!��`y!��0
-FV���$�E��                              �A���T����#����#z����6��/
-go-service      | 2�����j��2��!��8��d
-go-service      | L�b /�V����.��62��I�.�c��
-                                           ݸ��Ӛ!3
-                                                 q͜Dm�+N�h�N)����-#␦�v�} ��]�q��������s ��+�&�t����'A����'�ߣ�z��
-go-service      | �<���z���cs����
-go-service      | ������� ��`��'����
-                                    }Eу%;
-                                         �үk���l<�9
-                                                   ���M���!������
-                                                                 ��D���nA�8��g��#����- =���
-                                                                                           ��C�*
-p���ervice      | ����
-����.rvice      | j                     �٭,����+����C
-go-se��ice      | !��   ���� N��R����Q��
-       ����
-           ���������0����+�����E��!H�����"$����"��l��-����2q�l�TM������Hu���k%��]��a�U�����-�����%���9��������a�
-                                                                                                                M��
-                                                                                                                   ��M$����<������=��#�߀���
-go-service      | �f:�3�y��
-��I��"T�j������xP�t�       ���7Y����
-                    �[�$��$������x��
-go-service      | �����aE�      �e      A�[     x\�H��.n�U����
-go-service      | ��H
- �� ��vice      | A!���
-      @�� o�$�R�|�������       F
-                                ��������n��@��$�����
-                                                    .������������H
-�o-service      | ��X�2�^�Z!��r�������1������
-�f
-  ��mO������������6��
-                     �/�������� 7�}�����f��
-                                           �Y�
-go-service      | �����=���������������p��
-                                          -��'M=���`�d�
-                                                       y�@�X��m��,�K�Al����h� �3��      ���&��u�����G�
-
-                                                                                                      �T���������������f������B
-                                                                                                                               R�Y�����0$�����N��T9U�Q
-                                                                                                                                                      p���H��$��4�␦��j��������K����>��z�v�FJ���w�]�K���      `
-                         ��|&��ֱ ��4�2>��&����*
-                                               �H��4�����-��z�.���
-����� !R�������#���T����+i����i[�q�V                              ���������U�k(
-go-service      | �|��, ����.��T��Q)�   ��%����0��x��#���<���
-                                                             ��+M���t%���[Q�M��
-                                                                               +����0����V��E
-                                                                                             %��Ep��o���c���k������]!��"��␦
-                                                                                                                          ��
-                                                                                                                            ����-��#    ␦�
-�����V)-���#6�����\��٘2�П"�Oݑ��3����
-                                  ����=
-                                       ���4߹#%��hD��6   ���x
-                                                            ?
-                                                             �����O/t���K!�>����$�����%
-                                                                                       �Ќ�$��<�;5�;�g��g������%x
-                                                                                                                �Ј9
-                                                                                                                   ��ڍ.�=��G��}��!x
-                                                                                                                                   �j %�(�n5_����)�i̿�"���������%�]�����Y
-go-service      | B����
-m�-servi�����G  | �
-              �����␦X���?W
-go-service      | +����
-                       ���/{���u�#Y␦���!����v�
-                                              �h�;q�-��␦G�������(�L�<�v$4aٓ"��({
-                                                                                ���
-                                                                                   ��z����"��|��|�
-                                                                                                  :����
-                                                                                                       5�������V�����K
-                                                                                                                      �p�i���������-�K��!�����I
-                                                                                                                                               �����*v��
-go-service      | 4��N)����8�Q�Q������=�
-go-service      | ����|����
-                           ����j��
-�l���5                            �S
-      ��a��|;����)
-                  >���j
-                       �����3   ��Q�##��C�␦;a��)��_h��4�)
-go-service      | I
-go-service      | �������␦��F%f�,�@#��@�+
-go-service      | �Z@@�Kx�h���@�k��
-                                   k�\��
-                                        ���u
-go-service      | -���j�����"��E�S��Y�������y�����%
-                                                   >���
-                                                       5��
-go-service      | ����
-go-service      | �U��������-�����������h�R��/��������O
-                                                       ��8�@$h�a��1������������o␦p
-go-service      | j�X
-                     �  ����`�����6����=        *�����  P=��o�@����b�������␦k�s����a���3�sL����
-                                                                                               =Q���    <��� >  ����K"�G�
-go-service      | ��`�e��������y@���{␦^��D���b�
-����4rvi��������| i���l��m��T��������-�8���O�F�we��
-go-service      | ���W���"      $I��������l��
-go-service      | �����
-                       :
-                        ����
-                            �^��/�)���B��
-go-service      | ����i 9
-go-service      | `���Bn��
-                          ���P�������9�b�V
-go-service      | ���1�N�������j�
-                                 ����
-go-service      | R���  #�4�)���a���    c�C�5���9�U��+d���1�����?���2���7������ �
-��|���`��{��������O     ����|���        ��[����������������N                     ������)�������ud��%�j��        ���
-                                                            �d*����N�7�@3[e�����y��J��w2�
-go-service      | ��O�X�H9����wA���*gl�:�0����b�w���
-go-service      | ��␦���������X4�a���<���cW��!�f��.�0�D�jq�7���������T�Z����L����X��b�a#A��a��4�
-                                                                                                j�S����8y��:�{i��
-�o����8�                                                                                                         �c�\��������pQ�������6�m��XR�e����5�=��������������j�|
-���9ervice      | 8`B���a��=���(������������N�sR�����A8�������␦����W�T����������<�����?7���^�����
-����a��a���;��o����k���_��������{���u���-�q�B���O{���/Z/�%�9\���@��Y�OK��j[�������L��E�H�����0����n����T���X���
-                                                                                                         ����9.A�rj�f���y��D�"���8�1�$��c�����Z{��R���
-go-service      | m��"������
-�6��l���B��v���`��������f���kr�P�����,���z�W���G�_����S��
-                                                         }�s�l^���RY��y�$8c�Ti���y�������j�������*���[S���
-                                                                                                          �����m�;�c�,��k���������"     <8�����\F�������␦Q�!U���V����������}Q��8c��������7�g)����+c���J���I6��������s���,�4���C�R���G�����q�(�����������"��[����������#����R��G����s��MY��i�t���S�������w�����I���/��������f�)���\������O�����v^[��?��><�������v4��Y���G���O�h��p����o
-            5������90�������KY������~������h����)�B��w���s�����������!3�Y������x������^�����0�nmR���Y���K�
-go-service      | R����
-go-service      | �U�P���D@     N�`�,~���O�����<�H�m����/��f�P;���������/       ���~���J
-                                                                                        W�v��8
-h�3����1��\A�|�i�(�}��
-                      "h�nX��FM
-.����uK                        ������]��
-go-service      | \i������W#���&�<����
-io-service      | 3���Hf�E���1�H
-go-service      | n���>��8�����&��-Wn��5�%�r
-                                            �k�����c
-                                                    o
-                                                     [������    ���A����V�E���;\��������I���S�P�z������S�u9�e�@�O����������8����f���X3��\�fS����K���
-go-service      | ��7���T�
-                          mu�����������3j�-�U��������cG���j��2�q����d������P����S�F��h��������Q���������1���    ������r���������I�i������Z�[�p�c�c�������|���5���%�Z����������#���HU���������7��\��^����H�S��K������]�������%�����/
-���wj�����@a��M���>���)g���wQ7�&�*'��������2�����j���_�M�����0��p�?�("���_��K�`��']N�����
-                                                ���������f��a_ �{���,�"���
-                                                                          3\���������G��sV��������
-                                                                                                  ����� �)���
-go-service      | ��f���������F���?������P���
-                                             ����a�z�h� 7�����������H�Y�����J�g�@�&$`   (��>�R  b
-                                                                                                 �
-go-service      | %
-�                  �
+go-service      | 2025/12/06 11:38:59 /app/main.go:656 record not found
+go-service      | [0.669ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-h�-service      |
-go-service      | 1
-                   Z
-                    �   �
-                        2������a��������������l�����%���g������P�␦�}�������A�a��h���K�zT�G#'M�������\'��������B%w�#'��96��u����<�����]�����c���L����������@�7���$�����2�������&�������f�^���-����H���L����������uD
-                             u��j���_
-go-service      | �     o�����
-go-service      | �R=�����]�J�&�����e�G�����W����!��� ���������O������
-                                                                      ��5�b3��8��������\�������E�o�\����A�>���G�P���P�i�F�,�y>�a;�����X��U69�cW>'�f)�C�.���#�;���;���o�������������!�v��� �����^�K���S�������v��f��U���e�␦�����u�d�b���q���'��l�<��  &
-                                                                 �
-�6      �2~     w;(     ���������������V���A���8���)�����X���%�:��������h��*�␦���Y�X����B���D���I��Z�\��������������2������Xq��\�EO�H���;���S���r�e�D�����?��␦�������E�,�d������.����)@i@�C���K��������������������������e���v�.���~�
-                                                �o���w��A<���
-�fC�                                                         a
-
-    �
-go-service      | �U�5S���������������m�G���������S�����E�}��0␦���^|�i�|�+���=�b�_�����v����U�n�\���y���w���dI�@�0���6��M�b�%���������{�-�<�o���������e������Q���4��@�����Q�m���\�����A�I�
-go-service      | �C���0�
-                         ���~���������Y�E���K|����h��L�9{�
-go-service      | >
-                   U
-                    �
-go-service      | 2
-                   d
-go-service      | 0     p       �       ��?���5����������T�`������5�g�+�����������6���
-                                                                                      �*�/�`�b�Pr�����������;���
-<�L�����6���q���'�����������E�������w�����}�A�t�����������K�������R�3���C�
-go-service      | �����@�~��)���        {
-)                                        ��Q�B␦␦�O���
-go-service      | Es���:�#���o�����K�T�t�+���`�����
-                                                   ���8���J�Y�G��7�M�H��S^"i3\��l�,�����f�-�4��
-go-service      | 3(����'k{��N�>��Cw�
-���������K�t����␦�]�&o������������P4�����*^����>���'������<�C�|�������n���I�L�����T���?���q��I�D��/�}e��f����������Tq
-                                                                                                                     �Nj��1@�   �k(��$�}�.������0���.�>���*�����f�������n�w���m�e���R���b�������r�E���O�
-  ��������G�u�B�����'�'�C����`�C�␦�&���[�k�������6������W�1�������[�����␦��������O
-go-service      | �
-                   �\f
-(                     ��
- �      p��7��S�R�%����M���v�y���n������9�������z�����
-                                                      �"�~�������w�jGd �S����1���@���)���#w%�L��&H�d0�@������������������{�S���9�{�v��"����I��P�AX�     \�O5��I������������@�s���Z�����Y��(������g�6�����������K�����h�x�����o��|I��p�X�a�����>���.���\[��o����v�R���� ��_������'�D���T����Y���~�q����~�l�]�����W�����w����BF�       �����
-go-service      | Q���?�J�e���%���1���l�d�d�9�_����$�����3s6��(��R�f�kg��
-                                                                         �j������T��h��9�jIXa���������������Q�$�7�>�o�6���6���#�c���x�{���y�����������!�?����`������L�����Z� ���]����V����i����V��������������*�J�|��@���t�}���F�s���-���������Ob@q�[h�;��7�_��:�k����BQ%,~o��^�DutB��K��������������������H�����}���x�����L�����������1��g�z�D�%���������B���"␦����w�I��
-                                                                                                                                                                                    �2k�����M.��o-����YN0��������������6�c�x��������~�C���������
-go-service      | �����
-�$�������V��J����c0�D����Oo�#�� �       �       {       �       �
-                                                                                �
-                                                                               �~�F��7�h�Q
-                                                                                          �4��]���k�L���;�e���P��������w�n�P����9�6���y���������_�j����$���
-                                                                                                                                                           �S�2����$�
-                                                                                                                                                                     ��Z�������Z�������Y��H���KJ���{���6��
-go-service      | ��(�4�"���g���P�%�L�v�P�@�����4�M�n�������+�������o�����F|�#P5�]����
-                                                                                      ��;�Ry�}d(
-                                                                                                �J����'�7P��6�r�����r��f�n����c���P�&��5�9�!�:���~���������@�C�f�����������������������_�~�|���������&�d�Y�c�����������������
-+d��9��M�b�r#.����o���X��J��F�w;��������6�����&�����_�/������#�4�2���k�}�|�������������s�>�H���B�?�p���"�>�e���2�Y����-� �w���y���=�h�e�W0r&
-�)���!�i�w������g����.�U��������'�s������9�o�������������������d�A�F�;�:�L�g�h�R�u�}�A�7�>�*��������������������^�s�x�P�H�a�U�m���s�������'��Anw�n���AA�������wH2wBF�L<�����o���'�����i�v����^�W�����������������C����O���
-       \eT�5jQ�Ajc����k-���V@"���]�f/����W�����=�����^�L�       �����������������h���������%�y�����Y�u�k�����������m�_�������/�����*���KK���@z�4&M=+B����
-go-service      | ����{��P1���d@����R�����3�����X�V�-�
-                                                      ��)�/��������������������������� �g�P�t������Q�������6�9�t�������f
-go-service      | ��j�=~�,D4n������K
-                                    ��Q�sQ�T�V����������"�
-go-service      | ����q�r�?�+�!��������`�H�␦�����������
-                                                       �=�2�Y�Z�N�h�V�C�+�␦������������� �P���������)�L�*�X�s�\�t�����a���w���e�,�S��"u�<�      q�d�����'�c     �M�Q�I�f��!�r���`���`�����F����Y�����w��������T��������3�^������C�����Q���5���������"�����7����T�K�*���Lrty�������0Ad����}hXA0       ���n{�N7+�n7
-                                                                                                                            ������H�
-                                                                                                                                    �����'���y�2�-������������������3�l�]�}���������������O�8�J��������������d�L�j�"��������<�M��b�����������5�n�p�����C�m���K�c�����N���K���Er�/[��)J���V[q�m`oV���A]}~j��rp��z��ag\␦�����G��E#������e�/�����u�L�
-                                                                                                                ��(�v
-                                                                                                                     �-�J��j�������'�����S�������V������F���������������������������q�z���s�e�|�������2�w�����Y�����@�����@�����?���0�B�;�F�$�
-                                                         j�/����p4�?�s�@��T�"�0��%���F���O���w����u�#�������n�L�<�E�7�?�f��������K�z����F����F������h�������G�z�����������@.'`dTn����]���␦e��-M_s��������������,9NbYW_ZMF5 &��������qOND3!����������������e�r�A��������������������p�J�)�/�����������������(�(�4�@�F�X���������1�u�����+m���
-&6("$+"#␦�����sB���l<���N��������5�� �������}�M�8�<�������������o�j�o�[�Q�n�]�O�V�C�R�W�s�d���������A�O�}�������,�^�~�����%Xv��!0d���3i�����(-7������V;���A���V;����n�6�
-                                                                                                                                                                        �������e�?�������������x�Y�N�.� �4�T�M�S�T�Q�d�k�c�Z�v�x������������C�b�x������������/�Q�������O~��:]��$m����$P\hho�cXcXM1���I��k4���YA����b�*�
-                                                                                                                                  �����{�U�1������������������|�|�����������������������������������)���=�`�y���������/�K�]�����������)Qs���Ge�����(Od���������"�����rb:��sC/���9����z�F�
-���������������������������2�I�P������� �*�D�c�t�������"�M�^�c�|�������␦4d���"4Ri{���� @PYgy|lnr�aKF&���vU^3�������ZO7��������������������g�W�R�:�D�+��"���������������z���|�l�t���z�����������������������
-                      ���#�1�;�F�Z�r�����������
-                                               +1Gx�������$& 5',0B<7PJO\B?M4:(,␦/������}`Z@)$
-                                                                                             ��������}�[�B�/������������������}�h���d�b�M�L�X�>�D�Q�S�X�W�|���������������)�\�f�x����&DTMNMdr�����������),;R8@[;6D9(3*#.�������rMFR���������e�?�%�␦����������������������������������������
-                                                                                                      ���.�/�F�y����������������#:;0XaNi���������������������������|�XEb[\T5/6��������������u�k�R�W�^�I�=�U�i�]�c�p�u���������������������j�W�_�l�W�f�x�j�l���������������������������99D^v~���������uztn�p��������������������zkWB6)␦��������������������������������������������␦ 8=Gdimu��������������������m]ZPZ_dYdbS^QD98364"A�C�d�x�V�r���k�y���������������������������������������p\I2+&!
-                                                         ���������������������������n�r�}�{�n�s���������q�b�g�h�_�T�b�b�`�c�h�g�_�e�[�n�y���������������������������#JIMLL\WdUcjays����x�����������������lciP3+ ����������������������������������������������������������������������������������������������       !8<;NPL>NShfgqWVL; &
-                ������������������������������������������������������   #/HVORP;B@8)*�����������������������������������␦������
-                                                                                                                                ������������������2.
-�������������� $'*,/'$ !!,(��������������
-
-␦
+go-service      | 2025/12/06 11:39:01 /app/main.go:656 record not found
+go-service      | [0.766ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-                  ��������������������������������������������������������␦
-                                                                           ␦
-                                                                           �����
+go-service      | 2025/12/06 11:39:03 /app/main.go:656 record not found
+go-service      | [0.681ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-
-�����
+go-service      | 2025/12/06 11:39:05 /app/main.go:656 record not found
+go-service      | [0.570ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-                  ���������
-                           ��������������������������������������
-go-service      | �␦$+&/0+*2) 0=3)#!
-                                    )�������������������������������
-                                                                    ��
-                                                                      ␦��������������������������������������������������������
-                                                                                                                               "
-
-                                                                                                                                ���������������������������������
-
-
-
+go-service      | 2025/12/06 11:39:07 /app/main.go:656 record not found
+go-service      | [0.314ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-␦$����������������������������������������������������␦:9?IDH639:0<4' (+<@.*?D@KA*=8��������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������1=Jed]l�rp_glc^YWHF@=9<: *+.(%-,&00(/),-+)&0,(!��������������������������������������������������������������������������������������������������
-#�����������������������������������������������������������������������������
-
-go-service      | ")7;?;6=;75/53534,,37><;AD<8>?DE8;@:11##��������������������������������������������������������������������������������
-
-go-service      | ␦
-                                ��
-
-go-service      |       ��������������������������������������������
-go-service      | ������������������������������������������������������
-
-                                                                       ������������������������
-                                                                                               32@IINKIPC1/10))/
-go-service      | ����
-
-
-go-service      | ␦
-                   $��������������������������������������������������������������������������������������������������������������������������������
-                                                                                                                                                    ����
-$8CAC0EK<>QJDH=FGC:*&&%.'       �������������������������|�x�z�x�s�r�������������������������
-␦7>97-9L7<CHF66<;1+)%
-go-servi����������������������������������������������������������������������������������������$$42+3882@D4/$
-
-�����������������������������������������������
+go-service      | 2025/12/06 11:39:09 /app/main.go:656 record not found
+go-service      | [0.507ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-$"0(-13,$"����������������������������������������������������������������������$$#'9:<- ������������������������������
-go-service      | ����������
-                                ␦
-                                       ��
-
-��������������������������������������������������������������������������������������������������������$#+/%).3,00(#'%
-������������������������������������������������
-go-service      | ������������������
-
-
-␦␦��ervi��      | ����!("&,
-
-go-service      |       ����������������������������������#+/!
-
-
-                                                              ��������������������&!
-                                                                                    ������������������������������������������������������������������  ��
-                                                                                                                                                          "&-*(&';?L_Z\bi\aeNRVK?>2# ������������������������������������������������������������������������������������������������������������    ��      ����
+go-service      | 2025/12/06 11:39:11 /app/main.go:656 record not found
+go-service      | [0.543ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-
-
-
+go-service      | 2025/12/06 11:39:13 /app/main.go:656 record not found
+go-service      | [0.537ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-
-                ����������������������������������%+%'��������������������������������
-
-                                                                                      %"%0'.=2,$$ '&
-go-service      | ������������������������������������������������������������������������������������������������������������������␦␦␦%(%&#&9A63.+6>A2)6:.-␦����������������������������������������������������
-
+go-service      | 2025/12/06 11:39:15 /app/main.go:656 record not found
+go-service      | [0.576ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-go-service      | ����
-
-go-service      |       +)$5%04=<*0*$-* ��������������������������������������������������������������������������������         (%!.:/;>B@598/--
-                                                                                                                                                 ������������������������������������������������������������������
-                                '<HSZRLRTKLD>562* ������������������������������������������������������������������������������������������������
-                                                                                                                                                 !"%"+"$970-(0(&,,������������������������������������������������������������������������������������       ��������������������������������
-                                                                                                       ␦␦$
-!!*'"&  �����������������������������������������������������������������������%!%*"������
+go-service      | 2025/12/06 11:39:17 /app/main.go:656 record not found
+go-service      | [0.568ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
+go-service      | 2025/12/06 11:39:19 /app/main.go:656 record not found
+go-service      | [0.334ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
+go-service      | 2025/12/06 11:39:21 /app/main.go:656 record not found
+go-service      | [0.517ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-                 ��
-                   ��"
-go-service      |��
-                   �����������������������������������������������������������������␦ %����������������������������������␦),/(2#"!'␦**$')'. 7.0*)$      ��������������������������������������������������������������������������������������
-
-go-service      | ��
-
+go-service      | 2025/12/06 11:39:23 /app/main.go:656 record not found
+go-service      | [0.496ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
+go-service      | 2025/12/06 11:39:25 /app/main.go:656 record not found
+go-service      | [0.483ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
 go-service      |
-go-service      |  -*)!&(����������������������������������������������
-������
-go-service      ␦3><@@9G67853&! ������������������������������������������������������
-                                                                                      ������������������������������������������������������������������������ !#1(/475/8/'+    ����������������������������
-go-service      | ������
-100%|██████████| 1.87G/1.87G [00:22<00:00, 81.7MiB/s]22;23;24;28;32;42;52c^[[?61;1;6;7;21;22;23;24;28;32;42;52cpython-service  |
-4.37kiB [00:00, 22.2kiB/s]
-361kiB [00:00, 1.88MiB/s]
+go-service      | 2025/12/06 11:39:27 /app/main.go:656 record not found
+go-service      | [0.527ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:29 /app/main.go:656 record not found
+go-service      | [0.627ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+tts-db          | 2025-12-06 11:38:22.618 UTC [1] LOG:  database system is ready to accept connections
+tts-db          | 2025-12-06 11:43:22.708 UTC [27] LOG:  checkpoint starting: time
+tts-db          | 2025-12-06 11:43:28.144 UTC [27] LOG:  checkpoint complete: wrote 57 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=5.423 s, sync=0.008 s, total=5.437 s; sync files=43, longest=0.002 s, average=0.001 s; distance=195 kB, estimate=195 kB
+tts-frontend    |
+go-service      |
+go-service      | 2025/12/06 11:39:31 /app/main.go:656 record not found
+go-service      | [0.455ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+tts-frontend    |  ✓ Starting...
+python-service  | INFO:     127.0.0.1:37832 - "GET /health HTTP/1.1" 200 OK
+tts-frontend    |  ✓ Ready in 305ms
+python-service  | INFO:     127.0.0.1:34554 - "GET /health HTTP/1.1" 200 OK
+go-service      |
+go-service      | 2025/12/06 11:39:33 /app/main.go:656 record not found
+go-service      | [0.530ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:35 /app/main.go:656 record not found
+go-service      | [0.528ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:37 /app/main.go:656 record not found
+go-service      | [0.418ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+python-service  | INFO:     127.0.0.1:50128 - "GET /health HTTP/1.1" 200 OK
+python-service  |  > Downloading model to /root/.local/share/tts/tts/tts_models--multilingual--multi-dataset--xtts_v2
+100%|█████████▉| 1.86G/1.87G [00:20<00:00, 87.9MiB/s]
+go-service      |
+go-service      | 2025/12/06 11:39:39 /app/main.go:656 record not found
+go-service      | [0.586ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:41 /app/main.go:656 record not found
+go-service      | [0.522ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:43 /app/main.go:656 record not found
+go-service      | [0.470ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:45 /app/main.go:656 record not found
+go-service      | [0.408ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:47 /app/main.go:656 record not found
+go-service      | [0.436ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:49 /app/main.go:656 record not found
+go-service      | [0.693ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:51 /app/main.go:656 record not found
+go-service      | [0.453ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:53 /app/main.go:656 record not found
+go-service      | [0.559ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:55 /app/main.go:656 record not found
+go-service      | [0.513ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:57 /app/main.go:656 record not found
+go-service      | [0.412ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:59 /app/main.go:656 record not found
+go-service      | [0.647ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:01 /app/main.go:656 record not found
+go-service      | [0.455ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:03 /app/main.go:656 record not found
+go-service      | [0.494ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:05 /app/main.go:656 record not found
+go-service      | [0.533ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:07 /app/main.go:656 record not found
+go-service      | [0.623ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:09 /app/main.go:656 record not found
+go-service      | [0.382ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:11 /app/main.go:656 record not found
+go-service      | [0.550ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:13 /app/main.go:656 record not found
+go-service      | [0.477ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:15 /app/main.go:656 record not found
+go-service      | [0.630ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:17 /app/main.go:656 record not found
+go-service      | [0.520ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      | 2025/12/06 11:43:19 voice clone worker: job 1 failed: python service request failed: Post "http://python-service:5000/voice-clone": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+go-service      |
+go-service      | 2025/12/06 11:43:19 /app/main.go:656 record not found
+go-service      | [0.281ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:21 /app/main.go:656 record not found
+go-service      | [0.304ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:23 /app/main.go:656 record not found
+go-service      | [0.645ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:25 /app/main.go:656 record not found
+go-service      | [0.450ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:27 /app/main.go:656 record not found
+go-service      | [0.301ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE100%|██████████| 1.87G/1.87G [00:21<00:00, 88.7MiB/s]
+4.37kiB [00:00, 21.1kiB/s]
+361kiB [00:00, 1.71MiB/s]
 100%|██████████| 32.0/32.0 [00:00<00:00, 131iB/s]
 python-service  |  > Model's license - CPML
 python-service  |  > Check https://coqui.ai/cpml.txt for more info.
 python-service  |  > Using model: xtts
 python-service  |  > Text splitted to sentences.
-python-service  | INFO:     127.0.0.1:57914 - "GET /health HTTP/1.1" 200 OK
-python-service  | INFO:     127.0.0.1:48688 - "GET /health HTTP/1.1" 200 OK
-python-service  | INFO:     127.0.0.1:42698 - "GET /health HTTP/1.1" 200 OK
-python-service  | ['The town library sits where the coastline curls like a question mark, and in it the air always smells faintly of rain and old paper.', 'Nia kept the place steady, like a lighthouse keeper who never expects the sea to listen but keeps the lamp lit anyway.', 'She shelved books, brewed bad coffee that somehow tasted better than it deserved, and watched the town breathe in and out through stories.', 'One ordinary Thursday, when the sky wore a sheet of grey as if afraid to spill its color, Nia found a box tucked behind a stack of atlases she hadn’t touched in years.', 'The box was a quiet thing, leather-bound, its stitching frayed by someone who handled it with care and not hurry.', 'Inside lay a single notebook: weathered, the corners softened as if someone had patted them with affection.', 'On the cover, in gold leaf that had begun to flake, were the words: Book of Unsent Letters.', 'A note accompanied the box, written in the same careful hand she’d learned to recognize from her grandmother, a woman who had written more letters than anyone she knew and then never mailed them.', 'The note read, in part: “Dear you. If you’re reading this, you’re the listening sort. Write to the ones who never hear back. The world is rumor; letters are proof we cared enough to speak anyway.”', 'Nia frowned at the odd sentiment, then opened the notebook.', 'The pages were blank, as blank as a stretch of winter sky.', 'She turned to the first page and found a single line, penned in a script she didn’t recognize at first.', 'It said: Dear you.', 'That was all.', '“Grandmother?” she whispered, because the voice in the back of her head sounded like hers but older, warmer, more certain.', 'The next moment the page warmed under her fingertips, and the letters appeared—not printed, but written, as if someone had tapped them into existence with a light touch.', 'The ink glowed faintly, the lines written in a rhythm she could feel in her bones: Dear you.', 'I hope you’re listening.', 'Her breath caught.', 'The notebook wouldn’t spill its secrets all at once, not like a book that promised adventures but offered only a page of dust.', 'She closed her eyes, pressed the book to her chest for a heartbeat, and when she opened them again the room’s silence had shifted to a soft, almost conspiratorial noise—the sound of someone nearby who wished to be found.', 'That night, after the last customer had drifted out and the town had settled into its habit of quiet, Nia opened the notebook once more and read the words she had “written.”', 'They weren’t addressed to her, not exactly; they felt more like messages flung across a wide harbor to boats that didn’t know they were part of a voyage yet.', 'She read aloud to the empty room, whispering a name she had barely ever spoken aloud: Mrs. Calder, who sold seashells on the pier every Sunday with a smile that crept only at the edges of her lips.', 'Dear you, she read, and the ink seemed to brighten.', 'I’ve been waiting for the courage to say your name aloud.', 'The sea remembers you, and so do we.', 'She blinked, then looked toward the door as if Mrs. Calder might appear in a moment, seashells clacking in a tin bucket.', 'But of course the door stayed shut, and the shells stayed in the bucket.', 'Still, the words trembled in the air as if they had just stepped off the page and onto the wooden floor.', 'The next morning, a letter, or perhaps a whisper of one, found its way into her routine.', 'The bakery at the end of the street ran out of croissants a half hour early because Mrs. Calder herself stopped by the library to tell Nia that a small miracle had just occurred on the pier: a man she’d once helped with a broken boat had returned to claim a memory he’d forgotten to collect—the memory of his late wife, a memory Mrs. Calder had once woven into a shell necklace for him.', '“He laughed,” she said, “and cried at the same time. It was strange and true.”', 'She left the bakery tray behind, and the library gained a new scent—sea salt and warm butter—that clung to the shelves.', 'Nia’s breath found its own rhythm, and she kept writing.', 'She decided to test whether the notebook really connected strangers through their words.', 'She wrote a letter for a neighbor she hardly spoke to, a quiet man who repaired bikes and never spoke of his own life beyond “the usual.”', 'She wrote to him about a dog that needed a home and a child who would love a bicycle more than a new toy that squealed when pushed.', 'She left the letter open on the counter of the bicycle repair shop, tucked between spare tires and a jar of greasy rags.', 'That afternoon, the man returned with a bicycle that sounded like a tired tune when he pedaled.', 'Behind him walked a little girl, cheeks flushed with the kind of excitement only a first proper ride can grant.', 'She held up a bike bell she’d painted red with black stripes to mimic a dragon, and she laughed when the bell jingled.', 'The man saw the letter on the counter and his eyes widened with recognition as if he’d always known someone had been thinking about him, even from miles away.', 'He pockets the note as if it’s a charm and carefully empties a second, unused shelf in the shop, which suddenly seems brighter, more orderly than it did before.', 'Word travels through a town like wind traveling through reeds; no one knows exactly when the turning point happens, only that it did, and it keeps turning.', 'The library’s attic becomes a small sanctuary for people who needed to be heard: a schoolteacher recovering from a stubborn ache in her ankle, a fisherman who wanted to tell his mother that he would not come home until the sea calmed, a teenage boy who wanted someone to listen to his poetry and not just to his grades.', 'Nia doesn’t yet understand the mechanism behind the letters.', 'They seem to conjure moments—repairing a bicycle, the return of a memory, the moment when a door opens and a voice says, “I didn’t know you were waiting for me.”', 'It’s not magic in a showy sense, she tells herself; it’s a careful kindness that reshapes a town by encouraging people to speak the parts of themselves they’d kept quiet.', 'One evening, under a sky the color of a bruise just before rain, she writes her own letter in the notebook.', 'Her grandmother’s handwriting—once again warm and patient—appears on the page, but now it looks more like a mirror than a signature.', 'The words arrive almost before she finishes forming the thought: Dear you, do not forget what your grandmother taught you: to listen is to love twice.', 'She hesitates, then writes a second line, the truth she has never admitted aloud, especially to herself: I’m afraid the town will forget to notice me if I stop writing these letters.', 'Her fear sits with her for a moment, heavy as a stone in a stream.', 'Then something shifts.', 'The attic light flickers, a habit the town chalks up to old wiring, but this time it feels deliberate, like someone has pressed a switch inside the room.', 'The letters glow a soft, forgiving blue, and the page offers her a thought she hadn’t considered: a new letter would require someone else’s listening, not just hers.', 'That night, Nia hosts a “Letters Night” in the library.', 'The town’s people gather: the grocer who always smiles when a child puts a penny on the counter, the bus driver who knows every face by heart, the single mother who hauls groceries and stories in a tote bag that’s seen better days.', 'They sit around tables with cups of coffee cooled to the perfect shade of beige, and they bring their own unspoken truths to the table—photos of people who moved away, apologies they never sent, gratitude they forgot to voice.', 'Nia reads aloud from the notebook.', 'The letters, once addressed to “Dear you,” now feel more like a chorus, each voice joining in to form something larger than any single voice could.', 'The crowd recognizes the names in the margins—the names of people they know, of strangers they’ve seen every day with a story they never asked to hear.', 'The letters are not a magic trick; they’re a ritual of acknowledgment, a way of choosing to see each other as more than the surface of daily routine.', 'As the night grows late and the town slows into a comfortable hush, a letter arrives addressed to Nia herself, written not by her grandmother’s hand but by the town in chorus, as if the town itself could knit a message from all its threads of memory.', 'Dear you, they write, we forgot how to listen because we forgot how to be still.', 'Thank you for reminding us that listening is an act of love, and love is the weather that keeps a town alive.', 'Nia reads the letter aloud to the room, and when she finishes, she feels a strange, buoyant warmth rise in her chest, the kind that feels like lungs remembering how to breathe after a long winter.', 'She looks around at the faces turned toward her—some shy, some eager, some haunted by their own private storms—and something inside her settles into a new rhythm.', 'The notebook rests again on the desk after the last guest leaves, its pages catching the lamplight like a calm sea catching a stray ray of sun.', 'The Book of Unsent Letters has become a map of how to live in the town: a map drawn not with roads and borders but with words that say, “I see you,” and “I am listening,” and “Thank you for staying.”', 'On a morning not long after, the box sits quiet in the same spot behind the atlas shelf, the notebook resting closed as if it has finished speaking for now.', 'Nia touches its cover; the leather is warm, almost familiar.', 'It occurs to her that the notebook might rest until a new moment—one she could not predict—asks it to wake again.', 'She smiles, because she’s learned something essential: you don’t need grand gestures to change a place; you need words spoken into the ears of people who want to be heard.', 'And so the town continues to breathe through stories, one letter at a time, a little louder, a little brighter, the sea outside listening like a patient confidant.', 'The library’s lights burn a little longer, not out of obligation, but because a room where people are seen by someone who cares is the kind of light that refuses to dim.', 'The attic hums with quiet reassurance, and in that hum, Nia finally feels what her grandmother must have known all along: listening, poured out as letters and shared aloud, is a kind of kindness that travels farther than any sea-wind can carry.']
-python-service  | INFO:     127.0.0.1:39692 - "GET /health HTTP/1.1" 200 OK
-go-service      | 2025/12/06 10:03:11 python service request failed: Post "http://python-service:5000/voice-clone": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-python-service  | INFO:     127.0.0.1:60654 - "GET /health HTTP/1.1" 200 OK
-python-service  | INFO:     127.0.0.1:36790 - "GET /health HTTP/1.1" 200 OK
-python-service  | INFO:     127.0.0.1:38180 - "GET /health HTTP/1.1" 200 OK
-python-service  | INFO:     127.0.0.1:33540 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:55742 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:39494 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:45622 - "GET /health HTTP/1.1" 200 OK
+python-service  | ['The town library sits where the coastline curls like a question mark, and in it the air always smells faintly of rain and old paper.', 'Nia kept the place steady, like a lighthouse keeper who never expects the sea to listen but keeps the lamp lit anyway.', 'She shelved books, brewed bad coffee that somehow tasted better than it deserved, and watched the town breathe in and out through stories.', 'One ordinary Thursday, when the sky wore a sheet of grey as if afraid to spill its color, Nia found a box tucked behind a stack of atlases she hadn’t touched in years.', 'The box was a quiet thing, leather-bound, its stitching frayed by someone who handled it with care and not hurry.', 'Inside lay a single notebook: weathered, the corners softened as if someone had patted them with affection.', 'On the cover, in gold leaf that had begun to flake, were the words: Book of Unsent Letters.', 'A note accompanied the box, written in the same careful hand she’d learned to recognize from her grandmother, a woman who had written more letters than anyone she knew and then never mailed them.', 'The note read, in part: “Dear you. If you’re reading this, you’re the listening sort. Write to the ones who never hear back. The world is rumor; letters are proof we cared enough to speak anyway.”', 'Nia frowned at the odd sentiment, then opened the notebook.', 'The pages were blank, as blank as a stretch of winter sky.', 'She turned to the first page and found a single line, penned in a script she didn’t recognize at first.', 'It said: Dear you.', 'That was all.', '“Grandmother?” she whispered, because the voice in the back of her head sounded like hers but older, warmer, more certain.', 'The next moment the page warmed under her fingertips, and the letters appeared—not printed, but written, as if someone had tapped them into existence with a light touch.', 'The ink glowed faintly, the lines written in a rhythm she could feel in her bones: Dear you.', 'I hope you’re listening.', 'Her breath caught.', 'The notebook wouldn’t spill its secrets all at once, not like a book that promised adventures but offered only a page of dust.', 'She closed her eyes, pressed the book to her chest for a heartbeat, and when she opened them again the room’s silence had shifted to a soft, almost conspiratorial noise—the sound of someone nearby who wished to be found.', 'That night, after the last customer had drifted out and the town had settled into its habit of quiet, Nia opened the notebook once more and read the words she had “written.”', 'They weren’t addressed to her, not exactly; they felt more like messages flung across a wide harbor to boats that didn’t know they were part of a voyage yet.', 'She read aloud to the empty room, whispering a name she had barely ever spoken aloud: Mrs. Calder, who sold seashells on the pier every Sunday with a smile that crept only at the edges of her lips.', 'Dear you, she read, and the ink seemed to brighten.', 'I’ve been waiting for the courage to say your name aloud.', 'The sea remembers you, and so do we.', 'She blinked, then looked toward the door as if Mrs. Calder might appear in a moment, seashells clacking in a tin bucket.', 'But of course the door stayed shut, and the shells stayed in the bucket.', 'Still, the words trembled in the air as if they had just stepped off the page and onto the wooden floor.', 'The next morning, a letter, or perhaps a whisper of one, found its way into her routine.', 'The bakery at the end of the street ran out of croissants a half hour early because Mrs. Calder herself stopped by the library to tell Nia that a small miracle had just occurred on the pier: a man she’d once helped with a broken boat had returned to claim a memory he’d forgotten to collect—the memory of his late wife, a memory Mrs. Calder had once woven into a shell necklace for him.', '“He laughed,” she said, “and cried at the same time. It was strange and true.”', 'She left the bakery tray behind, and the library gained a new scent—sea salt and warm butter—that clung to the shelves.', 'Nia’s breath found its own rhythm, and she kept writing.', 'She decided to test whether the notebook really connected strangers through their words.', 'She wrote a letter for a neighbor she hardly spoke to, a quiet man who repaired bikes and never spoke of his own life beyond “the usual.”', 'She wrote to him about a dog that needed a home and a child who would love a bicycle more than a new toy that squealed when pushed.', 'She left the letter open on the counter of the bicycle repair shop, tucked between spare tires and a jar of greasy rags.', 'That afternoon, the man returned with a bicycle that sounded like a tired tune when he pedaled.', 'Behind him walked a little girl, cheeks flushed with the kind of excitement only a first proper ride can grant.', 'She held up a bike bell she’d painted red with black stripes to mimic a dragon, and she laughed when the bell jingled.', 'The man saw the letter on the counter and his eyes widened with recognition as if he’d always known someone had been thinking about him, even from miles away.', 'He pockets the note as if it’s a charm and carefully empties a second, unused shelf in the shop, which suddenly seems brighter, more orderly than it did before.']
+python-service  | INFO:     127.0.0.1:44682 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:53724 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:57420 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:47544 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:43906 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:45048 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:58984 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:43210 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:59020 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:58462 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:55842 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:37656 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:51458 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:47308 - "GET /health HTTP/1.1" 200 OK
+root@Automations:/opt/TTS# docker-compose -f docker-compose.prod.yml logs
+go-service  | 2025/12/06 11:38:53 Go Service (SaaS Edition) listening on :8080
+go-service  | 2025/12/06 11:38:53 Voice clone worker started
+go-service  |
+go-service  | 2025/12/06 11:38:53 /app/main.go:656 record not found
+go-service  | [1.893ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:38:55 /app/main.go:656 record not found
+go-service  | [0.938ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:38:57 /app/main.go:656 record not found
+go-service  | [0.738ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:38:59 /app/main.go:656 record not found
+go-service  | [0.669ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:01 /app/main.go:656 record not found
+go-service  | [0.766ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:03 /app/main.go:656 record not found
+go-service  | [0.681ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:05 /app/main.go:656 record not found
+go-service  | [0.570ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:07 /app/main.go:656 record not found
+go-service  | [0.314ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:09 /app/main.go:656 record not found
+go-service  | [0.507ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:11 /app/main.go:656 record not found
+go-service  | [0.543ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:13 /app/main.go:656 record not found
+go-service  | [0.537ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:15 /app/main.go:656 record not found
+go-service  | [0.576ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:17 /app/main.go:656 record not found
+go-service  | [0.568ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service  |
+go-service  | 2025/12/06 11:39:19 /app/main.go:656 record not found
+python-service  | /usr/local/lib/python3.10/site-packages/jieba/_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+python-service  |   import pkg_resources
+python-service  | INFO:     Started server process [1]
+python-service  | INFO:     Waiting for application startup.
+python-service  | ERROR:tts_service:Failed to pre-load engines: 'cv'
+python-service  | INFO:     Application startup complete.
+python-service  | INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+python-service  | INFO:     127.0.0.1:44782 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:49724 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:47754 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:45440 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:59788 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:56848 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:37832 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:34554 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:50128 - "GET /health HTTP/1.1" 200 OK
+python-service  |  > Downloading model to /root/.local/share/tts/tts/tts_models--multilingual--multi-dataset--xtts_v2
+100%|█████████▉| 1.86G/1.87G [00:20<00:00, 87.9MiB/s]
+caddy-proxy     | {"level":"info","ts":1765021139.2788,"msg":"maxprocs: Leaving GOMAXPROCS=4: CPU quota undefined"}
+caddy-proxy     | {"level":"info","ts":1765021139.2789428,"msg":"GOMEMLIMIT is updated","package":"github.com/KimMachineGun/automemlimit/memlimit","GOMEMLIMIT":7314967756,"previous":9223372036854775807}
+caddy-proxy     | {"level":"info","ts":1765021139.2789896,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+caddy-proxy     | {"level":"info","ts":1765021139.2801132,"msg":"adapted config to JSON","adapter":"caddyfile"}
+caddy-proxy     | {"level":"warn","ts":1765021139.280128,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/etc/caddy/Caddyfile","line":3}
+caddy-proxy     | {"level":"warn","ts":1765021139.2804484,"logger":"admin","msg":"admin endpoint disabled"}
+caddy-proxy     | {"level":"info","ts":1765021139.2805667,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
+caddy-proxy     | {"level":"info","ts":1765021139.2808456,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc0001b2180"}
+caddy-proxy     | {"level":"warn","ts":1765021139.2809296,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+caddy-proxy     | {"level":"warn","ts":1765021139.280935,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+caddy-proxy     | {"level":"info","ts":1765021139.2809374,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+caddy-proxy     | {"level":"info","ts":1765021139.2811449,"msg":"autosaved config (load with --resume flag)","file":"/config/caddy/autosave.json"}
+caddy-proxy     | {"level":"info","ts":1765021139.2811635,"msg":"serving initial configuration"}
+caddy-proxy     | {"level":"info","ts":1765021139.2830472,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/data/caddy","instance":"d8065e38-ac18-4c56-9718-355cfc33b1f3","try_again":1765107539.2830462,"try_again_in":86399.999999649}
+100%|██████████| 1.87G/1.87G [00:21<00:00, 88.7MiB/s]124,"logger":"tls","msg":"finished cleaning storage units"}
+4.37kiB [00:00, 21.1kiB/s]
+361kiB [00:00, 1.71MiB/s]
+100%|██████████| 32.0/32.0 [00:00<00:00, 131iB/s]
+python-service  |  > Model's license - CPML
+python-service  |  > Check https://coqui.ai/cpml.txt for more info.
+python-service  |  > Using model: xtts
+python-service  |  > Text splitted to sentences.
+python-service  | INFO:     127.0.0.1:55742 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:39494 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:45622 - "GET /health HTTP/1.1" 200 OK
+python-service  | ['The town library sits where the coastline curls like a question mark, and in it the air always smells faintly of rain and old paper.', 'Nia kept the place steady, like a lighthouse keeper who never expects the sea to listen but keeps the lamp lit anyway.', 'She shelved books, brewed bad coffee that somehow tasted better than it deserved, and watched the town breathe in and out through stories.', 'One ordinary Thursday, when the sky wore a sheet of grey as if afraid to spill its color, Nia found a box tucked behind a stack of atlases she hadn’t touched in years.', 'The box was a quiet thing, leather-bound, its stitching frayed by someone who handled it with care and not hurry.', 'Inside lay a single notebook: weathered, the corners softened as if someone had patted them with affection.', 'On the cover, in gold leaf that had begun to flake, were the words: Book of Unsent Letters.', 'A note accompanied the box, written in the same careful hand she’d learned to recognize from her grandmother, a woman who had written more letters than anyone she knew and then never mailed them.', 'The note read, in part: “Dear you. If you’re reading this, you’re the listening sort. Write to the ones who never hear back. The world is rumor; letters are proof we cared enough to speak anyway.”', 'Nia frowned at the odd sentiment, then opened the notebook.', 'The pages were blank, as blank as a stretch of winter sky.', 'She turned to the first page and found a single line, penned in a script she didn’t recognize at first.', 'It said: Dear you.', 'That was all.', '“Grandmother?” she whispered, because the voice in the back of her head sounded like hers but older, warmer, more certain.', 'The next moment the page warmed under her fingertips, and the letters appeared—not printed, but written, as if someone had tapped them into existence with a light touch.', 'The ink glowed faintly, the lines written in a rhythm she could feel in her bones: Dear you.', 'I hope you’re listening.', 'Her breath caught.', 'The notebook wouldn’t spill its secrets all at once, not like a book that promised adventures but offered only a page of dust.', 'She closed her eyes, pressed the book to her chest for a heartbeat, and when she opened them again the room’s silence had shifted to a soft, almost conspiratorial noise—the sound of someone nearby who wished to be found.', 'That night, after the last customer had drifted out and the town had settled into its habit of quiet, Nia opened the notebook once more and read the words she had “written.”', 'They weren’t addressed to her, not exactly; they felt more like messages flung across a wide harbor to boats that didn’t know they were part of a voyage yet.', 'She read aloud to the empty room, whispering a name she had barely ever spoken aloud: Mrs. Calder, who sold seashells on the pier every Sunday with a smile that crept only at the edges of her lips.', 'Dear you, she read, and the ink seemed to brighten.', 'I’ve been waiting for the courage to say your name aloud.', 'The sea remembers you, and so do we.', 'She blinked, then looked toward the door as if Mrs. Calder might appear in a moment, seashells clacking in a tin bucket.', 'But of course the door stayed shut, and the shells stayed in the bucket.', 'Still, the words trembled in the air as if they had just stepped off the page and onto the wooden floor.', 'The next morning, a letter, or perhaps a whisper of one, found its way into her routine.', 'The bakery at the end of the street ran out of croissants a half hour early because Mrs. Calder herself stopped by the library to tell Nia that a small miracle had just occurred on the pier: a man she’d once helped with a broken boat had returned to claim a memory he’d forgotten to collect—the memory of his late wife, a memory Mrs. Calder had once woven into a shell necklace for him.', '“He laughed,” she said, “and cried at the same time. It was strange and true.”', 'She left the bakery tray behind, and the library gained a new scent—sea salt and warm butter—that clung to the shelves.', 'Nia’s breath found its own rhythm, and she kept writing.', 'She decided to test whether the notebook really connected strangers through their words.', 'She wrote a letter for a neighbor she hardly spoke to, a quiet man who repaired bikes and never spoke of his own life beyond “the usual.”', 'She wrote to him about a dog that needed a home and a child who would love a bicycle more than a new toy that squealed when pushed.', 'She left the letter open on the counter of the bicycle repair shop, tucked between spare tires and a jar of greasy rags.', 'That afternoon, the man returned with a bicycle that sounded like a tired tune when he pedaled.', 'Behind him walked a little girl, cheeks flushed with the kind of excitement only a first proper ride can grant.', 'She held up a bike bell she’d painted red with black stripes to mimic a dragon, and she laughed when the bell jingled.', 'The man saw the letter on the counter and his eyes widened with recognition as if he’d always known someone had been thinking about him, even from miles away.', 'He pockets the note as if it’s a charm and carefully empties a second, unused shelf in the shop, which suddenly seems brighter, more orderly than it did before.']
+python-service  | INFO:     127.0.0.1:44682 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:53724 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:57420 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:47544 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:43906 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:45048 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:58984 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:43210 - "GET /health HTTP/1.1" 200 OK
+tts-frontend    |
+tts-frontend    | > frontend@0.1.0 start
+tts-frontend    | > next start
+tts-frontend    |
+go-service      | [0.334ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:21 /app/main.go:656 record not found
+python-service  | INFO:     127.0.0.1:59020 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:58462 - "GET /health HTTP/1.1" 200 OK
+tts-frontend    |    ▲ Next.js 16.0.6
+python-service  | INFO:     127.0.0.1:55842 - "GET /health HTTP/1.1" 200 OK
+tts-frontend    |    - Local:         http://localhost:3000
+python-service  | INFO:     127.0.0.1:37656 - "GET /health HTTP/1.1" 200 OK
+tts-frontend    |    - Network:       http://172.18.0.5:3000
+python-service  | INFO:     127.0.0.1:51458 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:47308 - "GET /health HTTP/1.1" 200 OK
+python-service  | INFO:     127.0.0.1:51460 - "GET /health HTTP/1.1" 200 OK
+tts-frontend    |
+tts-frontend    |  ✓ Starting...
+tts-frontend    |  ✓ Ready in 305ms
+go-service      | [0.517ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:23 /app/main.go:656 record not found
+go-service      | [0.496ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:25 /app/main.go:656 record not found
+go-service      | [0.483ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:27 /app/main.go:656 record not found
+go-service      | [0.527ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:29 /app/main.go:656 record not found
+go-service      | [0.627ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:31 /app/main.go:656 record not found
+go-service      | [0.455ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:33 /app/main.go:656 record not found
+go-service      | [0.530ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:35 /app/main.go:656 record not found
+go-service      | [0.528ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:37 /app/main.go:656 record not found
+go-service      | [0.418ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:39 /app/main.go:656 record not found
+go-service      | [0.586ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:41 /app/main.go:656 record not found
+go-service      | [0.522ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:43 /app/main.go:656 record not found
+go-service      | [0.470ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:45 /app/main.go:656 record not found
+go-service      | [0.408ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:47 /app/main.go:656 record not found
+go-service      | [0.436ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:49 /app/main.go:656 record not found
+go-service      | [0.693ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:51 /app/main.go:656 record not found
+go-service      | [0.453ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:53 /app/main.go:656 record not found
+go-service      | [0.559ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:55 /app/main.go:656 record not found
+go-service      | [0.513ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:57 /app/main.go:656 record not found
+go-service      | [0.412ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:39:59 /app/main.go:656 record not found
+go-service      | [0.647ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:01 /app/main.go:656 record not found
+go-service      | [0.455ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:03 /app/main.go:656 record not found
+go-service      | [0.494ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:05 /app/main.go:656 record not found
+go-service      | [0.533ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:07 /app/main.go:656 record not found
+go-service      | [0.623ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:09 /app/main.go:656 record not found
+go-service      | [0.382ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:11 /app/main.go:656 record not found
+go-service      | [0.550ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:13 /app/main.go:656 record not found
+go-service      | [0.477ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:15 /app/main.go:656 record not found
+go-service      | [0.630ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:40:17 /app/main.go:656 record not found
+go-service      | [0.520ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      | 2025/12/06 11:43:19 voice clone worker: job 1 failed: python service request failed: Post "http://python-service:5000/voice-clone": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+go-service      |
+go-service      | 2025/12/06 11:43:19 /app/main.go:656 record not found
+go-service      | [0.281ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:21 /app/main.go:656 record not found
+go-service      | [0.304ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:23 /app/main.go:656 record not found
+go-service      | [0.645ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:25 /app/main.go:656 record not found
+go-service      | [0.450ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:27 /app/main.go:656 record not found
+go-service      | [0.301ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+go-service      |
+go-service      | 2025/12/06 11:43:29 /app/main.go:656 record not found
+go-service      | [0.506ms] [rows:0] SELECT * FROM "voice_clone_jobs" WHERE status = 'pending' AND "voice_clone_jobs"."deleted_at" IS NULL ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+tts-db          |
+tts-db          | PostgreSQL Database directory appears to contain a database; Skipping initialization
+tts-db          |
+tts-db          | 2025-12-06 11:38:22.601 UTC [1] LOG:  starting PostgreSQL 15.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+tts-db          | 2025-12-06 11:38:22.601 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+tts-db          | 2025-12-06 11:38:22.601 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+tts-db          | 2025-12-06 11:38:22.608 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+tts-db          | 2025-12-06 11:38:22.613 UTC [29] LOG:  database system was shut down at 2025-12-06 11:34:26 UTC
+tts-db          | 2025-12-06 11:38:22.618 UTC [1] LOG:  database system is ready to accept connections
+tts-db          | 2025-12-06 11:43:22.708 UTC [27] LOG:  checkpoint starting: time
+tts-db          | 2025-12-06 11:43:28.144 UTC [27] LOG:  checkpoint complete: wrote 57 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=5.423 s, sync=0.008 s, total=5.437 s; sync files=43, longest=0.002 s, average=0.001 s; distance=195 kB, estimate=195 kB
+root@Automations:/opt/TTS#
