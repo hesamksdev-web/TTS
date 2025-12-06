@@ -756,6 +756,18 @@ func runVoiceCloneJob(job *VoiceCloneJob) error {
 		return fmt.Errorf("python service returned %d: %s", resp.StatusCode, string(respData))
 	}
 
+	// Verify response is actually audio data (should be binary WAV)
+	if len(respData) < 44 {
+		log.Printf("WARNING: Response data too small (%d bytes) - may not be valid WAV file", len(respData))
+		return fmt.Errorf("python service returned invalid audio data (size: %d bytes)", len(respData))
+	}
+
+	// Check for WAV header
+	if string(respData[:4]) != "RIFF" {
+		log.Printf("WARNING: Response does not start with RIFF header - first 100 bytes: %s", string(respData[:min(100, len(respData))]))
+		return fmt.Errorf("python service returned non-WAV data")
+	}
+
 	if err := os.MkdirAll(filepath.Dir(job.OutputPath), 0o755); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
@@ -764,6 +776,7 @@ func runVoiceCloneJob(job *VoiceCloneJob) error {
 		return fmt.Errorf("failed to write output audio: %w", err)
 	}
 
+	log.Printf("Voice clone job %d: successfully wrote %d bytes to %s", job.ID, len(respData), job.OutputPath)
 	return nil
 }
 
@@ -863,6 +876,13 @@ func getFileSize(path string) int64 {
 		return 0
 	}
 	return info.Size()
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func downloadVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {

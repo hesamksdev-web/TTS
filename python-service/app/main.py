@@ -106,7 +106,7 @@ def split_text_into_chunks(text: str, max_chars: int = 240) -> List[str]:
     
     return [chunk.strip() for chunk in chunks if chunk.strip()]
 
-def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_duration: float = 0.2):
+def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_duration: float = 0.1):
     """Merge multiple audio files with smooth crossfade transitions"""
     import soundfile as sf
     import numpy as np
@@ -134,8 +134,10 @@ def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_durati
             data = librosa.resample(data, orig_sr=sr, target_sr=sample_rate)
         audio_data_list.append(data)
     
-    # Calculate crossfade samples with minimum of 0.2 seconds
-    crossfade_samples = max(int(crossfade_duration * sample_rate), int(0.2 * sample_rate))
+    # Calculate crossfade samples - use smaller crossfade to preserve word boundaries
+    # Minimum 50ms, maximum 150ms to avoid cutting words
+    crossfade_samples = int(crossfade_duration * sample_rate)
+    crossfade_samples = max(int(0.05 * sample_rate), min(crossfade_samples, int(0.15 * sample_rate)))
     
     # Merge with smooth crossfade
     merged = audio_data_list[0].copy()
@@ -156,21 +158,22 @@ def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_durati
             merged[-crossfade_samples:] += next_audio[:crossfade_samples]
             merged = np.concatenate([merged, next_audio[crossfade_samples:]])
         else:
-            # If files too short for crossfade, use simple concatenation with small fade
-            if len(merged) > 100 and len(next_audio) > 100:
-                # Apply small fade at boundaries
-                fade_samples = min(100, len(merged) // 4, len(next_audio) // 4)
-                fade_out = np.linspace(1, 0.9, fade_samples)
-                fade_in = np.linspace(0.9, 1, fade_samples)
-                merged[-fade_samples:] *= fade_out
-                next_audio[:fade_samples] *= fade_in
+            # If files too short for crossfade, use simple concatenation with minimal fade
+            if len(merged) > 50 and len(next_audio) > 50:
+                # Apply very small fade at boundaries (just 50ms)
+                fade_samples = min(int(0.05 * sample_rate), len(merged) // 10, len(next_audio) // 10)
+                if fade_samples > 0:
+                    fade_out = np.linspace(1, 0.95, fade_samples)
+                    fade_in = np.linspace(0.95, 1, fade_samples)
+                    merged[-fade_samples:] *= fade_out
+                    next_audio[:fade_samples] *= fade_in
             merged = np.concatenate([merged, next_audio])
     
     # Normalize final audio with gentle compression to prevent clipping
     max_val = np.max(np.abs(merged))
     if max_val > 0:
-        # Use 0.9 instead of 0.95 to leave more headroom
-        merged = merged / max_val * 0.9
+        # Use 0.92 to leave good headroom
+        merged = merged / max_val * 0.92
     
     # Apply gentle high-pass filter to reduce clicks (optional)
     # This helps smooth out any remaining discontinuities
@@ -529,8 +532,8 @@ async def voice_clone(
                 
                 logger.info("All chunks synthesized, merging audio files")
                 
-                # Merge all chunks with smooth crossfade (0.2 seconds for natural transitions)
-                merge_audio_files(chunk_audio_paths, output_path, crossfade_duration=0.2)
+                # Merge all chunks with smooth crossfade (0.1 seconds for natural transitions without cutting words)
+                merge_audio_files(chunk_audio_paths, output_path, crossfade_duration=0.1)
                 
                 # Clean up chunk files
                 for chunk_path in chunk_audio_paths:
