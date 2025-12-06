@@ -122,9 +122,11 @@ export default function Dashboard() {
       });
       const job = res.data;
       console.log("Poll result:", job);
+      console.log("Job status:", job.status);
       setVoiceCloneJobStatus(job.status);
 
       if (job.status === "completed") {
+        console.log("Job completed, downloading...");
         setStatus("✅ Voice clone ready! Downloading...");
         await downloadVoiceCloneJob(jobId);
         fetchNotifications();
@@ -519,15 +521,21 @@ export default function Dashboard() {
                     <p className="text-xs text-slate-500 mt-1">We will notify you when the job completes.</p>
                   )}
                   {voiceCloneJobStatus === "completed" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadVoiceCloneJob(voiceCloneJobId)}
-                      className="mt-2"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
+                    <>
+                      <p className="text-xs text-slate-500 mt-1">Job completed successfully!</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          console.log("Download button clicked, jobId:", voiceCloneJobId);
+                          downloadVoiceCloneJob(voiceCloneJobId);
+                        }}
+                        className="mt-2"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Download
+                      </Button>
+                    </>
                   )}
                   {(voiceCloneJobStatus === "failed" || voiceCloneJobStatus === "timeout") && (
                     <Button
