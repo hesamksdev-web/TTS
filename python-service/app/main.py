@@ -122,9 +122,18 @@ class TrainRequest(BaseModel):
 async def _synthesize_to_path(engine: TTS, text: str, speaker_id: Optional[str], file_path: str, language: Optional[str] = None) -> None:
     def _run() -> None:
         try:
-            # XTTS v2 uses language parameter instead of speaker
+            # XTTS v2 uses language parameter and requires a speaker for multi-speaker models
             if language:
-                engine.tts_to_file(text=text, language=language, file_path=file_path)
+                # Get available speakers from the engine
+                speakers = getattr(engine, 'speakers', None)
+                if speakers:
+                    # Use first available speaker as default
+                    default_speaker = speakers[0] if isinstance(speakers, list) else next(iter(speakers)) if isinstance(speakers, dict) else None
+                    logger.info("Using default speaker '%s' for language '%s'", default_speaker, language)
+                    engine.tts_to_file(text=text, speaker=default_speaker, language=language, file_path=file_path)
+                else:
+                    # Fallback if no speakers available
+                    engine.tts_to_file(text=text, language=language, file_path=file_path)
             else:
                 engine.tts_to_file(text=text, speaker=speaker_id, file_path=file_path)
         except ValueError as err:
