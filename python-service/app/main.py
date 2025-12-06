@@ -36,6 +36,22 @@ from app.audio_patch import patch_torchaudio, patch_phoneme_dataset
 patch_torchaudio()
 patch_phoneme_dataset()
 
+# Patch torch.load to handle weights_only parameter for PyTorch 2.6+
+def patch_torch_load():
+    """Patch torch.load to disable weights_only for TTS model loading"""
+    import torch
+    original_load = torch.load
+    
+    def patched_load(f, map_location=None, pickle_module=None, **kwargs):
+        # If weights_only is not specified, set it to False for compatibility
+        if 'weights_only' not in kwargs:
+            kwargs['weights_only'] = False
+        return original_load(f, map_location=map_location, pickle_module=pickle_module, **kwargs)
+    
+    torch.load = patched_load
+
+patch_torch_load()
+
 from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from fastapi.concurrency import run_in_threadpool
