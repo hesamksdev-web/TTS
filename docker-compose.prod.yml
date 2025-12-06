@@ -62,7 +62,7 @@ services:
       postgres:
         condition: service_healthy
       python-service:
-        condition: service_started
+        condition: service_healthy
     networks:
       - tts-network
     restart: always
@@ -97,6 +97,12 @@ services:
     networks:
       - tts-network
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
     logging:
       driver: "json-file"
       options:
@@ -117,10 +123,17 @@ services:
       # For browser, Nginx will handle the routing
       NEXT_PUBLIC_API_URL: /api/v1
     depends_on:
-      - go-service
+      go-service:
+        condition: service_started
     networks:
       - tts-network
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -141,8 +154,10 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - frontend
-      - go-service
+      frontend:
+        condition: service_healthy
+      go-service:
+        condition: service_started
     networks:
       - tts-network
     restart: always

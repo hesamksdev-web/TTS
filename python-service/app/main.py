@@ -104,6 +104,35 @@ def get_tts_engine(model_name: str) -> TTS:
 
 app = FastAPI(title="Python TTS Service", version="0.1.0")
 
+# Track service readiness
+_service_ready = False
+_tts_engines_loaded = {}
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize TTS engines on startup"""
+    global _service_ready, _tts_engines_loaded
+    logger.info("Service starting up, pre-loading TTS engines...")
+    try:
+        for speaker_id, config in VOICE_CONFIGS.items():
+            logger.info("Pre-loading engine for %s", speaker_id)
+            engine = get_tts_engine(config["model_name"])
+            _tts_engines_loaded[speaker_id] = engine
+        _service_ready = True
+        logger.info("Service startup complete - all engines ready")
+    except Exception as e:
+        logger.error("Failed to pre-load engines: %s", e)
+        _service_ready = False
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Docker healthcheck and service readiness"""
+    if not _service_ready:
+        return {"status": "starting", "ready": False}
+    return {"status": "ready", "ready": True}
+
 
 class GenerateRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)

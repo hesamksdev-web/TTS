@@ -12,7 +12,8 @@ RUN apt-get update && \
     espeak-ng \
     cargo \
     rustc \
-    git && \
+    git \
+    curl && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
