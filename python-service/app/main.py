@@ -66,9 +66,52 @@ from app.train_job import prepare_training_config, run_training_job as launch_tr
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("tts_service")
 
-def split_text_into_chunks(text: str, max_chars: int = 240) -> List[str]:
-    """Split long text into chunks that respect sentence boundaries"""
-    sentences = text.replace('\r\n', '\n').split('.')
+def split_text_into_chunks(text: str, max_chars: int = 240, language: str = "en") -> List[str]:
+    """
+    Split long text into chunks that respect sentence and phrase boundaries.
+    
+    Handles multiple languages with proper punctuation detection:
+    - English/German: . ! ?
+    - Farsi/Persian: ۔ ؟ ! .
+    
+    Args:
+        text: Input text to split
+        max_chars: Maximum characters per chunk (XTTS v2 limit is 250)
+        language: Language code ('en', 'de', 'fa') for proper punctuation handling
+    
+    Returns:
+        List of text chunks, each under max_chars
+    """
+    # Normalize line endings
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+    
+    # Define sentence terminators by language
+    if language == "fa":
+        # Farsi uses ۔ as period, but also accepts . ? !
+        sentence_terminators = ['۔', '؟', '!', '.', '؍']
+        phrase_separators = ['،', ',']
+    elif language == "de":
+        sentence_terminators = ['.', '!', '?']
+        phrase_separators = [',', ';']
+    else:  # Default to English
+        sentence_terminators = ['.', '!', '?']
+        phrase_separators = [',', ';']
+    
+    # Split by sentence terminators first
+    sentences = [text]
+    for terminator in sentence_terminators:
+        new_sentences = []
+        for sent in sentences:
+            parts = sent.split(terminator)
+            for i, part in enumerate(parts[:-1]):
+                new_sentences.append(part + terminator)
+            if parts[-1]:  # Add the last part if not empty
+                new_sentences.append(parts[-1])
+        sentences = new_sentences
+    
+    # Clean up sentences
+    sentences = [s.strip() for s in sentences if s.strip()]
+    
     chunks = []
     current_chunk = ""
     
@@ -77,37 +120,78 @@ def split_text_into_chunks(text: str, max_chars: int = 240) -> List[str]:
         if not sentence:
             continue
         
-        sentence_with_period = sentence + "."
-        
-        # If single sentence exceeds limit, split by comma
-        if len(sentence_with_period) > max_chars:
-            parts = sentence.split(',')
-            for part in parts:
-                part = part.strip()
-                if not part:
-                    continue
-                part_with_comma = part + ","
-                if len(current_chunk) + len(part_with_comma) > max_chars:
-                    if current_chunk:
-                        chunks.append(current_chunk.rstrip(',').strip() + ".")
-                    current_chunk = part
-                else:
-                    current_chunk += (" " if current_chunk else "") + part
+        # If sentence fits in current chunk, add it
+        if len(current_chunk) + len(sentence) + 1 <= max_chars:
+            current_chunk += (" " if current_chunk else "") + sentence
+        # If sentence alone fits in a chunk, start new chunk
+        elif len(sentence) <= max_chars:
+            if current_chunk:
+                chunks.append(current_chunk)
+            current_chunk = sentence
+        # If sentence is too long, split by phrase separators
         else:
-            if len(current_chunk) + len(sentence_with_period) > max_chars:
-                if current_chunk:
-                    chunks.append(current_chunk.rstrip('.').strip() + ".")
-                current_chunk = sentence
-            else:
-                current_chunk += (" " if current_chunk else "") + sentence
+            if current_chunk:
+                chunks.append(current_chunk)
+                current_chunk = ""
+            
+            # Try to split long sentence by phrase separators
+            phrases = [sentence]
+            for separator in phrase_separators:
+                new_phrases = []
+                for phrase in phrases:
+                    parts = phrase.split(separator)
+                    for i, part in enumerate(parts[:-1]):
+                        new_phrases.append(part + separator)
+                    if parts[-1]:
+                        new_phrases.append(parts[-1])
+                phrases = new_phrases
+            
+            phrases = [p.strip() for p in phrases if p.strip()]
+            
+            # Add phrases to chunks
+            for phrase in phrases:
+                if len(current_chunk) + len(phrase) + 1 <= max_chars:
+                    current_chunk += (" " if current_chunk else "") + phrase
+                else:
+                    if current_chunk:
+                        chunks.append(current_chunk)
+                    # If phrase still too long, split by words
+                    if len(phrase) > max_chars:
+                        words = phrase.split()
+                        for word in words:
+                            if len(current_chunk) + len(word) + 1 <= max_chars:
+                                current_chunk += (" " if current_chunk else "") + word
+                            else:
+                                if current_chunk:
+                                    chunks.append(current_chunk)
+                                current_chunk = word
+                    else:
+                        current_chunk = phrase
     
+    # Add remaining chunk
     if current_chunk:
-        chunks.append(current_chunk.rstrip('.').strip() + ".")
+        chunks.append(current_chunk)
     
-    return [chunk.strip() for chunk in chunks if chunk.strip()]
+    # Ensure minimum chunk size (at least 10 characters to avoid very short segments)
+    # and filter empty chunks
+    result = [chunk.strip() for chunk in chunks if len(chunk.strip()) >= 10]
+    
+    # If we have no valid chunks, return the original text as single chunk
+    if not result:
+        return [text.strip()] if text.strip() else []
+    
+    return result
 
-def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_duration: float = 0.1):
-    """Merge multiple audio files with smooth crossfade transitions"""
+def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_duration: float = 0.3, silence_duration: float = 0.05):
+    """
+    Merge multiple audio files with smooth crossfade transitions and silence padding.
+    
+    Args:
+        audio_paths: List of audio file paths to merge
+        output_path: Output file path
+        crossfade_duration: Duration of crossfade between chunks in seconds (default 0.3s)
+        silence_duration: Duration of silence to add between chunks in seconds (default 0.05s)
+    """
     import soundfile as sf
     import numpy as np
     
@@ -134,17 +218,26 @@ def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_durati
             data = librosa.resample(data, orig_sr=sr, target_sr=sample_rate)
         audio_data_list.append(data)
     
-    # Calculate crossfade samples - use smaller crossfade to preserve word boundaries
-    # Minimum 50ms, maximum 150ms to avoid cutting words
+    # Calculate crossfade and silence samples
     crossfade_samples = int(crossfade_duration * sample_rate)
-    crossfade_samples = max(int(0.05 * sample_rate), min(crossfade_samples, int(0.15 * sample_rate)))
+    silence_samples = int(silence_duration * sample_rate)
     
-    # Merge with smooth crossfade
+    # Ensure crossfade is not too large (max 300ms to avoid cutting words)
+    crossfade_samples = max(int(0.1 * sample_rate), min(crossfade_samples, int(0.3 * sample_rate)))
+    
+    # Create silence padding
+    silence = np.zeros(silence_samples, dtype=np.float32)
+    
+    # Merge with smooth crossfade and silence padding
     merged = audio_data_list[0].copy()
     
     for i in range(1, len(audio_data_list)):
         next_audio = audio_data_list[i]
         
+        # Add silence between chunks for natural separation
+        merged = np.concatenate([merged, silence])
+        
+        # Apply crossfade if both chunks are long enough
         if len(merged) > crossfade_samples and len(next_audio) > crossfade_samples:
             # Create smooth crossfade using cosine curve (sounds more natural)
             fade_out = np.cos(np.linspace(0, np.pi / 2, crossfade_samples)) ** 2
@@ -188,8 +281,8 @@ def merge_audio_files(audio_paths: List[str], output_path: str, crossfade_durati
     
     # Save merged audio
     sf.write(output_path, merged, sample_rate)
-    logger.info("Audio files merged successfully: %d files merged with smooth crossfade (%.2f seconds)", 
-                len(audio_paths), crossfade_duration)
+    logger.info("Audio files merged successfully: %d files merged with %.2fs crossfade and %.2fs silence padding", 
+                len(audio_paths), crossfade_duration, silence_duration)
 
 DATA_ROOT = Path(os.getenv("DATA_ROOT", "/app/data"))
 TRAIN_OUTPUT_ROOT = Path(os.getenv("TRAIN_OUTPUT_ROOT", "/app/training_runs"))
@@ -510,9 +603,12 @@ async def voice_clone(
                 import soundfile as sf
                 import numpy as np
                 
-                # Split text into chunks if it's too long
-                text_chunks = split_text_into_chunks(text, max_chars=240)
-                logger.info("Text split into %d chunks for processing", len(text_chunks))
+                # Split text into chunks respecting language-specific punctuation
+                # XTTS v2 has a 250 character limit, we use 240 to be safe
+                text_chunks = split_text_into_chunks(text, max_chars=240, language=language)
+                logger.info("Text split into %d chunks for processing (language: %s)", len(text_chunks), language)
+                for idx, chunk in enumerate(text_chunks):
+                    logger.info("  Chunk %d: %d chars - %s", idx + 1, len(chunk), chunk[:60])
                 
                 chunk_audio_paths = []
                 
@@ -532,8 +628,9 @@ async def voice_clone(
                 
                 logger.info("All chunks synthesized, merging audio files")
                 
-                # Merge all chunks with smooth crossfade (0.1 seconds for natural transitions without cutting words)
-                merge_audio_files(chunk_audio_paths, output_path, crossfade_duration=0.1)
+                # Merge all chunks with smooth crossfade
+                # Use 0.3 seconds for better word boundary handling and natural transitions
+                merge_audio_files(chunk_audio_paths, output_path, crossfade_duration=0.3)
                 
                 # Clean up chunk files
                 for chunk_path in chunk_audio_paths:
