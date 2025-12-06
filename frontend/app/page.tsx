@@ -147,12 +147,9 @@ export default function Dashboard() {
         params: { job_id: jobId },
       });
       const job = res.data;
-      console.log("Poll result:", job);
-      console.log("Job status:", job.status);
       setVoiceCloneJobStatus(job.status);
 
       if (job.status === "completed") {
-        console.log("Job completed, downloading...");
         setStatus("✅ Voice clone ready! Downloading...");
         await downloadVoiceCloneJob(jobId);
         fetchNotifications();
@@ -160,7 +157,6 @@ export default function Dashboard() {
         setStatus(`❌ Voice cloning failed: ${job.error_message || "Unknown error"}`);
         toast.error(job.error_message || "Voice cloning failed");
       } else {
-        console.log(`Job ${jobId} still ${job.status}, polling again in ${delay}ms (elapsed: ${elapsedSeconds.toFixed(0)}s)`);
         jobPollTimeoutRef.current = setTimeout(() => pollVoiceCloneJob(jobId), delay);
       }
     } catch (error: any) {
@@ -579,32 +575,6 @@ export default function Dashboard() {
                       Clear
                     </Button>
                   )}
-                  {/* Debug button - remove in production */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={async () => {
-                      try {
-                        const res = await axios.post(
-                          `${API_BASE_URL}/voice-clone/job/test-complete`,
-                          {},
-                          {
-                            ...getHeaders(),
-                            params: { job_id: voiceCloneJobId },
-                          }
-                        );
-                        console.log("Test complete response:", res.data);
-                        setVoiceCloneJobStatus("completed");
-                        toast.success("Job marked as completed (test)");
-                      } catch (error: any) {
-                        console.error("Test complete error:", error);
-                        toast.error(getErrorMessage(error));
-                      }
-                    }}
-                    className="mt-2 text-xs"
-                  >
-                    [DEBUG] Test Complete
-                  </Button>
                 </div>
               )}
 

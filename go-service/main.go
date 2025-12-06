@@ -184,7 +184,6 @@ func main() {
 	mux.HandleFunc("/api/v1/voice-clone/jobs", authMiddleware(listVoiceCloneJobsHandler))
 	mux.HandleFunc("/api/v1/voice-clone/job", authMiddleware(getVoiceCloneJobHandler))
 	mux.HandleFunc("/api/v1/voice-clone/job/download", authMiddleware(downloadVoiceCloneJobHandler))
-	mux.HandleFunc("/api/v1/voice-clone/job/test-complete", authMiddleware(testCompleteVoiceCloneJobHandler))
 	mux.HandleFunc("/api/v1/notifications", authMiddleware(listNotificationsHandler))
 	mux.HandleFunc("/api/v1/notifications/read", authMiddleware(markNotificationsReadHandler))
 
@@ -904,74 +903,6 @@ func downloadVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "audio/wav")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"voice_clone_%d.wav\"", job.ID))
 	http.ServeFile(w, r, job.OutputPath)
-}
-
-func testCompleteVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
-
-	userID, err := getUserIDFromContext(r)
-	if err != nil {
-		writeError(w, http.StatusUnauthorized, "invalid user context")
-		return
-	}
-
-	jobIDStr := r.URL.Query().Get("job_id")
-	if jobIDStr == "" {
-		writeError(w, http.StatusBadRequest, "job_id is required")
-		return
-	}
-	jobID, err := strconv.ParseUint(jobIDStr, 10, 64)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid job_id")
-		return
-	}
-
-	var job VoiceCloneJob
-	if err := db.Where("id = ? AND user_id = ?", jobID, userID).First(&job).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			writeError(w, http.StatusNotFound, "job not found")
-			return
-		}
-		writeError(w, http.StatusInternalServerError, "failed to load job")
-		return
-	}
-
-	// Create a dummy output file for testing
-	jobDir := filepath.Join(os.TempDir(), "voice-clone-jobs", fmt.Sprintf("job-%d", job.ID))
-	outputPath := filepath.Join(jobDir, "output.wav")
-
-	if err := os.MkdirAll(filepath.Dir(outputPath), 0o755); err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to create output directory")
-		return
-	}
-
-	// Create a dummy WAV file
-	if err := os.WriteFile(outputPath, []byte("dummy wav data"), 0o644); err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to write output file")
-		return
-	}
-
-	// Update job status to completed
-	if err := db.Model(&VoiceCloneJob{}).Where("id = ?", job.ID).Updates(map[string]any{
-		"status":      jobStatusCompleted,
-		"output_path": outputPath,
-		"updated_at":  time.Now(),
-	}).Error; err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to update job status")
-		return
-	}
-
-	// Create notification
-	createNotification(job.UserID, job.ID, "Voice clone job completed (test)")
-
-	writeJSON(w, http.StatusOK, map[string]any{
-		"message": "Job marked as completed for testing",
-		"job_id":  job.ID,
-		"status":  jobStatusCompleted,
-	})
 }
 
 func listNotificationsHandler(w http.ResponseWriter, r *http.Request) {
