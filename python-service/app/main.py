@@ -575,7 +575,7 @@ async def voice_clone(
         await run_in_threadpool(_clone_voice)
         _schedule_cleanup(background_tasks, voice_sample_path)
         _schedule_cleanup(background_tasks, wav_sample_path)
-        _schedule_cleanup(background_tasks, output_path)
+        # Note: Do NOT cleanup output_path - it's stored in the database and served by Go service
         
         filename = f"voice_clone_{language}.wav"
         return FileResponse(path=output_path, media_type="audio/wav", filename=filename)
