@@ -536,7 +536,15 @@ export default function Dashboard() {
                     : voiceCloneJobStatus === "failed" || voiceCloneJobStatus === "timeout"
                     ? "bg-red-50 border-red-200 text-red-700"
                     : "bg-slate-50 border-slate-200 text-slate-700"
-                }`}>
+                }`}
+                style={{
+                  borderWidth: "2px",
+                  borderStyle: "solid"
+                }}>
+                {(() => {
+                  console.log("Job Status:", voiceCloneJobStatus, "Job ID:", voiceCloneJobId);
+                  return null;
+                })()}
                   <div className="flex items-center justify-between">
                     <span>Job ID: #{voiceCloneJobId}</span>
                     <span className="font-semibold">
