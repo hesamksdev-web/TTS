@@ -895,8 +895,26 @@ func listNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 	var unreadCount int64
 	db.Model(&Notification{}).Where("user_id = ? AND read = false", userID).Count(&unreadCount)
 
+	// Format notifications for JSON response
+	type NotificationResponse struct {
+		ID        uint      `json:"id"`
+		Message   string    `json:"message"`
+		Read      bool      `json:"read"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+
+	var formattedNotifications []NotificationResponse
+	for _, n := range notifications {
+		formattedNotifications = append(formattedNotifications, NotificationResponse{
+			ID:        n.ID,
+			Message:   n.Message,
+			Read:      n.Read,
+			CreatedAt: n.CreatedAt,
+		})
+	}
+
 	writeJSON(w, http.StatusOK, map[string]any{
-		"notifications": notifications,
+		"notifications": formattedNotifications,
 		"unread_count":  unreadCount,
 	})
 }

@@ -576,7 +576,7 @@ export default function Dashboard() {
                   >
                     <p className="text-sm text-slate-800">{notification.message}</p>
                     <p className="text-xs text-slate-400 mt-1">
-                      {new Date(notification.created_at).toLocaleString()}
+                      {notification.created_at ? new Date(notification.created_at).toLocaleString() : "Just now"}
                     </p>
                   </div>
                 ))
