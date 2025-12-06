@@ -179,19 +179,19 @@ setattr(tts_datasets, "tts_service_two_column", tts_service_two_column)
 
 VOICE_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
     "fa_standard": {
-        "model_name": os.getenv("TTS_MODEL_NAME_FA", "tts_models/fa/cv/vits"),
+        "model_name": os.getenv("TTS_MODEL_NAME_FA", "tts_models/multilingual/multi-dataset/xtts_v2"),
         "speaker": os.getenv("TTS_SPEAKER_ID_FA") or None,
-        "language": None,
+        "language": "fa",
     },
     "de_standard": {
-        "model_name": os.getenv("TTS_MODEL_NAME_DE", "tts_models/de/thorsten/tacotron2-DCA"),
+        "model_name": os.getenv("TTS_MODEL_NAME_DE", "tts_models/multilingual/multi-dataset/xtts_v2"),
         "speaker": os.getenv("TTS_SPEAKER_ID_DE") or None,
-        "language": None,
+        "language": "de",
     },
     "en_standard": {
-        "model_name": os.getenv("TTS_MODEL_NAME_EN", "tts_models/en/ljspeech/tacotron2-DDC"),
+        "model_name": os.getenv("TTS_MODEL_NAME_EN", "tts_models/multilingual/multi-dataset/xtts_v2"),
         "speaker": os.getenv("TTS_SPEAKER_ID_EN") or None,
-        "language": None,
+        "language": "en",
     },
 }
 
