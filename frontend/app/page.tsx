@@ -25,9 +25,6 @@ export default function Dashboard() {
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
 
-  const [datasetName, setDatasetName] = useState("my_dataset");
-  const [transcript, setTranscript] = useState("");
-  const [audioFile, setAudioFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
   const [textToSpeak, setTextToSpeak] = useState("Hello, this is a test of the voice synthesis system.");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -42,8 +39,6 @@ export default function Dashboard() {
   const [voiceCloneLanguage, setVoiceCloneLanguage] = useState("fa");
   const [voiceCloneText, setVoiceCloneText] = useState("سلام، این یک نمونه از صدای شما است.");
   const [voiceCloneSpeed, setVoiceCloneSpeed] = useState(1.0);
-  const [voiceCloneEmotion, setVoiceCloneEmotion] = useState("neutral");
-  const [voiceCloneModelType, setVoiceCloneModelType] = useState("xtts_v2");
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
 
   const speakers = [
@@ -86,58 +81,6 @@ export default function Dashboard() {
   const getHeaders = () => ({
     headers: { Authorization: `Bearer ${token}` },
   });
-
-  const handleUpload = async () => {
-    if (!audioFile || !transcript) {
-      toast.error("Please select audio file and enter transcript");
-      return;
-    }
-
-    setLoading(true);
-    setStatus("Uploading dataset...");
-
-    const formData = new FormData();
-    formData.append("dataset_name", datasetName);
-    formData.append("transcript", transcript);
-    formData.append("audio", audioFile);
-
-    try {
-      await axios.post(`${API_BASE_URL}/dataset/upload`, formData, getHeaders());
-      setStatus("✅ Dataset uploaded successfully");
-      toast.success("Dataset uploaded!");
-      setAudioFile(null);
-      setTranscript("");
-    } catch (error: any) {
-      setStatus("❌ Upload failed");
-      toast.error(getErrorMessage(error));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTrain = async () => {
-    setLoading(true);
-    setStatus("⏳ Training model...");
-
-    try {
-      await axios.post(
-        `${API_BASE_URL}/finetune/start`,
-        {
-          dataset_name: datasetName,
-          epochs: 1,
-          batch_size: 2,
-        },
-        getHeaders()
-      );
-      setStatus("✅ Training completed!");
-      toast.success("Model trained successfully!");
-    } catch (error: any) {
-      setStatus("❌ Training failed");
-      toast.error(getErrorMessage(error));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSynthesize = async () => {
     setLoading(true);
@@ -193,8 +136,6 @@ export default function Dashboard() {
       formData.append("text", voiceCloneText);
       formData.append("language", voiceCloneLanguage);
       formData.append("speed", voiceCloneSpeed.toString());
-      formData.append("emotion", voiceCloneEmotion);
-      formData.append("model_type", voiceCloneModelType);
 
       const res = await axios.post(`${API_BASE_URL}/voice-clone`, formData, {
         ...getHeaders(),
@@ -265,78 +206,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Train Section */}
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="border-b border-slate-200 bg-slate-50">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Upload className="w-5 h-5 text-blue-600" />
-                Train Voice
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Dataset Name
-                </label>
-                <Input
-                  placeholder="my_dataset"
-                  value={datasetName}
-                  onChange={(e) => setDatasetName(e.target.value)}
-                  className="border-slate-200"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Transcript
-                </label>
-                <Input
-                  placeholder="What is said in the audio"
-                  value={transcript}
-                  onChange={(e) => setTranscript(e.target.value)}
-                  className="border-slate-200"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Audio File
-                </label>
-                <Input
-                  type="file"
-                  accept="audio/*"
-                  onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
-                  className="border-slate-200"
-                />
-                {audioFile && (
-                  <p className="text-xs text-slate-500 mt-2">
-                    Selected: {audioFile.name}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={handleUpload}
-                  disabled={loading}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Upload
-                </Button>
-                <Button
-                  onClick={handleTrain}
-                  disabled={loading}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
-                  <Zap className="w-4 h-4 mr-2" />
-                  Train
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
+        <div className="grid grid-cols-1 gap-8">
           {/* Synthesize Section */}
           <Card className="border-0 shadow-sm">
             <CardHeader className="border-b border-slate-200 bg-slate-50">
@@ -466,34 +336,19 @@ export default function Dashboard() {
                 💡 Select a language and enter text to synthesize speech in that language
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Language
-                  </label>
-                  <select
-                    value={voiceCloneLanguage}
-                    onChange={(e) => setVoiceCloneLanguage(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    <option value="fa">🇮🇷 Persian (Farsi)</option>
-                    <option value="en">🇬🇧 English</option>
-                    <option value="de">🇩🇪 German</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Model Type
-                  </label>
-                  <select
-                    value={voiceCloneModelType}
-                    onChange={(e) => setVoiceCloneModelType(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    <option value="xtts_v2">🌟 XTTS v2 (Best Quality)</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Language
+                </label>
+                <select
+                  value={voiceCloneLanguage}
+                  onChange={(e) => setVoiceCloneLanguage(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  <option value="fa">🇮🇷 Persian (Farsi)</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="de">🇩🇪 German</option>
+                </select>
               </div>
 
               <div>
@@ -527,22 +382,6 @@ export default function Dashboard() {
                   className="w-full"
                 />
                 <p className="text-xs text-slate-500 mt-1">0.5 (slow) to 2.0 (fast)</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Emotion/Style
-                </label>
-                <select
-                  value={voiceCloneEmotion}
-                  onChange={(e) => setVoiceCloneEmotion(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                >
-                  <option value="neutral">😐 Neutral</option>
-                  <option value="happy">😊 Happy</option>
-                  <option value="sad">😢 Sad</option>
-                  <option value="angry">😠 Angry</option>
-                </select>
               </div>
 
               <div>
