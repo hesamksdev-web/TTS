@@ -823,7 +823,38 @@ func getVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, job)
+	// Format response with proper JSON tags
+	type JobResponse struct {
+		ID           uint      `json:"id"`
+		Status       string    `json:"status"`
+		Text         string    `json:"text"`
+		Language     string    `json:"language"`
+		Speed        float64   `json:"speed"`
+		Emotion      string    `json:"emotion"`
+		ModelType    string    `json:"model_type"`
+		InputPath    string    `json:"input_path"`
+		OutputPath   string    `json:"output_path"`
+		ErrorMessage string    `json:"error_message"`
+		CreatedAt    time.Time `json:"created_at"`
+		UpdatedAt    time.Time `json:"updated_at"`
+	}
+
+	response := JobResponse{
+		ID:           job.ID,
+		Status:       job.Status,
+		Text:         job.Text,
+		Language:     job.Language,
+		Speed:        job.Speed,
+		Emotion:      job.Emotion,
+		ModelType:    job.ModelType,
+		InputPath:    job.InputPath,
+		OutputPath:   job.OutputPath,
+		ErrorMessage: job.ErrorMessage,
+		CreatedAt:    job.CreatedAt,
+		UpdatedAt:    job.UpdatedAt,
+	}
+
+	writeJSON(w, http.StatusOK, response)
 }
 
 func downloadVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
