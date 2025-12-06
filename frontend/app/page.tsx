@@ -1,65 +1,3 @@
-  const pollVoiceCloneJob = async (jobId: number, delay = 5000) => {
-    if (!jobId || !token) return;
-
-    try {
-      const res = await axios.get(`${API_BASE_URL}/voice-clone/job`, {
-        ...getHeaders(),
-        params: { job_id: jobId },
-      });
-      const job = res.data;
-      setVoiceCloneJobStatus(job.status);
-
-      if (job.status === "completed") {
-        setStatus("✅ Voice clone ready! Downloading...");
-        await downloadVoiceCloneJob(jobId);
-        fetchNotifications();
-      } else if (job.status === "failed") {
-        setStatus(`❌ Voice cloning failed: ${job.error_message || "Unknown error"}`);
-        toast.error(job.error_message || "Voice cloning failed");
-      } else {
-        jobPollTimeoutRef.current = setTimeout(() => pollVoiceCloneJob(jobId), delay);
-      }
-    } catch (error: any) {
-      toast.error(getErrorMessage(error));
-    }
-  };
-
-  const downloadVoiceCloneJob = async (jobId: number) => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/voice-clone/job/download`, {
-        ...getHeaders(),
-        params: { job_id: jobId },
-        responseType: "blob",
-      });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      setClonedAudioUrl(url);
-      setStatus("✅ Voice clone ready!");
-      toast.success("Voice clone ready!");
-    } catch (error: any) {
-      toast.error(getErrorMessage(error));
-    }
-  };
-
-  const fetchNotifications = async () => {
-    if (!token) return;
-    try {
-      const res = await axios.get(`${API_BASE_URL}/notifications`, getHeaders());
-      setNotifications(res.data.notifications || []);
-      setUnreadNotifications(res.data.unread_count || 0);
-    } catch (error) {
-      console.error("Failed to fetch notifications", error);
-    }
-  };
-
-  const markNotificationsRead = async () => {
-    try {
-      await axios.post(`${API_BASE_URL}/notifications/read`, {}, getHeaders());
-      fetchNotifications();
-    } catch (error) {
-      console.error("Failed to mark notifications read", error);
-    }
-  };
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -163,6 +101,68 @@ export default function Dashboard() {
   const getHeaders = () => ({
     headers: { Authorization: `Bearer ${token}` },
   });
+
+  const pollVoiceCloneJob = async (jobId: number, delay = 5000) => {
+    if (!jobId || !token) return;
+
+    try {
+      const res = await axios.get(`${API_BASE_URL}/voice-clone/job`, {
+        ...getHeaders(),
+        params: { job_id: jobId },
+      });
+      const job = res.data;
+      setVoiceCloneJobStatus(job.status);
+
+      if (job.status === "completed") {
+        setStatus("✅ Voice clone ready! Downloading...");
+        await downloadVoiceCloneJob(jobId);
+        fetchNotifications();
+      } else if (job.status === "failed") {
+        setStatus(`❌ Voice cloning failed: ${job.error_message || "Unknown error"}`);
+        toast.error(job.error_message || "Voice cloning failed");
+      } else {
+        jobPollTimeoutRef.current = setTimeout(() => pollVoiceCloneJob(jobId), delay);
+      }
+    } catch (error: any) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const downloadVoiceCloneJob = async (jobId: number) => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/voice-clone/job/download`, {
+        ...getHeaders(),
+        params: { job_id: jobId },
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      setClonedAudioUrl(url);
+      setStatus("✅ Voice clone ready!");
+      toast.success("Voice clone ready!");
+    } catch (error: any) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const fetchNotifications = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get(`${API_BASE_URL}/notifications`, getHeaders());
+      setNotifications(res.data.notifications || []);
+      setUnreadNotifications(res.data.unread_count || 0);
+    } catch (error) {
+      console.error("Failed to fetch notifications", error);
+    }
+  };
+
+  const markNotificationsRead = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/notifications/read`, {}, getHeaders());
+      fetchNotifications();
+    } catch (error) {
+      console.error("Failed to mark notifications read", error);
+    }
+  };
 
   const handleSynthesize = async () => {
     setLoading(true);
