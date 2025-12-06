@@ -857,6 +857,14 @@ func getVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, response)
 }
 
+func getFileSize(path string) int64 {
+	info, err := os.Stat(path)
+	if err != nil {
+		return 0
+	}
+	return info.Size()
+}
+
 func downloadVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -896,10 +904,12 @@ func downloadVoiceCloneJobHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err := os.Stat(job.OutputPath); err != nil {
+		log.Printf("Output file not found at: %s (error: %v)", job.OutputPath, err)
 		writeError(w, http.StatusInternalServerError, "output file not found")
 		return
 	}
 
+	log.Printf("Serving voice clone file: %s (job_id: %d, size: %d bytes)", job.OutputPath, job.ID, getFileSize(job.OutputPath))
 	w.Header().Set("Content-Type", "audio/wav")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"voice_clone_%d.wav\"", job.ID))
 	http.ServeFile(w, r, job.OutputPath)

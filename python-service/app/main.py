@@ -561,7 +561,13 @@ async def voice_clone(
                     sf.write(output_path, wav_data, sr)
                     logger.info("Audio normalized")
                 
-                logger.info("Voice synthesis succeeded with speaker_wav and chunk merging")
+                # Verify output file exists and has content
+                if os.path.exists(output_path):
+                    file_size = os.path.getsize(output_path)
+                    logger.info("Voice synthesis succeeded - output file created: %s (size: %d bytes)", output_path, file_size)
+                else:
+                    logger.error("Voice synthesis failed - output file not created at: %s", output_path)
+                    raise Exception(f"Output file not created at {output_path}")
             except Exception as err:
                 logger.exception("Voice synthesis failed with speaker_wav: %s", err)
                 raise HTTPException(status_code=500, detail=f"Voice cloning failed: {str(err)}") from err
