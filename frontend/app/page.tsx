@@ -583,13 +583,27 @@ export default function Dashboard() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => {
-                      console.log("Debug: Current status is", voiceCloneJobStatus);
-                      setVoiceCloneJobStatus("completed");
+                    onClick={async () => {
+                      try {
+                        const res = await axios.post(
+                          `${API_BASE_URL}/voice-clone/job/test-complete`,
+                          {},
+                          {
+                            ...getHeaders(),
+                            params: { job_id: voiceCloneJobId },
+                          }
+                        );
+                        console.log("Test complete response:", res.data);
+                        setVoiceCloneJobStatus("completed");
+                        toast.success("Job marked as completed (test)");
+                      } catch (error: any) {
+                        console.error("Test complete error:", error);
+                        toast.error(getErrorMessage(error));
+                      }
                     }}
                     className="mt-2 text-xs"
                   >
-                    [DEBUG] Mark Completed
+                    [DEBUG] Test Complete
                   </Button>
                 </div>
               )}
