@@ -165,6 +165,19 @@ export default function Dashboard() {
     }
   };
 
+  const extractFilename = (disposition?: string | null) => {
+    if (!disposition) return null;
+    const filenameMatch = disposition.match(/filename\*?=(?:UTF-8'')?["']?([^\"';]+)/i);
+    if (filenameMatch && filenameMatch[1]) {
+      try {
+        return decodeURIComponent(filenameMatch[1]);
+      } catch {
+        return filenameMatch[1];
+      }
+    }
+    return null;
+  };
+
   const downloadVoiceCloneJob = async (jobId: number) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/voice-clone/job/download`, {
@@ -172,10 +185,22 @@ export default function Dashboard() {
         params: { job_id: jobId },
         responseType: "blob",
       });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const blob = res.data instanceof Blob ? res.data : new Blob([res.data], { type: "audio/wav" });
+      const url = window.URL.createObjectURL(blob);
       setClonedAudioUrl(url);
-      setStatus("✅ Voice clone ready!");
-      toast.success("Voice clone ready!");
+
+      const filenameFromHeader = extractFilename(res.headers["content-disposition"]);
+      const downloadName = filenameFromHeader || `voice_clone_${jobId}.wav`;
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = downloadName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setStatus("✅ Voice clone ready! Audio downloaded.");
+      toast.success(`Voice clone downloaded as ${downloadName}`);
     } catch (error: any) {
       toast.error(getErrorMessage(error));
     }
