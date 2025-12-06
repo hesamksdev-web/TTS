@@ -111,6 +111,7 @@ export default function Dashboard() {
         params: { job_id: jobId },
       });
       const job = res.data;
+      console.log("Poll result:", job);
       setVoiceCloneJobStatus(job.status);
 
       if (job.status === "completed") {
@@ -121,9 +122,11 @@ export default function Dashboard() {
         setStatus(`❌ Voice cloning failed: ${job.error_message || "Unknown error"}`);
         toast.error(job.error_message || "Voice cloning failed");
       } else {
+        console.log(`Job ${jobId} still ${job.status}, polling again in ${delay}ms`);
         jobPollTimeoutRef.current = setTimeout(() => pollVoiceCloneJob(jobId), delay);
       }
     } catch (error: any) {
+      console.error("Poll error:", error);
       toast.error(getErrorMessage(error));
     }
   };
