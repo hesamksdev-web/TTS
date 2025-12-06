@@ -3,6 +3,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+RUN apk add --no-cache curl
+
 # Copy package files
 COPY package*.json ./
 
@@ -19,6 +21,8 @@ RUN npm run build
 FROM node:20-alpine
 
 WORKDIR /app
+
+RUN apk add --no-cache curl
 
 # Install production dependencies only
 COPY package*.json ./
